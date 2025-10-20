@@ -1,7 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[..\\..\\2025\\ZZZUI\\2025mobile\\2025mobile.eez-project]:/userPages/0",
-    "selectedActionObject": "[..\\..\\2025\\ZZZUI\\2025mobile\\2025mobile.eez-project]:/actions/0",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/5",
     "subnavigationSelectedItems": {}
   },
   "layoutModel": {
@@ -22,7 +21,6 @@
           },
           {
             "type": "border",
-            "selected": 2,
             "size": 289.5,
             "location": "right",
             "children": [
@@ -123,7 +121,7 @@
                 {
                   "type": "tabset",
                   "id": "#20d204f2-bdde-46f3-a5d4-70bb6c608c21",
-                  "weight": 22.342356719119167,
+                  "weight": 12.80104145714379,
                   "selected": 1,
                   "enableClose": false,
                   "children": [
@@ -156,7 +154,7 @@
                 {
                   "type": "tabset",
                   "id": "#361be082-dd9d-4f88-9e68-f69a7895f328",
-                  "weight": 28.264427174789304,
+                  "weight": 37.80574243676465,
                   "children": [
                     {
                       "type": "tab",
@@ -188,29 +186,17 @@
             {
               "type": "tabset",
               "id": "EDITORS",
-              "weight": 42.35240389599875,
+              "weight": 39.71725248731073,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
                 {
                   "type": "tab",
-                  "id": "#9e7b3fb8-4058-4bd2-ac89-2bf0f7717e93",
-                  "name": "Settings",
+                  "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
+                  "name": "loginScreen",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[..\\..\\2025\\ZZZUI\\2025mobile\\2025mobile.eez-project]:/settings",
-                    "subObjectPath": "[..\\..\\2025\\ZZZUI\\2025mobile\\2025mobile.eez-project]:/settings",
-                    "permanent": false
-                  },
-                  "icon": "material:settings"
-                },
-                {
-                  "type": "tab",
-                  "id": "#3aa82d90-906b-4bad-b584-25977620439e",
-                  "name": "Main",
-                  "component": "editor",
-                  "config": {
-                    "objectPath": "[..\\..\\2025\\ZZZUI\\2025mobile\\2025mobile.eez-project]:/userPages/0",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/5",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -221,7 +207,7 @@
             {
               "type": "tabset",
               "id": "#cdf4dea9-5043-49e7-8ec6-80f7c45964f4",
-              "weight": 21.388199520337523,
+              "weight": 24.02335092902554,
               "children": [
                 {
                   "type": "tab",
@@ -1254,6 +1240,46 @@
         "secondToPx": 200,
         "scrollLeft": 0
       }
+    },
+    "[TheBrickUI.eez-project]:/userPages/0[flow-state]": {
+      "selection": {},
+      "transform": {
+        "translate": {
+          "x": -333,
+          "y": -223
+        },
+        "scale": 0.8
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[TheBrickUI.eez-project]:/userPages/5[flow-state]": {
+      "selection": {
+        "0": {
+          "1": {},
+          "3": {},
+          "5": {
+            "$selected": true
+          }
+        }
+      },
+      "transform": {
+        "translate": {
+          "x": -304.7287121212121,
+          "y": -191.70689393939398
+        },
+        "scale": 0.67
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
     }
   },
   "activeOutputSection": 0,
@@ -1277,6 +1303,6 @@
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
-  "flowZoom": 0.8,
+  "flowZoom": 0.67,
   "implementationLanguage": "C++"
 }
