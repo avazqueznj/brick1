@@ -40,7 +40,6 @@ public:
     };
 
     virtual void handleScreenEvents( lv_event_t* e ){
-        Serial.println("Screen class: handle event not overriden");  
     }
 
     virtual void rfidEvent( byte *uid, byte length ){
@@ -203,7 +202,7 @@ public:
 
         // get the focused thing
         lv_obj_t* focused = lv_group_get_focused(inputGroup);
-        Serial.print( "Screen Base: Key Handler: " );            
+        Serial.print( "*** *** Screen Base: Key Handler: " );            
         Serial.println( key );            
 
         // list scrolling
@@ -294,7 +293,7 @@ public:
 
       try{
 
-        Serial.print("State:Touch");
+        Serial.print("*** Screen event:");
         lv_obj_t *target = lv_event_get_target(e);  // The object that triggered the event
 
         // windows
@@ -313,7 +312,7 @@ public:
   void keyboardEvent( String key ){
     try{
 
-      Serial.print("State->Key event:");
+      Serial.print("*** Key event:");
       Serial.println(key);
 
       // are we in system modal ? ignore
@@ -387,6 +386,8 @@ extern "C" void action_main_event_dispatcher(lv_event_t *e) {
 }
 
 //-------------------------------------------------
+
+
 
 
 #endif

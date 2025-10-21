@@ -21,12 +21,13 @@
 #include "Arduino_GigaDisplayTouch.h"
 #include "src/ui.h"
 
-#include "util.hpp"
-#include "state.hpp"
-
 #include <SPI.h>
 #include <MFRC522.h>
 #include "RTClib.h"
+
+#include "util.hpp"
+#include "state.hpp"
+#include "loginScreen.hpp"
 
 // RFID Pins
 #define SS_PIN 10  // SDA pin on RC522
@@ -181,11 +182,8 @@ void setup() {
   Serial.println("Start screens  ...");
   create_screens();           
 
-/*
-  stateManager = new stateClass();  
+  stateManager = new stateManagerClass();  
   stateManager->openScreen(new loginScreenClass());
-domain manager will go here
-*/
 
   Serial.println("Started !!!!");
 }
@@ -208,8 +206,8 @@ void loop() {
 
   // general delay  - render
   delayBlink();  // 50MSEC *********************
-  //lv_timer_handler(); 
-  //ui_tick();   
+  lv_timer_handler(); 
+  ui_tick();   
   
 
   memStatReportInterval++;
@@ -239,8 +237,7 @@ void loop() {
         Serial.println();
         mfrc522->PICC_HaltA();
         mfrc522->PCD_StopCrypto1();
-
-       // stateManager->rfidEvent(currentCardUID, currentCardLength);
+        stateManager->rfidEvent(currentCardUID, currentCardLength);
       }
     }
 
@@ -257,7 +254,7 @@ void loop() {
               now.minute(),
               now.second());
       String time = String(buffer);
-      //stateManager->clockTic(time); // make copy
+      stateManager->clockTic(time); // make copy
     }
 
     //---------------------------------------------------------
@@ -270,9 +267,7 @@ void loop() {
           unsigned long now = millis();
           if (now - lastPressTime > DEBOUNCE_MS) {
             char key = hexaKeys[row][col];
-
-            //stateManager->keyboardEvent(String(key));
-
+            stateManager->keyboardEvent(String(key));
             lastPressTime = now;
           }
         }
