@@ -22,7 +22,7 @@
 #include "src/ui.h"
 
 #include "util.hpp"
-//#include "state.hpp"
+#include "state.hpp"
 
 #include <SPI.h>
 #include <MFRC522.h>
@@ -32,20 +32,12 @@
 #define SS_PIN 10  // SDA pin on RC522
 #define RST_PIN 9  // Back to D9 for RST
 
-
-
-// LVGL pool guard (global)
-static void* lvgl_sdram_pool = nullptr;
-extern "C" void* lvgl_get_sdram_pool() {
-  return lvgl_sdram_pool;  // Return whatever we reserved at setup
-}
-
 // managers
 Arduino_H7_Video* Display = nullptr;
 Arduino_GigaDisplayTouch* TouchDetector = nullptr;
 RTC_DS3231* rtc = nullptr;
 MFRC522* mfrc522 = nullptr;
-//stateClass* stateManager = nullptr;  
+stateManagerClass* stateManager = nullptr;  
 
 // Misc
 bool rtcUp = false;
@@ -69,6 +61,27 @@ unsigned long lastPressTime = 0;
 
 
 //=================================================================================
+
+
+// LVGL pool guard (global)
+static void* lvgl_sdram_pool = nullptr;
+extern "C" void* lvgl_get_sdram_pool() {
+  return lvgl_sdram_pool;  // Return whatever we reserved at setup
+}
+
+void getInternalHeapFreeBytes() {
+  mbed_stats_heap_t heap_stats;
+  mbed_stats_heap_get(&heap_stats);    
+  const int total_internal_ram = 491520;  
+  int heap_used = heap_stats.current_size;
+  int heap_free = total_internal_ram - heap_used;
+  if (heap_free < 0) heap_free = 0;
+  Serial.print( "Heap free: " );
+  Serial.print( heap_free );
+  Serial.print( "   LVGL pool at 0x") ;
+  Serial.println((uintptr_t)lvgl_sdram_pool, HEX);  
+}
+
 
 void setup() {
 
@@ -108,7 +121,6 @@ void setup() {
     Serial.println("SDRAM.malloc failed, retrying...");
     delay(100);
   }
-
   if (!lvgl_sdram_pool) {
     Serial.println("SDRAM.malloc failed after retries! HALT.");
     sosBlink();
@@ -178,26 +190,11 @@ domain manager will go here
   Serial.println("Started !!!!");
 }
 
-// -----------------------------
-
-void getInternalHeapFreeBytes() {
-  mbed_stats_heap_t heap_stats;
-  mbed_stats_heap_get(&heap_stats);    
-  const int total_internal_ram = 491520;  
-  int heap_used = heap_stats.current_size;
-  int heap_free = total_internal_ram - heap_used;
-  if (heap_free < 0) heap_free = 0;
-  Serial.print( "Heap free: " );
-  Serial.print( heap_free );
-  Serial.print( "   LVGL pool at 0x") ;
-  Serial.println((uintptr_t)lvgl_sdram_pool, HEX);  
-}
-
 
 // -----------------------------
 
 
-byte currentCardUID[10];
+byte currentCardUID[20];
 byte currentCardLength = 0;
 int slowPollInterval = 0;
 int memStatReportInterval = 0;
@@ -211,23 +208,18 @@ void loop() {
 
   // general delay  - render
   delayBlink();  // 50MSEC *********************
-
-
-  return;
-
-  lv_timer_handler(); 
-  ui_tick();   
+  //lv_timer_handler(); 
+  //ui_tick();   
   
 
-  memStatReportInterval += 1;
+  memStatReportInterval++;
   if (memStatReportInterval == ( 20 + 20 + 20 ) ) {  // 3 sec 
     getInternalHeapFreeBytes();
     memStatReportInterval = 0;   
   }
 
-  slowPollInterval += 1;
+  slowPollInterval++;
   if (slowPollInterval ==  2 ) { // x main delay = 100msec
-
     slowPollInterval = 0;   
 
     //---------------------------------------------------------
@@ -235,17 +227,16 @@ void loop() {
     if (mfrc522 && mfrc522->PICC_IsNewCardPresent()) {
       if (mfrc522->PICC_ReadCardSerial()) {
         currentCardLength = mfrc522->uid.size;
+        if (currentCardLength > sizeof(currentCardUID)) currentCardLength = sizeof(currentCardUID);        
         for (byte i = 0; i < currentCardLength; i++) {
           currentCardUID[i] = mfrc522->uid.uidByte[i];
         }
-
         Serial.print("Card UID:");
         for (byte i = 0; i < currentCardLength; i++) {
           Serial.print(":");
           Serial.print(currentCardUID[i]);
         }
         Serial.println();
-
         mfrc522->PICC_HaltA();
         mfrc522->PCD_StopCrypto1();
 
@@ -257,8 +248,8 @@ void loop() {
     // rtc
     if (rtcUp && rtc) {
       DateTime now = rtc->now();
-      char buffer[20];
-      sprintf(buffer, "%04d-%02d-%02d %02d:%02d:%02d",
+      char buffer[30];
+      snprintf(buffer, sizeof( buffer ), "%04d-%02d-%02d %02d:%02d:%02d",
               now.year(),
               now.month(),
               now.day(),
@@ -266,7 +257,7 @@ void loop() {
               now.minute(),
               now.second());
       String time = String(buffer);
-      //stateManager->clockTic(time); 
+      //stateManager->clockTic(time); // make copy
     }
 
     //---------------------------------------------------------
@@ -288,28 +279,10 @@ void loop() {
       }
 
       digitalWrite(rowPins[row], LOW);
-    }
-
-    //-----------------------------------------------
-
-
-
-    
+    }    
   }
 
+} // loop
 
 
-} //<< END
-
-
-//------------------------------------------------------
-
-
-#include "src/actions.h"
-extern "C" void action_main_event_dispatcher(lv_event_t *e) {
-  if ( (lv_event_get_code(e) != LV_EVENT_PRESSED) && (lv_event_get_code(e) != LV_EVENT_CLICKED)   )return;    
-  
-}
-
-//------------------------------------------------------
 
