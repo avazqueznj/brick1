@@ -66,11 +66,10 @@ public:
             throw std::runtime_error("Fatal WL_NO_SHIELD" );
         }
 
-        // always re try
-        // if( connState == CONNECTED ){
-        //     Serial.println( "Attempt connect when connection is CONNECTED, ignoring ..." );
-        //     return;
-        // }            
+        if( WiFi.status() == WL_CONNECTED ){ 
+            Serial.println("WIFI connect.... CONNECTED");  
+            return;
+        }
 
         Serial.println("Attempting to connect to SSID: ");
         Serial.println( ssid.c_str() );
@@ -146,7 +145,7 @@ public:
         while (true) {            
 
             if( !client.connected() ){
-                throw std::runtime_error( "Connection to server lost!!" );
+                client.println( "Server closed the connection" );
                 break;
             }
 

@@ -26,6 +26,8 @@ public:
 
         screenClass::handleEvents( e, key );
         
+        lv_obj_t *target = lv_event_get_target(e);
+
         // add numeric input to focused text areas
         if( key != "A" && key != "B" && key != "C" && key != "D" && key != "*" && key != "#"  ){
             lv_obj_t* focused = lv_group_get_focused(inputGroup);
@@ -52,6 +54,12 @@ public:
                 }
             }
         }  
+
+
+        if( target == objects.do_sync_2 ){
+
+            domainManagerClass::getInstance()->sync();
+        }
 
     }
 
