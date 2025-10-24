@@ -188,6 +188,13 @@ void setup() {
   stateManager = new stateManagerClass();  
   stateManager->openScreen(new loginScreenClass());
 
+  try{
+      domainManagerClass::getInstance()->loadConfigFromKVStore();
+  }catch( const std::runtime_error& error ){
+      Serial.println( error.what() );            
+  }  
+
+
   Serial.println("Started !!!!");
 }
 
