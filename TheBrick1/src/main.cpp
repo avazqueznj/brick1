@@ -26,6 +26,9 @@
 #include "RTClib.h"
 
 #include "util.hpp"
+
+#include "comms.hpp"
+#include "domain.hpp"
 #include "state.hpp"
 #include "loginScreen.hpp"
 
