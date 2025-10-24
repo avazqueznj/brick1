@@ -35,17 +35,6 @@ public:
     String ssid = "irazu2G";
     String pass = "casiocasio";
 
-    // hot spot
-    //String ssid = "irazu5g";
-    //String pass = "Casiopea4";
-
-
-    enum connectionState{
-        NOT_CONNECTED,
-        CONNECTED
-    };
-    connectionState connState = NOT_CONNECTED;
-
 
 
     commsClass(){
@@ -77,10 +66,11 @@ public:
             throw std::runtime_error("Fatal WL_NO_SHIELD" );
         }
 
-        if( connState == CONNECTED ){
-            Serial.println( "Attempt connect when connection is CONNECTED, ignoring ..." );
-            return;
-        }            
+        // always re try
+        // if( connState == CONNECTED ){
+        //     Serial.println( "Attempt connect when connection is CONNECTED, ignoring ..." );
+        //     return;
+        // }            
 
         Serial.println("Attempting to connect to SSID: ");
         Serial.println( ssid.c_str() );
@@ -105,16 +95,13 @@ public:
         {
             Serial.println("Connected !!");             
             printWifiStatus();
-            connState = CONNECTED;
         }        
     }
 
 
     WiFiClient& connectToServer( String serverURL ){
 
-        if( connState != CONNECTED ){            
-            connectToWifi();
-        }    
+        connectToWifi();
 
         bool serverConnected = false;
         Serial.print("Connecting to server... ");        
@@ -257,9 +244,7 @@ public:
 
     void syncClockWithNTP() {
 
-        if (connState != CONNECTED) {
-            connectToWifi();
-        }
+        connectToWifi();
 
         WiFiUDP ntpUDP;
         NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);

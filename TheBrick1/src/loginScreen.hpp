@@ -21,9 +21,11 @@ public:
         lv_label_set_text( objects.clock_login, time.c_str());
     }
 
-    void keyboardEvent(String key) override {        
-        screenClass::keyboardEvent( key );
 
+    void handleEvents( lv_event_t* e, String key ) override{
+
+        screenClass::handleEvents( e, key );
+        
         // add numeric input to focused text areas
         if( key != "A" && key != "B" && key != "C" && key != "D" && key != "*" && key != "#"  ){
             lv_obj_t* focused = lv_group_get_focused(inputGroup);
@@ -49,13 +51,8 @@ public:
                     lv_textarea_del_char( focused );                                         
                 }
             }
-        }   
+        }  
 
-
-    }
-
-    void handleScreenEvents( lv_event_t* e ) override{
-        
     }
 
     void open() override {

@@ -29,6 +29,7 @@
 
 #include "comms.hpp"
 #include "domain.hpp"
+#include "screenClass.hpp"
 #include "state.hpp"
 #include "loginScreen.hpp"
 
