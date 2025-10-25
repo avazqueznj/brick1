@@ -186,7 +186,10 @@ public:
 
             Serial.println("GET done!");
 
-            Serial.println("Disconnecting socket ....");
+            // one every get? 
+            syncClockWithNTP();
+
+            Serial.println( "Wifi shut down ***" );            
             client.stop();  
             WiFi.end();                               
 
@@ -237,6 +240,7 @@ public:
                 response += line + "\n";
             }
 
+            Serial.println( "Wifi shut down ***" );            
             client.stop();
             WiFi.end();                     
 
@@ -259,39 +263,32 @@ public:
 
     void syncClockWithNTP() {
 
-        try{
 
-            connectToWifi();
+        // only call from inside get with wifi on
 
-            WiFiUDP ntpUDP;
-            NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
+        WiFiUDP ntpUDP;
+        NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 
-            Serial.println("Starting NTP sync...");
-            timeClient.begin();
+        Serial.println("Starting NTP sync...");
+        timeClient.begin();
 
-            int tries = 0;
-            while (!timeClient.update()) {
-                timeClient.forceUpdate();
-                delay(500);
-                tries++;
-                if (tries > 5) {
-                    throw std::runtime_error("NTP sync failed: timeout");
-                }
+        int tries = 0;
+        while (!timeClient.update()) {
+            timeClient.forceUpdate();
+            delay(500);
+            tries++;
+            if (tries > 5) {
+                throw std::runtime_error("NTP sync failed: timeout");
             }
+        }
 
-            unsigned long epochTime = timeClient.getEpochTime();
-            DateTime ntpTime(epochTime);
+        unsigned long epochTime = timeClient.getEpochTime();
+        DateTime ntpTime(epochTime);
 
-            rtc->adjust(ntpTime);  // Uses the global rtc
+        rtc->adjust(ntpTime);  // Uses the global rtc
 
-            Serial.println("RTC synced!");
+        Serial.println("RTC synced!");
 
-            WiFi.end();                     
-
-        } catch (...) {
-            WiFi.end();        
-            throw;        
-        }        
     }
 
 };
