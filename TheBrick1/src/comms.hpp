@@ -126,147 +126,172 @@ public:
 
     std::vector<String> GET( String serverURL, String path ){
 
-        connectToServer( serverURL );
+        try{
+                 
+            connectToServer( serverURL );
 
-        // ok send content request
-        Serial.print("GET ");
-        Serial.println( path );
+            // ok send content request
+            Serial.print("GET ");
+            Serial.println( path );
 
-        // send request
-        client.print("GET ");
-        client.println( path );
-        client.println("Accept: */*");
-        client.println();
-        
-        // read the response ...
-        int wait = 0;
-        std::vector<String> response;        
-        String currentRow;
-        while (true) {            
+            // send request
+            client.print("GET ");
+            client.println( path );
+            client.println("Accept: */*");
+            client.println();
+            
+            // read the response ...
+            int wait = 0;
+            std::vector<String> response;        
+            String currentRow;
+            while (true) {            
 
-            if( !client.connected() ){
-                client.println( "Server closed the connection" );
-                break;
-            }
-
-            if (client.available()) {
-
-                // read pending data
-                char c = client.read();              
-
-                // end of row   ...                 
-                if( c == '\r' or c == '\n' ){                    
-                    if( currentRow == "" ) continue;  // null line
-                    response.push_back( currentRow );  // add, next ...       
-                    if( response.size() > 10000 ){
-                        throw std::runtime_error( "Error more than 10,000 rows read" );
-                    }                
-                    Serial.println(currentRow );
-                    currentRow = "";
-                    continue;
+                if( !client.connected() ){
+                    client.println( "Server closed the connection" );
+                    break;
                 }
 
-                // keep reading
-                currentRow += c;
-                if( currentRow.length() > 1000 ){
-                    throw std::runtime_error( "Error more than 1000 chars in line" );
-                }                
+                if (client.available()) {
 
-            }else{
+                    // read pending data
+                    char c = client.read();              
 
-                // no data ... wait
-                Serial.println("{no data wait}");
-                delayBlink();
-                wait += 100;
-                if( wait >= 10000 ) throw std::runtime_error( "*** ERROR *** read timeout -" );
-            }                        
-        }
+                    // end of row   ...                 
+                    if( c == '\r' or c == '\n' ){                    
+                        if( currentRow == "" ) continue;  // null line
+                        response.push_back( currentRow );  // add, next ...       
+                        if( response.size() > 10000 ){
+                            throw std::runtime_error( "Error more than 10,000 rows read" );
+                        }                
+                        Serial.println(currentRow );
+                        currentRow = "";
+                        continue;
+                    }
 
-        Serial.println("GET done!");
+                    // keep reading
+                    currentRow += c;
+                    if( currentRow.length() > 1000 ){
+                        throw std::runtime_error( "Error more than 1000 chars in line" );
+                    }                
 
-        Serial.println("Disconnecting socket ....");
-        client.stop();            
+                }else{
 
-        return response;
+                    // no data ... wait
+                    Serial.println("{no data wait}");
+                    delayBlink();
+                    wait += 100;
+                    if( wait >= 10000 ) throw std::runtime_error( "*** ERROR *** read timeout -" );
+                }                        
+            }
+
+            Serial.println("GET done!");
+
+            Serial.println("Disconnecting socket ....");
+            client.stop();  
+            WiFi.end();                               
+
+            return response;
+
+        } catch (...) {
+            WiFi.end();         
+            throw;             
+        }        
     }
 
 
     // redo all this in domain
     String POST( String serverURL, String path, const String& payload) {
 
-        Serial.println("POSTing to server...");
+        try{
 
-        connectToServer( serverURL );
+            Serial.println("POSTing to server...");
 
-        // Compose HTTP POST request
-        String request = "";
-        request += "POST " + path + " HTTP/1.1\r\n";
-        request += "Host: " + serverURL + "\r\n";
-        request += "Content-Type: text/plain\r\n";
-        request += "Content-Length: " + String(payload.length()) + "\r\n";
-        request += "Connection: close\r\n";
-        request += "\r\n";
-        request += payload;
+            connectToServer( serverURL );
 
-        client.print(request);
+            // Compose HTTP POST request
+            String request = "";
+            request += "POST " + path + " HTTP/1.1\r\n";
+            request += "Host: " + serverURL + "\r\n";
+            request += "Content-Type: text/plain\r\n";
+            request += "Content-Length: " + String(payload.length()) + "\r\n";
+            request += "Connection: close\r\n";
+            request += "\r\n";
+            request += payload;
 
-        // Wait for server response
-        unsigned long timeout = millis();
-        while (client.available() == 0) {
-            if (millis() - timeout > 5000) {
-                createDialog("Client Timeout");
-                client.stop();
-                throw std::runtime_error("Server did not respond!"); 
+            client.print(request);
+
+            // Wait for server response
+            unsigned long timeout = millis();
+            while (client.available() == 0) {
+                if (millis() - timeout > 5000) {
+                    createDialog("Client Timeout");
+                    client.stop();
+                    throw std::runtime_error("Server did not respond!"); 
+                }
             }
+
+            // Read response
+            String response = "";
+            while (client.available()) {
+                String line = client.readStringUntil('\n');
+                response += line + "\n";
+            }
+
+            client.stop();
+            WiFi.end();                     
+
+            // Extract only body , ie remove headers
+            int bodyIndex = response.indexOf("\r\n\r\n");
+            if (bodyIndex != -1) {
+                response = response.substring(bodyIndex + 4);
+            }
+
+            Serial.println( "Success response ->" );
+            Serial.println( response );
+
+            return response;
+
+        } catch (...) {
+            WiFi.end();         
+            throw;             
         }
-
-        // Read response
-        String response = "";
-        while (client.available()) {
-            String line = client.readStringUntil('\n');
-            response += line + "\n";
-        }
-
-        client.stop();
-
-        // Extract only body , ie remove headers
-        int bodyIndex = response.indexOf("\r\n\r\n");
-        if (bodyIndex != -1) {
-            response = response.substring(bodyIndex + 4);
-        }
-
-        Serial.println( "Success response ->" );
-        Serial.println( response );
-
-        return response;
     }
 
     void syncClockWithNTP() {
 
-        connectToWifi();
+        try{
 
-        WiFiUDP ntpUDP;
-        NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
+            connectToWifi();
 
-        Serial.println("Starting NTP sync...");
-        timeClient.begin();
+            WiFiUDP ntpUDP;
+            NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 
-        int tries = 0;
-        while (!timeClient.update()) {
-            timeClient.forceUpdate();
-            delay(500);
-            tries++;
-            if (tries > 5) {
-                throw std::runtime_error("NTP sync failed: timeout");
+            Serial.println("Starting NTP sync...");
+            timeClient.begin();
+
+            int tries = 0;
+            while (!timeClient.update()) {
+                timeClient.forceUpdate();
+                delay(500);
+                tries++;
+                if (tries > 5) {
+                    throw std::runtime_error("NTP sync failed: timeout");
+                }
             }
-        }
 
-        unsigned long epochTime = timeClient.getEpochTime();
-        DateTime ntpTime(epochTime);
+            unsigned long epochTime = timeClient.getEpochTime();
+            DateTime ntpTime(epochTime);
 
-        rtc->adjust(ntpTime);  // Uses the global rtc
+            rtc->adjust(ntpTime);  // Uses the global rtc
 
-        Serial.println("RTC synced!");
+            Serial.println("RTC synced!");
+
+            WiFi.end();                     
+
+        } catch (...) {
+            WiFi.end();        
+            throw;        
+        }        
     }
 
 };
