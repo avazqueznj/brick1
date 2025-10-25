@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/5",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/4",
     "subnavigationSelectedItems": {}
   },
   "layoutModel": {
@@ -121,7 +121,7 @@
                 {
                   "type": "tabset",
                   "id": "#20d204f2-bdde-46f3-a5d4-70bb6c608c21",
-                  "weight": 12.80104145714379,
+                  "weight": 21.36205363745979,
                   "selected": 1,
                   "enableClose": false,
                   "children": [
@@ -154,7 +154,7 @@
                 {
                   "type": "tabset",
                   "id": "#361be082-dd9d-4f88-9e68-f69a7895f328",
-                  "weight": 37.80574243676465,
+                  "weight": 29.24473025644865,
                   "children": [
                     {
                       "type": "tab",
@@ -193,10 +193,10 @@
                 {
                   "type": "tab",
                   "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
-                  "name": "loginScreen",
+                  "name": "inspectionZones",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[TheBrickUI.eez-project]:/userPages/5",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/4",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -1248,7 +1248,7 @@
           "x": -333,
           "y": -223
         },
-        "scale": 0.8
+        "scale": 0.67
       },
       "timeline": {
         "isEditorActive": false,
@@ -1271,6 +1271,86 @@
         "translate": {
           "x": -304.7287121212121,
           "y": -191.70689393939398
+        },
+        "scale": 0.67
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[TheBrickUI.eez-project]:/userPages/6[flow-state]": {
+      "selection": {},
+      "transform": {
+        "translate": {
+          "x": -400,
+          "y": -240
+        },
+        "scale": 0.67
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[TheBrickUI.eez-project]:/userPages/1[flow-state]": {
+      "selection": {},
+      "transform": {
+        "translate": {
+          "x": -400,
+          "y": -240
+        },
+        "scale": 0.67
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[TheBrickUI.eez-project]:/userPages/2[flow-state]": {
+      "selection": {},
+      "transform": {
+        "translate": {
+          "x": -400,
+          "y": -240
+        },
+        "scale": 0.67
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[TheBrickUI.eez-project]:/userPages/3[flow-state]": {
+      "selection": {},
+      "transform": {
+        "translate": {
+          "x": -400,
+          "y": -240
+        },
+        "scale": 0.67
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[TheBrickUI.eez-project]:/userPages/4[flow-state]": {
+      "selection": {},
+      "transform": {
+        "translate": {
+          "x": -400,
+          "y": -240
         },
         "scale": 0.67
       },

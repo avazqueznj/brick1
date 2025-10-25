@@ -247,12 +247,12 @@ public:
 //-------------------------------------------------
 
 
-
-
 #include "KVStore.h"
 #include "kvstore_global_api.h"
 
-//TODO: get this from settings screen
+#define CONFIG_KV_BUFFER_SIZE  10240
+
+//TODO: get this from settings screen, and save it to KV magnus.conf
 String serverURL = "10.0.0.32"; 
 String getConfigPath = "/server2025/config";
 String postInspectionsPath = "/server2025/inspections";
@@ -662,7 +662,7 @@ public:
         Serial.println("Config load from KVStore and parse  ....");
 
         size_t actual_size = 0;
-        char buffer[4096]; // adjust if your config is bigger
+        char buffer[ CONFIG_KV_BUFFER_SIZE ]; 
 
         int ret = kv_get("/kv/config", buffer, sizeof(buffer), &actual_size);
         if (ret != MBED_SUCCESS || actual_size == 0) {
