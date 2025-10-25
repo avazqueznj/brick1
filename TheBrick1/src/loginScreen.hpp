@@ -58,7 +58,14 @@ public:
 
         if( target == objects.do_sync_2 ){
 
-            domainManagerClass::getInstance()->sync();
+            try{
+
+                domainManagerClass::getInstance()->sync();
+
+            }catch( const std::runtime_error& error ){
+                Serial.println( error.what() );            
+                createDialog( error.what() );  
+            }            
         }
 
     }

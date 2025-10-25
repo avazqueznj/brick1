@@ -200,13 +200,23 @@ void setup() {
 }
 
 
-// -----------------------------
+//================================================
 
+// ---- tunable cadences (ms) ----
+const unsigned long RFID_MS = 500;     // RFID poll
+const unsigned long RTC_MS  = 250;     // clock tick
+const unsigned long KEYS_MS = 50;      // keypad scan
+const unsigned long MEM_MS  = 3000;    // mem stats
+
+// ---- timer state ----
+unsigned long lastRfidAt = 0;
+unsigned long lastRtcAt  = 0;
+unsigned long lastKeysAt = 0;
+unsigned long lastMemAt  = 0;
 
 byte currentCardUID[20];
 byte currentCardLength = 0;
-int slowPollInterval = 0;
-int memStatReportInterval = 0;
+
 void loop() {
 
   // wait for start
@@ -215,67 +225,76 @@ void loop() {
     return;
   }
 
-  // general delay  - render
-  delayBlink();  // 50MSEC *********************
-  lv_timer_handler(); 
-  ui_tick();   
   
+  delayBlink();  // 50MSEC *********************
+  lv_timer_handler();
+  ui_tick();
 
-  memStatReportInterval++;
-  if (memStatReportInterval == ( 20 + 20 + 20 ) ) {  // 3 sec 
+  unsigned long now = millis();
+
+  // ---------------- mem stats ----------------
+  if (now - lastMemAt >= MEM_MS) {
     getInternalHeapFreeBytes();
-    memStatReportInterval = 0;   
+    lastMemAt = now;
   }
 
-  slowPollInterval++;
-  if (slowPollInterval ==  2 ) { // x main delay = 100msec
-    slowPollInterval = 0;   
+  // ---------------- RFID ----------------
+  if (mfrc522 && (now - lastRfidAt >= RFID_MS)) {
+    lastRfidAt = now;
 
-    //---------------------------------------------------------
-    // rfid
-    if (mfrc522 && mfrc522->PICC_IsNewCardPresent()) {
-      if (mfrc522->PICC_ReadCardSerial()) {
-        currentCardLength = mfrc522->uid.size;
-        if (currentCardLength > sizeof(currentCardUID)) currentCardLength = sizeof(currentCardUID);        
-        for (byte i = 0; i < currentCardLength; i++) {
-          currentCardUID[i] = mfrc522->uid.uidByte[i];
+    static unsigned long lastCardReadTime = 0;
+    static byte lastUID[10];
+    static byte lastUIDLength = 0;
+
+    mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x83); // Field ON
+
+    if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
+
+      bool isSameCard = false;
+      if (mfrc522->uid.size == lastUIDLength) {
+        if (memcmp(mfrc522->uid.uidByte, lastUID, lastUIDLength) == 0) {
+          if ((now - lastCardReadTime) < 3000UL) {
+            isSameCard = true;
+          }
         }
-        Serial.print("Card UID:");
-        for (byte i = 0; i < currentCardLength; i++) {
-          Serial.print(":");
-          Serial.print(currentCardUID[i]);
-        }
-        Serial.println();
-        mfrc522->PICC_HaltA();
-        mfrc522->PCD_StopCrypto1();
-        stateManager->rfidEvent(currentCardUID, currentCardLength);
       }
+
+      if (!isSameCard) {
+        lastCardReadTime = now;
+        lastUIDLength = mfrc522->uid.size;
+        if (lastUIDLength > sizeof(lastUID)) lastUIDLength = sizeof(lastUID);
+        memcpy(lastUID, mfrc522->uid.uidByte, lastUIDLength);
+
+        stateManager->rfidEvent(mfrc522->uid.uidByte, mfrc522->uid.size);
+      }
+
+      mfrc522->PICC_HaltA();
+      mfrc522->PCD_StopCrypto1();
     }
 
-    //---------------------------------------------------------
-    // rtc
-    if (rtcUp && rtc) {
-      DateTime now = rtc->now();
-      char buffer[30];
-      snprintf(buffer, sizeof( buffer ), "%04d-%02d-%02d %02d:%02d:%02d",
-              now.year(),
-              now.month(),
-              now.day(),
-              now.hour(),
-              now.minute(),
-              now.second());
-      String time = String(buffer);
-      stateManager->clockTic(time); // make copy
-    }
+    mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x00); // Field OFF
+  }
 
-    //---------------------------------------------------------
-    // keypad voltage check
+  // ---------------- RTC ----------------
+  if (rtcUp && rtc && (now - lastRtcAt >= RTC_MS)) {
+    lastRtcAt = now;
+
+    DateTime t = rtc->now();
+    char buffer[30];
+    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d",
+             t.year(), t.month(), t.day(), t.hour(), t.minute(), t.second());
+    stateManager->clockTic(String(buffer)); // make copy
+  }
+
+  // ---------------- keypad ----------------
+  if (now - lastKeysAt >= KEYS_MS) {
+    lastKeysAt = now;
+
     for (byte row = 0; row < ROWS; row++) {
       digitalWrite(rowPins[row], HIGH);
       for (byte col = 0; col < COLS; col++) {
         int val = analogRead(colPins[col]);
         if (val > ANALOG_THRESHOLD) {
-          unsigned long now = millis();
           if (now - lastPressTime > DEBOUNCE_MS) {
             char key = hexaKeys[row][col];
             stateManager->keyboardEvent(String(key));
@@ -283,12 +302,10 @@ void loop() {
           }
         }
       }
-
       digitalWrite(rowPins[row], LOW);
-    }    
+    }
   }
 
-} // loop
 
-
-
+  
+}
