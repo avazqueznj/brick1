@@ -353,8 +353,7 @@ public:
                 std::vector<String> config = comms->GET( serverURL , getConfigPath );
 
                 parse( &config );
-                saveConfigToKVStore( &config );
-                comms->syncClockWithNTP();
+                saveConfigToKVStore( &config );                
 
                     String syncMessage = "Sync successful. \n";
                     syncMessage += "Loaded: \n";
