@@ -13,7 +13,7 @@
 #include <Arduino.h>
 #include "lvgl.h"
 #include <functional>
-
+#include "mbed.h"
 
 //----------------------------------------------
 
@@ -34,9 +34,8 @@ lv_obj_t* get_checked_child(lv_obj_t* list) {
 
 void delayBlink() {
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(25);
+    thread_sleep_for( 50 );
     digitalWrite(LED_BUILTIN, LOW);
-    delay(25);
 }
 
 void sosBlink() {
