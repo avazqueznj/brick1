@@ -41,8 +41,6 @@ public:
 
         }
     
-        screenClass::init();
-
         screenClass::makeKeyboard();
         screenClass::addKeyboard( objects.setting_company );
         screenClass::addKeyboard( objects.setting_server_url );
