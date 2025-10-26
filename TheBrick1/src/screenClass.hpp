@@ -10,15 +10,14 @@ public:
 
     ScreensEnum screenId;    
     lv_group_t* inputGroup = nullptr;
+    lv_obj_t* kb = nullptr;    
 
     screenClass( ScreensEnum screenIdParam ): 
         screenId{screenIdParam}{
         inputGroup = lv_group_create();
     }
 
-    virtual void open(){
-        loadScreen( screenId );        
-    };
+    virtual void init(){};
 
     virtual bool modalActive(){
         return false;
@@ -31,6 +30,55 @@ public:
     }
 
     //---
+    virtual void makeKeyboard() {
+
+        if (kb == nullptr) {
+            kb = lv_keyboard_create( lv_scr_act());
+            lv_obj_set_size(kb, 800, 200);
+            lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
+            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+
+            lv_obj_add_event_cb(
+                kb,
+                [](lv_event_t* e) {
+                    lv_event_code_t code = lv_event_get_code(e);
+                    screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
+                    if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
+                        lv_obj_add_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
+                    }
+                    Serial.println( "Keyboard dismissed !" );                                                            
+                },
+                LV_EVENT_ALL,
+                this
+            );
+
+        
+            Serial.println( "Keyboard created" );                                        
+        }
+    }
+
+
+    // Attach keyboard to a textarea. Throws if kb is not set!
+    void addKeyboard(lv_obj_t* textarea) {
+
+        if (!kb) {
+            // Immediate fail — programmer error!
+            throw std::runtime_error("Keyboard not created before addKeyboard()!");
+        }
+
+        Serial.println( "Keyboard attached" );                                                
+        lv_obj_add_event_cb(
+            textarea, 
+            [](lv_event_t* e) {                
+                lv_obj_t* ta = lv_event_get_target(e);
+                screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
+                lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
+                lv_keyboard_set_textarea(self->kb, ta);
+lv_obj_scroll_to_view(ta, LV_ANIM_ON); // <-- Add this line!
+                Serial.println( "Open Keyboard !" );                                                                            
+                }, 
+            LV_EVENT_PRESSED, this);
+    }    
 
     lv_obj_t* getFocusedButton() {
         if (!inputGroup) return nullptr;
@@ -178,6 +226,44 @@ public:
 
     }
 
+
+    // ===================================================
+
+    void keyDropdownScrolling(String key) {
+
+        Serial.print("Dropdown scroll...");
+
+        lv_obj_t* focused = lv_group_get_focused(inputGroup);
+        if (!focused || !lv_obj_check_type(focused, &lv_dropdown_class)) return;
+
+        int32_t selected = lv_dropdown_get_selected(focused);
+
+
+        const char* opts = lv_dropdown_get_options(focused);
+        uint16_t option_cnt = 0;
+        if (opts && opts[0]) {
+            option_cnt = 1;
+            for (const char* c = opts; *c; ++c) {
+                if (*c == '\n') ++option_cnt;
+            }
+        }
+        if (option_cnt == 0) return;
+
+        int32_t next = selected;
+        if (key == "A") {
+            next = (selected > 0) ? selected - 1 : option_cnt - 1;
+        } else if (key == "B") {
+            next = (selected + 1 < option_cnt) ? selected + 1 : 0;
+        } else {
+            return;
+        }
+
+        lv_dropdown_set_selected(focused, next);
+        Serial.print("Dropdown scrolled to option: ");
+        Serial.println(next);
+    }
+
+
     // ===================================================
 
     virtual void handleEvents(lv_event_t* e, String key) {
@@ -198,6 +284,9 @@ public:
         // LIST UP/DWN ---------------
         Serial.print( "L" );            
         keyListScrolling( key );
+
+        // DROPDOWN SCROLL ---------------
+        keyDropdownScrolling(key);        
 
         // TAB NAVI ---------------
         Serial.print( "Tab" );            
@@ -223,9 +312,16 @@ public:
 
 
     virtual ~screenClass(){
+
         if (inputGroup) {
             lv_group_del(inputGroup);
             Serial.println("mainScreenClass: Screen Class destroyed, inputGroup destroyed");
+        }        
+
+        if (kb != NULL) {
+            lv_obj_del(kb);
+            kb = NULL;
+            Serial.println("Keyboard destroyed");
         }        
     }
 

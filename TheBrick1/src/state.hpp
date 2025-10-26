@@ -143,26 +143,103 @@ public:
 
   //********************************* */  
 
-  // SCREEN TO SCREEN NAVIGATION
-  void openScreen( screenClass* screen ){        
-    try{
+  // // SCREEN TO SCREEN NAVIGATION
+  // void openScreen( screenClass* screen ){        
+  //   try{
 
-      // ok well see if it opens
-      screen->open();         
+  //     // ok well see if it opens
+  //     screen->open();         
 
-      // ok replace and go
-      delete currentScreenState;
-      currentScreenState = screen;
+  //     // ok replace and go
+  //     delete currentScreenState;
+  //     currentScreenState = screen;
 
-    }catch( const std::runtime_error& error ){
-        // no delete 
-        Serial.println( "*** window closed but not recycled ***" );   
-        Serial.println( error.what() );            
-        createDialog( error.what() );  
-    }
+  //   }catch( const std::runtime_error& error ){
+  //       // no delete 
+  //       Serial.println( "*** window closed but not recycled ***" );   
+  //       Serial.println( error.what() );            
+  //       createDialog( error.what() );  
+  //   }
+  // }
+
+
+  static int setOrGetPendingScreenId(int value = -1) {
+      static int pendingScreenId = 0;
+      if (value != -1) pendingScreenId = value;
+      return pendingScreenId;
   }
 
 
+  void processPendingScreenTransition() {
+
+      int nextScreen = setOrGetPendingScreenId();
+      if (nextScreen == 0) return; // Nothing pending
+      setOrGetPendingScreenId(0);       
+
+      Serial.println( "*** Transition  ..." );   
+
+      // 1 create new backing
+
+        // backup
+        screenClass* oldScreenState = NULL;
+        lv_obj_t* oldRoot =NULL;
+
+        if( currentScreenState != NULL ){
+
+          oldScreenState = currentScreenState;
+          oldRoot = lv_scr_act();
+          Serial.println( "old backed up" );             
+
+        }else{
+
+          oldScreenState = NULL;
+          oldRoot = NULL;
+          Serial.println( "from null" );                       
+        }
+
+        // new state
+        switch (nextScreen) {
+            case SCREEN_ID_LOGIN_SCREEN:
+                currentScreenState = new loginScreenClass();
+                break;
+            case SCREEN_ID_SETTINGS:
+                currentScreenState = new settingsScreenClass();
+                break;
+            default:
+                  Serial.print("FATAL: Unknown screen ID in processPendingScreenTransition: ");          
+                  while( true ){
+                    sosBlink();
+                  }
+                  break;
+        }      
+
+      
+      // 2 open the new screen
+
+        Serial.println( "Load new !!" );             
+        loadScreen( (ScreensEnum) nextScreen );                    
+
+      // 4 wait for new screen
+
+        while( lv_scr_act() == oldRoot || lv_scr_act() == nullptr ){        
+          Serial.println( "New screen not active.  tick.." );                     
+          delayBlink();  // 50MSEC *********************
+          lv_timer_handler();
+          ui_tick();
+        }
+        
+      // 5 delete previous if any
+
+        if( oldScreenState != NULL ){
+          //lv_obj_del(oldRoot);  // stupid lvgl
+          delete oldScreenState;
+        }
+
+      // 5 init the state
+
+        currentScreenState->init();      
+
+    }
 
 };
 
@@ -183,4 +260,6 @@ extern "C" void action_main_event_dispatcher(lv_event_t *e) {
 
 
 #endif
+
+
 

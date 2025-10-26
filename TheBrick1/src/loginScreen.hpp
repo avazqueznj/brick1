@@ -9,6 +9,7 @@
 
 //-------------------------------------------------
 
+void navigateTo(int screenId);
 
 class loginScreenClass:public screenClass{
 public:
@@ -24,8 +25,7 @@ public:
 
     void handleEvents( lv_event_t* e, String key ) override{
 
-        screenClass::handleEvents( e, key );
-        
+        screenClass::handleEvents( e, key );        
         lv_obj_t *target = lv_event_get_target(e);
 
         // add numeric input to focused text areas
@@ -57,20 +57,25 @@ public:
 
 
         if( target == objects.do_sync_2 ){
-
             try{
-
                 domainManagerClass::getInstance()->sync();
-
             }catch( const std::runtime_error& error ){
                 Serial.println( error.what() );            
                 createDialog( error.what() );  
             }            
         }
 
+        if( target == objects.do_settings_2 ){
+
+            Serial.println( "Open settings!" );
+            navigateTo( SCREEN_ID_SETTINGS );
+        }
+
+
+
     }
 
-    void open() override {
+    void init() override {
 
         // Create fresh group or reuse existing
         {
@@ -91,7 +96,7 @@ public:
         // Add focusable widgets
         //-------------------------------------
 
-        screenClass::open();
+        screenClass::init();
     }
 
     virtual ~loginScreenClass(){

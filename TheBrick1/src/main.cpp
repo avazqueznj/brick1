@@ -30,8 +30,10 @@
 #include "comms.hpp"
 #include "domain.hpp"
 #include "screenClass.hpp"
-#include "state.hpp"
 #include "loginScreen.hpp"
+#include "settingsScreen.hpp"
+
+#include "state.hpp"
 
 // RFID Pins
 #define SS_PIN 10  // SDA pin on RC522
@@ -187,7 +189,7 @@ void setup() {
   create_screens();           
 
   stateManager = new stateManagerClass();  
-  stateManager->openScreen(new loginScreenClass());
+  stateManager->setOrGetPendingScreenId( SCREEN_ID_LOGIN_SCREEN );
 
   try{
       domainManagerClass::getInstance()->loadConfigFromKVStore();
@@ -199,6 +201,10 @@ void setup() {
   Serial.println("Started !!!!");
 }
 
+
+void navigateTo(int screenId) {
+    stateManagerClass::setOrGetPendingScreenId(screenId);
+}
 
 //================================================
 
@@ -225,7 +231,8 @@ void loop() {
     return;
   }
 
-  
+  stateManager->processPendingScreenTransition();
+
   delayBlink();  // 50MSEC *********************
   lv_timer_handler();
   ui_tick();
@@ -306,6 +313,6 @@ void loop() {
     }
   }
 
-
+  
   
 }

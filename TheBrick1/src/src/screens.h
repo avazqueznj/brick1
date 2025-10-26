@@ -90,7 +90,7 @@ typedef struct _objects_t {
     lv_obj_t *obj11;
     lv_obj_t *setting_company;
     lv_obj_t *obj12;
-    lv_obj_t *setting_division;
+    lv_obj_t *settings_tz;
 } objects_t;
 
 extern objects_t objects;

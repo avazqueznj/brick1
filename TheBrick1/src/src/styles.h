@@ -32,6 +32,7 @@ void remove_style_bottom_panel(lv_obj_t *obj);
 
 // Style: text_area
 lv_style_t *get_style_text_area_MAIN_DEFAULT();
+lv_style_t *get_style_text_area_MAIN_FOCUSED();
 void add_style_text_area(lv_obj_t *obj);
 void remove_style_text_area(lv_obj_t *obj);
 
