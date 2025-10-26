@@ -181,7 +181,7 @@ public:
   }
 
 
-  screenClass* getOrCreateScreen(int id) {
+  screenClass* getOrCreateScreenState(int id) {
       if (id < 1 || id > 7)
           throw std::runtime_error("Invalid screen ID");
       if (!screenStates[id]) {
@@ -203,28 +203,33 @@ public:
   }
 
 
-  // 4. Transition logic: Reuse cached state object, don’t recreate!
   void processPendingScreenTransition() {
       int nextScreen = setOrGetPendingScreenId();
       if (nextScreen == 0) return;
       setOrGetPendingScreenId(0);
 
       try {
-          screenClass* oldScreenState = currentScreenState;
           lv_obj_t* oldRoot = lv_scr_act();
 
-          screenClass* nextScreenState = getOrCreateScreen(nextScreen);
-          if (!nextScreenState) throw std::runtime_error("Unknown screen ID");
+          // ---- Minimal "just check for null" pattern ----
+          bool isNew = (screenStates[nextScreen] == nullptr);
+          if (isNew) {
+              switch (nextScreen) {
+                  // ... your cases ...
+                  case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass(); break;
+                  case SCREEN_ID_SETTINGS:            screenStates[nextScreen] = new settingsScreenClass(); break;
+                  default:
+                      throw std::runtime_error("Unknown screen ID in getOrCreateScreen()");
+              }
+              if (!screenStates[nextScreen])
+                  throw std::runtime_error("Failed to create screen instance for ID: ");
+          }
+          currentScreenState = screenStates[nextScreen];
 
-          // Set new current state *before* load
-          currentScreenState = nextScreenState;
-
-          // Load the new screen
           loadScreen((ScreensEnum)nextScreen);
 
-          // ---- Wait for the new screen to be active ----
           int waitCount = 0;
-          while (lv_scr_act() == oldRoot && waitCount++ < 50) { // Optional timeout
+          while (lv_scr_act() == oldRoot && waitCount++ < 50) {
               Serial.println("New screen not active.  tick..");
               delayBlink();
               lv_timer_handler();
@@ -234,8 +239,9 @@ public:
           if (lv_scr_act() == oldRoot)
               throw std::runtime_error("Timeout: LVGL did not swap root!");
 
-          // Now safe to initialize: set keyboard, focus groups, etc
-          currentScreenState->init();
+          // ---- Only call init() if new ----
+          if (isNew)
+              currentScreenState->init();
 
       } catch (const std::runtime_error& error) {
           Serial.println("*** Screen transition error ***");
