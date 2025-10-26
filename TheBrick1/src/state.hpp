@@ -181,28 +181,6 @@ public:
   }
 
 
-  screenClass* getOrCreateScreenState(int id) {
-      if (id < 1 || id > 7)
-          throw std::runtime_error("Invalid screen ID");
-      if (!screenStates[id]) {
-          switch (id) {
-              // case SCREEN_ID_MAIN:                screenStates[id] = new mainScreenClass(); break;
-              // case SCREEN_ID_SELECT_ASSET_SCREEN: screenStates[id] = new selectAssetScreenClass(); break;
-              // case SCREEN_ID_SELECT_INSPECTION_TYPE: screenStates[id] = new selectInspectionTypeScreenClass(); break;
-              // case SCREEN_ID_INSPECTION_FORM:     screenStates[id] = new inspectionFormScreenClass(); break;
-              // case SCREEN_ID_INSPECTION_ZONES:    screenStates[id] = new inspectionZonesScreenClass(); break;
-              case SCREEN_ID_LOGIN_SCREEN:        screenStates[id] = new loginScreenClass(); break;
-              case SCREEN_ID_SETTINGS:            screenStates[id] = new settingsScreenClass(); break;
-              default:
-                  throw std::runtime_error("Unknown screen ID in getOrCreateScreen()");
-          }
-          if (!screenStates[id])
-              throw std::runtime_error("Failed to create screen instance for ID: " );
-      }
-      return screenStates[id];
-  }
-
-
   void processPendingScreenTransition() {
       int nextScreen = setOrGetPendingScreenId();
       if (nextScreen == 0) return;
@@ -215,7 +193,7 @@ public:
           bool isNew = (screenStates[nextScreen] == nullptr);
           if (isNew) {
               switch (nextScreen) {
-                  // ... your cases ...
+                  
                   case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass(); break;
                   case SCREEN_ID_SETTINGS:            screenStates[nextScreen] = new settingsScreenClass(); break;
                   default:

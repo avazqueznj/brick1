@@ -202,10 +202,8 @@ void setup() {
 }
 
 
-void navigateTo(int screenId) {
-    stateManagerClass::setOrGetPendingScreenId(screenId);
-}
-
+//================================================
+//================================================
 //================================================
 
 // ---- tunable cadences (ms) ----
@@ -222,6 +220,11 @@ unsigned long lastMemAt  = 0;
 
 byte currentCardUID[20];
 byte currentCardLength = 0;
+
+void navigateTo(int screenId) {
+    stateManagerClass::setOrGetPendingScreenId(screenId);
+}
+
 
 void loop() {
 
