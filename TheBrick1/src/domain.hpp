@@ -8,8 +8,8 @@
 
 //TODO: get this from settings screen, and save it to KV magnus.conf
 String serverURL = "10.0.0.32"; 
-String getConfigPath = "/server2025/config";
-String postInspectionsPath = "/server2025/inspections";
+String getConfigPath = "/brickServer1/config";
+String postInspectionsPath = "/brickServer1/inspections";
 
 
                                 // P R O B L E M  ***  D O M A I N 
