@@ -182,18 +182,15 @@ public:
 
         // backup
         screenClass* oldScreenState = NULL;
-        lv_obj_t* oldRoot =NULL;
+        lv_obj_t* oldRoot = NULL;
 
         if( currentScreenState != NULL ){
-
           oldScreenState = currentScreenState;
           oldRoot = lv_scr_act();
           Serial.println( "old backed up" );             
-
         }else{
-
           oldScreenState = NULL;
-          oldRoot = NULL;
+          oldRoot = lv_scr_act();
           Serial.println( "from null" );                       
         }
 
@@ -221,7 +218,7 @@ public:
 
       // 4 wait for new screen
 
-        while( lv_scr_act() == oldRoot || lv_scr_act() == nullptr ){        
+        while( lv_scr_act() == oldRoot ){        
           Serial.println( "New screen not active.  tick.." );                     
           delayBlink();  // 50MSEC *********************
           lv_timer_handler();

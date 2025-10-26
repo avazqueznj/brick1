@@ -77,11 +77,7 @@ public:
 
     void init() override {
 
-        // Create fresh group or reuse existing
         {
-            //-------------------------------------            
-            // Add focusable widgets (  lv_group_focus_obj(objects.do_inspect_button);             )
-
 
             lv_group_add_obj(inputGroup, objects.login_username  );
             lv_group_add_obj(inputGroup, objects.login_password);
@@ -93,8 +89,9 @@ public:
 
         }
     
-        // Add focusable widgets
-        //-------------------------------------
+        screenClass::makeKeyboard( LV_KEYBOARD_MODE_NUMBER );
+        screenClass::addKeyboard( objects.login_username );
+        screenClass::addKeyboard( objects.login_password );
 
         screenClass::init();
     }

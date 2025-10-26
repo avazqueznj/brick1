@@ -30,13 +30,17 @@ public:
     }
 
     //---
-    virtual void makeKeyboard() {
 
+    // LV_KEYBOARD_MODE_NUMBER 
+    virtual void makeKeyboard(lv_keyboard_mode_t mode = LV_KEYBOARD_MODE_TEXT_LOWER ) {
         if (kb == nullptr) {
-            kb = lv_keyboard_create( lv_scr_act());
+            kb = lv_keyboard_create(lv_scr_act());
             lv_obj_set_size(kb, 800, 200);
             lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
             lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+
+            // Set keyboard mode
+            lv_keyboard_set_mode(kb, mode);
 
             lv_obj_add_event_cb(
                 kb,
@@ -46,14 +50,12 @@ public:
                     if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
                         lv_obj_add_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
                     }
-                    Serial.println( "Keyboard dismissed !" );                                                            
                 },
                 LV_EVENT_ALL,
                 this
             );
 
-        
-            Serial.println( "Keyboard created" );                                        
+            Serial.println("Keyboard created");
         }
     }
 
@@ -74,8 +76,7 @@ public:
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
                 lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
                 lv_keyboard_set_textarea(self->kb, ta);
-lv_obj_scroll_to_view(ta, LV_ANIM_ON); // <-- Add this line!
-                Serial.println( "Open Keyboard !" );                                                                            
+                //Serial.println( "Open Keyboard !" );                                                                            
                 }, 
             LV_EVENT_PRESSED, this);
     }    
