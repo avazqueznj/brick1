@@ -30,8 +30,8 @@ public:
     }
 
     //---
-
     // LV_KEYBOARD_MODE_NUMBER 
+
     virtual void makeKeyboard(lv_keyboard_mode_t mode = LV_KEYBOARD_MODE_TEXT_LOWER ) {
         if (kb == nullptr) {
             kb = lv_keyboard_create(lv_scr_act());
@@ -50,6 +50,7 @@ public:
                     if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
                         lv_obj_add_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
                     }
+                    //Serial.println( "Dismiss Keyboard !" );                                                                            
                 },
                 LV_EVENT_ALL,
                 this
@@ -277,6 +278,12 @@ public:
 
     // base screen class key nav
     void keyboardEvent(String key) {
+
+        if( kb != nullptr )
+        {
+            lv_obj_add_flag( kb, LV_OBJ_FLAG_HIDDEN );
+        }
+        
 
         // get the focused thing
         Serial.print( "*** *** Screen Base: Key Handler: " );            

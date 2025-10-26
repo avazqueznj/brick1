@@ -25,7 +25,8 @@ public:
 
     void handleEvents( lv_event_t* e, String key ) override{
 
-        screenClass::handleEvents( e, key );        
+        screenClass::handleEvents( e, key );    
+            
         lv_obj_t *target = lv_event_get_target(e);
 
         // add numeric input to focused text areas
