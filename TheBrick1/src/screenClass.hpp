@@ -8,12 +8,15 @@
 class screenClass{
 public:
 
+    configClass *settings;
+
     ScreensEnum screenId;    
     lv_group_t* inputGroup = nullptr;
     lv_obj_t* kb = nullptr;    
 
-    screenClass( ScreensEnum screenIdParam ): 
-        screenId{screenIdParam}{
+    screenClass( configClass* settingsParam, ScreensEnum screenIdParam ): 
+    settings{settingsParam}, screenId{screenIdParam}
+        {
         inputGroup = lv_group_create();
     }
 

@@ -15,7 +15,7 @@ class loginScreenClass:public screenClass{
 public:
     
 
-    loginScreenClass(): screenClass( SCREEN_ID_LOGIN_SCREEN ){            
+    loginScreenClass( configClass* settings ): screenClass( settings, SCREEN_ID_LOGIN_SCREEN ){            
     }
 
     void clockTic( String time ) override {
@@ -26,7 +26,7 @@ public:
     void handleEvents( lv_event_t* e, String key ) override{
 
         screenClass::handleEvents( e, key );    
-            
+
         lv_obj_t *target = lv_event_get_target(e);
 
         // add numeric input to focused text areas
@@ -68,7 +68,7 @@ public:
 
         if( target == objects.do_settings_2 ){
 
-            Serial.println( "Open settings!" );
+            Serial.println( "Open Settings!" );
             navigateTo( SCREEN_ID_SETTINGS );
         }
 
@@ -95,6 +95,8 @@ public:
         screenClass::addKeyboard( objects.login_password );
 
         screenClass::init();
+
+        Serial.println( "Login inited *********" );
     }
 
     virtual ~loginScreenClass(){

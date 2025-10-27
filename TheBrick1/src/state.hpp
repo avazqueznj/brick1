@@ -28,17 +28,46 @@
 
 //-------------------------------------------------------------
 
-
+#define settingsFileName "/kv/settings"
 
 class stateManagerClass{
 public:
 
-  
+  configClass settings;
 
-  stateManagerClass( ){            
+
+  //-------------------------------------------------
+
+
+  stateManagerClass(  ){            
     currentScreenState =  NULL;  
   }    
-          
+
+
+  void init(){
+    try{      
+      //COMMENT THIS TO RESET
+      settings.load( settingsFileName );
+
+    } catch (const std::exception& e) {
+
+        String msg = String( "Could not load config, defaulting: " ) + e.what() ;
+        Serial.println(msg); // optional
+
+        settings[ "company" ] = "DEMO";
+
+        settings[ "tz_id" ] = "1";
+        settings[ "tz_offset" ] = "-480";
+        settings[ "tz_dst" ] = "0";                        
+
+        settings[ "brick_server" ] = "10.0.0.32";
+        settings[ "wifi_ssid" ] = "irazu2G";
+        settings[ "wifi_password" ] = "casiocasio";                        
+    }
+  }
+     
+  
+
   virtual ~stateManagerClass(){   
   }
 
@@ -56,11 +85,18 @@ public:
     }          
   }
 
-  void clockTic( String time ){
+  void clockTic( DateTime dttime ){
     try{
+
+      char buffer[30];
+      DateTime local = dttime + TimeSpan(domainManagerClass::getInstance()->timeOffsetFromUTC * 60);
+      snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d",
+              local.year(), local.month(), local.day(), local.hour(), local.minute(), local.second());
+
       if( currentScreenState !=  NULL ){
-        currentScreenState->clockTic(  time );
+        currentScreenState->clockTic(  String( buffer ) );
       }
+
     }catch( const std::runtime_error& error ){
       Serial.println( "*** ERROR while handling clock event ***" );                    
       Serial.println( error.what() );                    
@@ -196,8 +232,8 @@ public:
           if (isNew) {
               switch (nextScreen) {
                   
-                  case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass(); break;
-                  case SCREEN_ID_SETTINGS:            screenStates[nextScreen] = new settingsScreenClass(); break;
+                  case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass( &settings ); break;
+                  case SCREEN_ID_SETTINGS:            screenStates[nextScreen] = new settingsScreenClass( &settings ); break;
                   default:
                       throw std::runtime_error("Unknown screen ID in getOrCreateScreen()");
               }

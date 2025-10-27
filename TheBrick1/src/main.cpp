@@ -25,15 +25,20 @@
 #include <MFRC522.h>
 #include "RTClib.h"
 
-#include "util.hpp"
+//-------------------------------
 
-#include "comms.hpp"
-#include "domain.hpp"
-#include "screenClass.hpp"
-#include "loginScreen.hpp"
-#include "settingsScreen.hpp"
+  #include "util.hpp"
+  #include "comms.hpp"
+  #include "domain.hpp"
+
+      #include "screenClass.hpp"
+      #include "loginScreen.hpp"
+      #include "settingsScreen.hpp"
 
 #include "state.hpp"
+
+//-------------------------------
+
 
 // RFID Pins
 #define SS_PIN 10  // SDA pin on RC522
@@ -91,6 +96,8 @@ void getInternalHeapFreeBytes() {
 
 
 void setup() {
+
+  
 
   // setup serial
   Serial.begin(9600);
@@ -189,10 +196,12 @@ void setup() {
   create_screens();           
 
   stateManager = new stateManagerClass();  
+  stateManager->init();
   stateManager->setOrGetPendingScreenId( SCREEN_ID_LOGIN_SCREEN );
 
   try{
-      domainManagerClass::getInstance()->loadConfigFromKVStore( "/kv/config" );
+      std::vector<String> config = loadFromKVStore( "/kv/config" );
+      domainManagerClass::getInstance()->parse( &config );
   }catch( const std::runtime_error& error ){
       Serial.println( error.what() );            
   }  
@@ -202,13 +211,13 @@ void setup() {
 }
 
 
-//================================================
-//================================================
-//================================================
+//================================================================================================================================================
+//================================================================================================================================================
+//================================================================================================================================================
 
 // ---- tunable cadences (ms) ----
 const unsigned long RFID_MS = 500;     // RFID poll
-const unsigned long RTC_MS  = 250;     // clock tick
+const unsigned long RTC_MS  = 250;     // clock tick 250
 const unsigned long KEYS_MS = 50;      // keypad scan
 const unsigned long MEM_MS  = 3000;    // mem stats
 
@@ -287,13 +296,8 @@ void loop() {
 
   // ---------------- RTC ----------------
   if (rtcUp && rtc && (now - lastRtcAt >= RTC_MS)) {
-    lastRtcAt = now;
-
-    DateTime t = rtc->now();
-    char buffer[30];
-    snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d",
-             t.year(), t.month(), t.day(), t.hour(), t.minute(), t.second());
-    stateManager->clockTic(String(buffer)); // make copy
+    lastRtcAt = now;    
+    stateManager->clockTic( rtc->now() ); // make copy
   }
 
   // ---------------- keypad ----------------

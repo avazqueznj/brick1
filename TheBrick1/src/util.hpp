@@ -15,6 +15,12 @@
 #include <functional>
 #include "mbed.h"
 
+#include <map>
+#include <vector>
+
+#include "KVStore.h"
+#include "kvstore_global_api.h"
+
 //----------------------------------------------
 
 // yea , really .... no other way in lvgl 8
@@ -195,7 +201,103 @@ void spinnerStart() {
 
 }
 
-//----------------------------------------------
+
+    //------------------------------
+
+    void saveToKVStore( const String path, const std::vector<String>* file) {
+
+        Serial.print("Save to KVStore....");
+        Serial.println( path );
+
+        String joined = "";
+        for (size_t i = 0; i < file->size(); i++) {
+            joined += file->at(i);
+            joined += '\n';
+        }
+
+        int ret = kv_set(path.c_str(), joined.c_str(), joined.length(), 0);
+        if (ret != MBED_SUCCESS) {
+            throw std::runtime_error("Failed to save  to KVStore!");
+        }
+
+        Serial.println("Saved to KVStore.");
+    }
+
+    //-----
+
+    #define KV_BUFFER_SIZE  10240
+    std::vector<String> loadFromKVStore( const String path ) {
+        Serial.print("Load from KVStore   ....");
+        Serial.print(path);
+
+        size_t actual_size = 0;
+        char buffer[ KV_BUFFER_SIZE ]; 
+
+        int ret = kv_get( path.c_str(), buffer, sizeof(buffer), &actual_size);
+        if (ret != MBED_SUCCESS || actual_size == 0) {
+            throw std::runtime_error("Failed to read file from disk!");
+        }
+
+        String joined = String(buffer).substring(0, actual_size);
+
+        std::vector<String> file;
+        int start = 0;
+        int end = joined.indexOf('\n');
+        while (end >= 0) {
+            String line = joined.substring(start, end);
+            line.trim();
+            if (line.length() > 0) {
+                file.push_back(line);
+            }
+            start = end + 1;
+            end = joined.indexOf('\n', start);
+        }
+
+        return( file );
+
+        Serial.println("Config loaded from KVStore and parsed!");
+    }
+
+//-------------------------------------------------
+
+class configClass : public std::map<String, String> {
+public:
+    void load(const String& filename) {
+        this->clear();
+        try {
+            auto lines = loadFromKVStore(filename); // may throw
+            for (const String& line : lines) {
+                String s = line; s.trim();
+                if (s.length() == 0 || s.startsWith("//")) continue;
+                int eq = s.indexOf('=');
+                if (eq > 0) {
+                    String k = s.substring(0, eq); k.trim();
+                    String v = s.substring(eq + 1); v.trim();
+                    (*this)[k] = v;
+                }
+            }
+        } catch (const std::exception& e) {
+            // Add more context and rethrow
+            String msg = String("Could not load config: ") + filename + " :: " + e.what();
+            Serial.println(msg); // optional: log before throw
+            throw std::runtime_error(msg.c_str());
+        }
+    }
+    void save(const String& filename) const {
+        try {
+            std::vector<String> lines;
+            for (const auto& it : *this)
+                lines.push_back(it.first + "=" + it.second);
+            saveToKVStore(filename, &lines); // may throw
+        } catch (const std::exception& e) {
+            String msg = String("Could not save config: ") + filename + " :: " + e.what();
+            Serial.println(msg); // optional
+            throw std::runtime_error(msg.c_str());
+        }
+    }
+};
+
+//-------------------------------------------------
 
 #endif
 

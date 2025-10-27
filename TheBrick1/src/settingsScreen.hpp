@@ -45,7 +45,7 @@ const int tz_count = sizeof(tz_offset_minutes) / sizeof(tz_offset_minutes[0]);
 class settingsScreenClass:public screenClass{
 public:
 
-    settingsScreenClass(): screenClass( SCREEN_ID_SETTINGS ){    
+    settingsScreenClass( configClass* settings ): screenClass( settings, SCREEN_ID_SETTINGS ){    
     }
 
     void clockTic( String time ) override {
@@ -60,28 +60,40 @@ public:
 
 
         if( target == objects.back_from_settings ){
-            Serial.println( "Open settings!" );
+            Serial.println( "Back to login screen!" );
             navigateTo( SCREEN_ID_LOGIN_SCREEN );
         }
 
         if ( code == LV_EVENT_VALUE_CHANGED && ( target == objects.settings_tz || target == objects.dst  ) ) {
+
             int sel = lv_dropdown_get_selected(objects.settings_tz);
             if (sel >= 0 && sel < tz_count) {
-                int offset = tz_offset_minutes[sel];
 
+                int offset = tz_offset_minutes[sel];
+        
                 // Check DST switch and add 60 if ON
                 bool dst_active = lv_obj_has_state(objects.dst, LV_STATE_CHECKED);
                 if (dst_active) {
                     offset += 60;
                     Serial.println("DST is ON, adding 60 minutes.");
+                    domainManagerClass::getInstance()->DST = true;
+                }else{
+                    domainManagerClass::getInstance()->DST = false;
                 }
 
-                Serial.print("Timezone changed to index: ");
-                Serial.print(sel);
-                Serial.print(" offset min: ");
-                Serial.println(offset);
+                domainManagerClass::getInstance()->timeZoneIndex = sel;                                     
+                domainManagerClass::getInstance()->timeOffsetFromUTC = offset;                
 
-                // appState.timezone_offset_min = offset; // <-- save to your settings if needed
+                Serial.print("Timezone changed to index: ");
+                Serial.print( domainManagerClass::getInstance()->timeZoneIndex );
+
+                Serial.print(" offset min: ");
+                Serial.print(domainManagerClass::getInstance()->timeOffsetFromUTC);
+
+                Serial.print(" dst: ");
+                Serial.println( String( domainManagerClass::getInstance()->DST ) );
+
+
             }
         }
     }
@@ -104,6 +116,7 @@ public:
         screenClass::addKeyboard( objects.setting_wifi_name );
         screenClass::addKeyboard( objects.setting_wifi_password );                        
 
+        Serial.println( "Setting inited *********" );
     }
 
     virtual ~settingsScreenClass(){};
