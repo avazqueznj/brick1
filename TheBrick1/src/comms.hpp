@@ -24,17 +24,9 @@ public:
 
     WiFiClient client;
 
-
-    // String serverURL = "10.0.0.32"; "/server2025/inspections";
-
-    // daday phone
-    //String ssid = "DadyPhone";
-    //String pass = "Casiopea1";
-
-    // house
+    // from the config
     String ssid = "irazu2G";
     String pass = "casiocasio";
-
 
 
     commsClass(){

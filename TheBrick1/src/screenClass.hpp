@@ -75,10 +75,12 @@ public:
             [](lv_event_t* e) {                
                 lv_obj_t* ta = lv_event_get_target(e);
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
-                lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
-                lv_keyboard_set_textarea(self->kb, ta);
-                //Serial.println( "Open Keyboard !" );                                                                            
-                }, 
+                lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);                
+                lv_keyboard_set_textarea(self->kb, ta);                
+                //Serial.println( "Open Keyboard !" );          
+                
+
+
             LV_EVENT_PRESSED, this);
     }    
 

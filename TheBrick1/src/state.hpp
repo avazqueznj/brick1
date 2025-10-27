@@ -71,7 +71,7 @@ public:
   // handle touch events
   void handleScreenEvents( lv_event_t* e ){
 
-    Serial.print("*** Screen event: ");
+    Serial.print("*** Screen event : ");
     lv_obj_t *target = lv_event_get_target(e);
     if (lv_obj_check_type( target, &lv_btn_class)) {
         lv_obj_t *label = lv_obj_get_child( target, 0);
@@ -79,6 +79,8 @@ public:
             const char *text = lv_label_get_text(label);
             Serial.println(text);
         }
+    }else{
+      Serial.println("");
     }    
 
     dispatchEventsToWindows( e , "" );
@@ -238,7 +240,9 @@ public:
 extern stateManagerClass* stateManager;
 #include "src/actions.h"
 extern "C" void action_main_event_dispatcher(lv_event_t *e) {
-  if ( (lv_event_get_code(e) != LV_EVENT_PRESSED) && (lv_event_get_code(e) != LV_EVENT_CLICKED)   )return;    
+  
+  lv_event_code_t code = lv_event_get_code(e);
+  if (code != LV_EVENT_PRESSED && code != LV_EVENT_CLICKED && code != LV_EVENT_VALUE_CHANGED) return;    
   
   if (stateManager != NULL) {
         stateManager->handleScreenEvents(e);

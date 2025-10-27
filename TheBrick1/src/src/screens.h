@@ -91,6 +91,9 @@ typedef struct _objects_t {
     lv_obj_t *setting_company;
     lv_obj_t *obj12;
     lv_obj_t *settings_tz;
+    lv_obj_t *dst;
+    lv_obj_t *obj13;
+    lv_obj_t *obj14;
 } objects_t;
 
 extern objects_t objects;

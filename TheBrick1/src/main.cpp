@@ -192,7 +192,7 @@ void setup() {
   stateManager->setOrGetPendingScreenId( SCREEN_ID_LOGIN_SCREEN );
 
   try{
-      domainManagerClass::getInstance()->loadConfigFromKVStore();
+      domainManagerClass::getInstance()->loadConfigFromKVStore( "/kv/config" );
   }catch( const std::runtime_error& error ){
       Serial.println( error.what() );            
   }  

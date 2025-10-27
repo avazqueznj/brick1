@@ -6,10 +6,7 @@
  * 
  ********************************************************************************************/
 
-//TODO: get this from settings screen, and save it to KV magnus.conf
-String serverURL = "10.0.0.32"; 
-String getConfigPath = "/brickServer1/config";
-String postInspectionsPath = "/brickServer1/inspections";
+
 
 
                                 // P R O B L E M  ***  D O M A I N 
@@ -259,8 +256,6 @@ public:
 
 
 class domainManagerClass {
-
-
 private:
 
     // database
@@ -270,6 +265,15 @@ private:
     std::vector<inspectionTypeClass> inspectionTypes;
 
 public:
+
+    // from the config
+    String company = ""; 
+    String timezone = "";
+    String serverURL = "10.0.0.32"; 
+
+    // internal
+    String getConfigPath = "/brickServer1/config";
+    String postInspectionsPath = "/brickServer1/inspections";
 
     std::vector<userClass> getUsers() const {
         return users;
@@ -354,7 +358,7 @@ public:
                 std::vector<String> config = comms->GET( serverURL , getConfigPath );
 
                 parse( &config );
-                saveConfigToKVStore( &config );                
+                saveConfigToKVStore( "/kv/config", &config );                
 
                     String syncMessage = "Sync successful. \n";
                     syncMessage += "Loaded: \n";
@@ -640,7 +644,7 @@ public:
 
     //------------------------------
 
-    void saveConfigToKVStore(const std::vector<String>* config) {
+    void saveConfigToKVStore( const String path, const std::vector<String>* config) {
 
         Serial.println("Config save to KVStore....");
 
@@ -658,13 +662,15 @@ public:
         Serial.println("Config saved to KVStore.");
     }
 
-    void loadConfigFromKVStore() {
+    //-----
+
+    void loadConfigFromKVStore( const String path ) {
         Serial.println("Config load from KVStore and parse  ....");
 
         size_t actual_size = 0;
         char buffer[ CONFIG_KV_BUFFER_SIZE ]; 
 
-        int ret = kv_get("/kv/config", buffer, sizeof(buffer), &actual_size);
+        int ret = kv_get( path.c_str(), buffer, sizeof(buffer), &actual_size);
         if (ret != MBED_SUCCESS || actual_size == 0) {
             throw std::runtime_error("Failed to read config from disk!\nHave you ever synced ?");
         }
