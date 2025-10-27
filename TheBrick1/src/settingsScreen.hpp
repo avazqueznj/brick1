@@ -60,8 +60,8 @@ public:
             navigateTo( SCREEN_ID_LOGIN_SCREEN );
         }
 
-        if (code == LV_EVENT_VALUE_CHANGED && target == objects.settings_tz) {
-            int sel = lv_dropdown_get_selected(target);
+        if ( code == LV_EVENT_VALUE_CHANGED && ( target == objects.settings_tz || target == objects.dst  ) ) {
+            int sel = lv_dropdown_get_selected(objects.settings_tz);
             if (sel >= 0 && sel < tz_count) {
                 int offset = tz_offset_minutes[sel];
 
