@@ -32,57 +32,63 @@ public:
     //---
     // LV_KEYBOARD_MODE_NUMBER 
 
-    virtual void makeKeyboard(lv_keyboard_mode_t mode = LV_KEYBOARD_MODE_TEXT_LOWER ) {
-        if (kb == nullptr) {
-            kb = lv_keyboard_create(lv_scr_act());
-            lv_obj_set_size(kb, 800, 200);
-            lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+void makeKeyboard(lv_keyboard_mode_t mode = LV_KEYBOARD_MODE_TEXT_LOWER) {
+    if (kb == nullptr) {
+        kb = lv_keyboard_create(lv_scr_act());
+        lv_obj_set_size(kb, 800, 200);
+        lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
+        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
-            // Set keyboard mode
-            lv_keyboard_set_mode(kb, mode);
+        lv_keyboard_set_mode(kb, mode);
 
-            lv_obj_add_event_cb(
-                kb,
-                [](lv_event_t* e) {
-                    lv_event_code_t code = lv_event_get_code(e);
-                    screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
-                    if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
-                        lv_obj_add_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
-                    }
-                    //Serial.println( "Dismiss Keyboard !" );                                                                            
-                },
-                LV_EVENT_ALL,
-                this
-            );
-
-            Serial.println("Keyboard created");
-        }
-    }
-
-
-    // Attach keyboard to a textarea. Throws if kb is not set!
-    void addKeyboard(lv_obj_t* textarea) {
-
-        if (!kb) {
-            // Immediate fail — programmer error!
-            throw std::runtime_error("Keyboard not created before addKeyboard()!");
-        }
-
-        Serial.println( "Keyboard attached" );                                                
         lv_obj_add_event_cb(
-            textarea, 
-            [](lv_event_t* e) {                
-                lv_obj_t* ta = lv_event_get_target(e);
+            kb,
+            [](lv_event_t* e) {
+                lv_event_code_t code = lv_event_get_code(e);
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
-                lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);                
-                lv_keyboard_set_textarea(self->kb, ta);                
-                //Serial.println( "Open Keyboard !" );          
-                
+                if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
+                    lv_obj_add_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
+                    // Optionally, restore settings screen position if you moved it
+          
+                }
+            },
+            LV_EVENT_ALL,
+            this
+        );
+        Serial.println("Keyboard created");
+    }
+}
 
 
-            LV_EVENT_PRESSED, this);
-    }    
+
+void addKeyboard(lv_obj_t* textarea) {
+    if (!kb) {
+        throw std::runtime_error("Keyboard not created before addKeyboard()!");
+    }
+    Serial.println("Keyboard attached");
+
+    lv_obj_add_event_cb(
+        textarea,
+        [](lv_event_t* e) {
+            lv_obj_t* ta = lv_event_get_target(e);
+            screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
+
+            // Show keyboard
+            lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
+            lv_keyboard_set_textarea(self->kb, ta);
+
+
+
+        },
+        LV_EVENT_PRESSED,
+        this
+    );
+}
+
+
+
+
+
 
     lv_obj_t* getFocusedButton() {
         if (!inputGroup) return nullptr;
