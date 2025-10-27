@@ -48,6 +48,10 @@ public:
     settingsScreenClass(): screenClass( SCREEN_ID_SETTINGS ){    
     }
 
+    void clockTic( String time ) override {
+        lv_label_set_text( objects.clock_settings, time.c_str());
+    }
+
     void handleEvents( lv_event_t* e, String key ) override{
         
         screenClass::handleEvents( e, key );        
