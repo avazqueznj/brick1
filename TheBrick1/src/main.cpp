@@ -220,12 +220,15 @@ const unsigned long RFID_MS = 500;     // RFID poll
 const unsigned long RTC_MS  = 250;     // clock tick 250
 const unsigned long KEYS_MS = 50;      // keypad scan
 const unsigned long MEM_MS  = 3000;    // mem stats
+const unsigned long SERIAL_POLL_MS = 500;
+
 
 // ---- timer state ----
 unsigned long lastRfidAt = 0;
 unsigned long lastRtcAt  = 0;
 unsigned long lastKeysAt = 0;
 unsigned long lastMemAt  = 0;
+unsigned long lastSerialPollAt = 0;
 
 byte currentCardUID[20];
 byte currentCardLength = 0;
@@ -234,6 +237,9 @@ void navigateTo(int screenId) {
     stateManagerClass::setOrGetPendingScreenId(screenId);
 }
 
+void configChanged() {
+    stateManager->updateSettingsFile();
+}
 
 void loop() {
 
@@ -320,6 +326,52 @@ void loop() {
     }
   }
 
+  //-------------------  commands
+
+  if (now - lastSerialPollAt >= SERIAL_POLL_MS) {
+    lastSerialPollAt = now;
+
+    if (Serial.available()) {
+
+        // read
+        String cmd = "";
+        while (Serial.available()) {
+            char c = Serial.read();
+            if (c == '\n' || c == '\r') break;
+            cmd += c;
+        }
+
+        // do
+        cmd.trim();
+        if (cmd.length() > 0) {
+
+            if (cmd == "show config") {
+              domainManagerClass::getInstance()->printDebugContents();               
+            } 
+            
+
+            else if (cmd == "show settings") {
+              Serial.println("===== SETTINGS =====");
+              for (const auto& kv : stateManager->settings ) {
+                  Serial.print(kv.first); Serial.print(" = "); Serial.println(kv.second);
+              }
+              Serial.println("=================");
+            }  
+            
+            else if (cmd == "reset settings") {
+              Serial.println("===== SETTINGS RESET =====");
+              stateManager->resetSettingsFile();
+            } else             
+            
+            {
+              Serial.println( "*** Unknown brick command  ***" );
+            }
+        }
+
+
+    }
+  }
   
-  
+  //----------------------------------
+
 }

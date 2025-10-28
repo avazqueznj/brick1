@@ -22,6 +22,10 @@ public:
 
     virtual void init(){};
 
+    virtual void start(){};
+
+    virtual void stop(){};    
+
     virtual bool modalActive(){
         return false;
     };

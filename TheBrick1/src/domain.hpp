@@ -249,28 +249,32 @@ public:
 //-------------------------------------------------
 
 class domainManagerClass {
-private:
-
-    // database
-    std::vector<userClass> users;    
-    std::vector<assetClass> assets;
-    std::vector<layoutClass> layouts;
-    std::vector<inspectionTypeClass> inspectionTypes;
-
 public:
 
     // from the config
     String company = ""; 
     String serverURL = "10.0.0.32"; 
 
+    int  timeZoneIndex = 0;    
     int  timeOffsetFromUTC = 0;
-    int  timeZoneIndex = 0;
-    bool DST = false;
-
+    int DST = 0;
 
     // internal
     String getConfigPath = "/brickServer1/config";
     String postInspectionsPath = "/brickServer1/inspections";
+
+private:
+
+    // database
+    std::vector<userClass> users;    
+    std::vector<assetClass> assets;
+    std::vector<layoutClass> layouts;
+    std::vector<inspectionTypeClass> inspectionTypes;    
+
+
+//----------------------------
+
+public:
 
     std::vector<userClass> getUsers() const {
         return users;

@@ -262,8 +262,21 @@ void spinnerStart() {
 
 class configClass : public std::map<String, String> {
 public:
+
+    // Throwing operator[]
+    String& operator[](const String& key) {
+        auto it = this->find(key);
+        if (it == this->end())
+            throw std::out_of_range(("Missing config key: " + key).c_str());
+        return it->second;
+    }
+    
+    void defaultKey( String k, String v ){
+        std::map<String, String>::operator[](k) = v;
+    }
+
     void load(const String& filename) {
-        this->clear();
+        this->clear(); //<------------- note
         try {
             auto lines = loadFromKVStore(filename); // may throw
             for (const String& line : lines) {
@@ -273,7 +286,7 @@ public:
                 if (eq > 0) {
                     String k = s.substring(0, eq); k.trim();
                     String v = s.substring(eq + 1); v.trim();
-                    (*this)[k] = v;
+                    std::map<String, String>::operator[](k) = v;
                 }
             }
         } catch (const std::exception& e) {
@@ -283,6 +296,9 @@ public:
             throw std::runtime_error(msg.c_str());
         }
     }
+
+
+
     void save(const String& filename) const {
         try {
             std::vector<String> lines;
@@ -295,6 +311,9 @@ public:
             throw std::runtime_error(msg.c_str());
         }
     }
+
+
+
 };
 
 //-------------------------------------------------

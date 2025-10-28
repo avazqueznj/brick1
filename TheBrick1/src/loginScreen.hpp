@@ -9,7 +9,9 @@
 
 //-------------------------------------------------
 
+// global calls
 void navigateTo(int screenId);
+void configChanged();
 
 class loginScreenClass:public screenClass{
 public:

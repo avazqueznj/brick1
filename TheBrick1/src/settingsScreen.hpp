@@ -69,20 +69,21 @@ public:
             int sel = lv_dropdown_get_selected(objects.settings_tz);
             if (sel >= 0 && sel < tz_count) {
 
+                // offset
                 int offset = tz_offset_minutes[sel];
-        
-                // Check DST switch and add 60 if ON
+                // + DST
                 bool dst_active = lv_obj_has_state(objects.dst, LV_STATE_CHECKED);
                 if (dst_active) {
                     offset += 60;
                     Serial.println("DST is ON, adding 60 minutes.");
-                    domainManagerClass::getInstance()->DST = true;
+                    domainManagerClass::getInstance()->DST = 1;
                 }else{
-                    domainManagerClass::getInstance()->DST = false;
+                    domainManagerClass::getInstance()->DST = 0;
                 }
+                domainManagerClass::getInstance()->timeOffsetFromUTC = offset;                                
 
                 domainManagerClass::getInstance()->timeZoneIndex = sel;                                     
-                domainManagerClass::getInstance()->timeOffsetFromUTC = offset;                
+                
 
                 Serial.print("Timezone changed to index: ");
                 Serial.print( domainManagerClass::getInstance()->timeZoneIndex );
@@ -117,6 +118,61 @@ public:
         screenClass::addKeyboard( objects.setting_wifi_password );                        
 
         Serial.println( "Setting inited *********" );
+    }
+
+    void start() override {
+
+        Serial.println( ">>>Setting Start *********" );        
+         
+        lv_textarea_set_text( objects.setting_company , domainManagerClass::getInstance()->company.c_str() );
+
+        lv_dropdown_set_selected( objects.settings_tz , domainManagerClass::getInstance()->timeZoneIndex );        
+        if(  domainManagerClass::getInstance()->DST  == 1  ){
+            lv_obj_add_state(objects.dst, LV_STATE_CHECKED);
+        }else{
+            lv_obj_clear_state(objects.dst, LV_STATE_CHECKED);
+        }
+
+        lv_textarea_set_text( objects.setting_server_url , domainManagerClass::getInstance()->serverURL.c_str() );
+        lv_textarea_set_text( objects.setting_wifi_name , domainManagerClass::getInstance()->comms->ssid.c_str() );
+        lv_textarea_set_text( objects.setting_wifi_password , domainManagerClass::getInstance()->comms->pass.c_str() );
+
+
+        Serial.println( "<<<Setting started *********" );
+    }
+
+    void stop() override {
+        
+        // Write back company
+        domainManagerClass::getInstance()->company = lv_textarea_get_text(objects.setting_company);
+
+        // Write back selected timezone index
+        domainManagerClass::getInstance()->timeZoneIndex = lv_dropdown_get_selected(objects.settings_tz);
+
+        // Write back DST switch (true if checked, false otherwise)
+        domainManagerClass::getInstance()->DST = lv_obj_has_state(objects.dst, LV_STATE_CHECKED);
+
+        // Write back server URL
+        domainManagerClass::getInstance()->serverURL = lv_textarea_get_text(objects.setting_server_url);
+
+        // Write back WiFi credentials
+        if(domainManagerClass::getInstance()->comms) {
+            domainManagerClass::getInstance()->comms->ssid = lv_textarea_get_text(objects.setting_wifi_name);
+            domainManagerClass::getInstance()->comms->pass = lv_textarea_get_text(objects.setting_wifi_password);
+        }
+
+        // update offset
+        int offset = tz_offset_minutes[lv_dropdown_get_selected(objects.settings_tz)];
+        bool dst_active = lv_obj_has_state(objects.dst, LV_STATE_CHECKED);
+        if (dst_active) {
+            offset += 60;
+        }
+        domainManagerClass::getInstance()->timeOffsetFromUTC = offset;               
+
+        Serial.println("Setting stopped (values saved) *********");
+
+
+        configChanged();
     }
 
     virtual ~settingsScreenClass(){};

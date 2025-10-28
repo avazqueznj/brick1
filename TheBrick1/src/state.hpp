@@ -44,29 +44,79 @@ public:
   }    
 
 
+
   void init(){
     try{      
-      //COMMENT THIS TO RESET
       settings.load( settingsFileName );
-
     } catch (const std::exception& e) {
-
         String msg = String( "Could not load config, defaulting: " ) + e.what() ;
         Serial.println(msg); // optional
-
-        settings[ "company" ] = "DEMO";
-
-        settings[ "tz_id" ] = "1";
-        settings[ "tz_offset" ] = "-480";
-        settings[ "tz_dst" ] = "0";                        
-
-        settings[ "brick_server" ] = "10.0.0.32";
-        settings[ "wifi_ssid" ] = "irazu2G";
-        settings[ "wifi_password" ] = "casiocasio";                        
+        resetSettingsFile();
     }
+    applySettingsFile();
   }
      
-  
+
+  void updateSettingsFile() {
+
+    Serial.println( "*** Config has been update !! ***" );
+
+    // Domain
+    settings["company"] = domainManagerClass::getInstance()->company;
+
+    settings["timeZoneIndex"] = String(domainManagerClass::getInstance()->timeZoneIndex);
+    settings["timeOffsetFromUTC"] = String(domainManagerClass::getInstance()->timeOffsetFromUTC);
+    settings["DST"] = String( domainManagerClass::getInstance()->DST );
+
+    settings["serverURL"] = domainManagerClass::getInstance()->serverURL;
+    settings["getConfigPath"] = domainManagerClass::getInstance()->getConfigPath;
+    settings["postInspectionsPath"] = domainManagerClass::getInstance()->postInspectionsPath;
+
+    // Comms
+    if(domainManagerClass::getInstance()->comms) {
+        settings["wifi_ssid"] = domainManagerClass::getInstance()->comms->ssid;
+        settings["wifi_password"] = domainManagerClass::getInstance()->comms->pass;
+    }    
+
+    settings.save( settingsFileName ); 
+  }
+
+
+  void applySettingsFile(){
+
+    domainManagerClass::getInstance()->company  = settings[ "company" ] ;
+
+    domainManagerClass::getInstance()->timeZoneIndex = settings[ "timeZoneIndex" ].toInt(); 
+    domainManagerClass::getInstance()->timeOffsetFromUTC = settings[ "timeOffsetFromUTC" ].toInt();
+    domainManagerClass::getInstance()->DST = settings[ "DST" ].toInt() ;
+
+    domainManagerClass::getInstance()->serverURL = settings[ "serverURL" ] ;
+    domainManagerClass::getInstance()->getConfigPath = settings[ "getConfigPath" ] ;
+    domainManagerClass::getInstance()->postInspectionsPath = settings[ "postInspectionsPath" ] ;
+
+    domainManagerClass::getInstance()->comms->ssid = settings[ "wifi_ssid" ] ;
+    domainManagerClass::getInstance()->comms->pass = settings[ "wifi_password" ] ;
+  }
+
+  void resetSettingsFile(){
+
+        // domain
+        settings.defaultKey( "company" , "DEMO" );
+
+        settings.defaultKey( "timeZoneIndex" , "2" );
+        settings.defaultKey( "timeOffsetFromUTC" , "-420" );
+        settings.defaultKey( "DST" , "0" );                        
+
+        settings.defaultKey( "serverURL" , "10.0.0.32" );        
+        settings.defaultKey( "getConfigPath" , "/brickServer1/config" );        
+        settings.defaultKey( "postInspectionsPath" , "/brickServer1/inspections" );                        
+
+        // commos        
+        settings.defaultKey( "wifi_ssid" , "irazu2G" );
+        settings.defaultKey( "wifi_password" , "casiocasio" );  
+        
+        applySettingsFile();
+  }
 
   virtual ~stateManagerClass(){   
   }
@@ -240,10 +290,17 @@ public:
               if (!screenStates[nextScreen])
                   throw std::runtime_error("Failed to create screen instance for ID: ");
           }
-          currentScreenState = screenStates[nextScreen];
 
+          // close previous / save
+          if( currentScreenState != nullptr ){
+            currentScreenState->stop();
+          }
+          
+          // load / display new
+          currentScreenState = screenStates[nextScreen];
           loadScreen((ScreensEnum)nextScreen);
 
+          // wait for it to display
           int waitCount = 0;
           while (lv_scr_act() == oldRoot && waitCount++ < 50) {
               Serial.println("New screen not active.  tick..");
@@ -251,13 +308,12 @@ public:
               lv_timer_handler();
               ui_tick();
           }
+          if (lv_scr_act() == oldRoot) throw std::runtime_error("Timeout: LVGL did not swap root!");
 
-          if (lv_scr_act() == oldRoot)
-              throw std::runtime_error("Timeout: LVGL did not swap root!");
+          if (isNew) currentScreenState->init();
 
-          // ---- Only call init() if new ----
-          if (isNew)
-              currentScreenState->init();
+          // always
+          currentScreenState->start();
 
       } catch (const std::runtime_error& error) {
           Serial.println("*** Screen transition error ***");
