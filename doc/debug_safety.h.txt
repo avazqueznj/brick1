@@ -1,0 +1,88 @@
+// debug_safety.h
+// Minimal crash-friendly debug helpers for Arduino GIGA R1 (STM32H747, M7 core)
+// Usage:
+//   #include "debug_safety.h"
+//   void setup() {
+//     debug_safety_init();   // freeze watchdogs while halted in debugger
+//     ...
+//   }
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// PlatformIO (put these in your ST-Link debug environment):
+//
+// [env:giga_stlink]
+// platform = ststm32
+// board = giga_r1_m7
+// framework = arduino
+// build_type = debug
+// build_flags = -DDEBUG
+// upload_protocol = stlink
+// debug_tool = stlink
+// debug_speed = 4000            ; drop to 1000 if connect is flaky
+// debug_init_break = tbreak setup
+//
+// ; If attach/upload sometimes fails, temporarily add:
+// ; upload_flags =
+// ;   -c reset_config srst_only srst_nogate connect_assert_srst
+// ;   -c adapter speed 1000
+// ─────────────────────────────────────────────────────────────────────────────
+
+#ifndef DEBUG_SAFETY_H
+#define DEBUG_SAFETY_H
+
+#include <stdint.h>
+#include "stm32h7xx_hal.h"
+
+// Call this early in setup() to stop watchdogs while the core is halted by the debugger.
+static inline void debug_safety_init() {
+#if defined(DEBUG) || defined(_DEBUG)
+  // Freeze independent and window watchdogs during debug halt.
+  // Guards keep this portable across HAL versions.
+  #ifdef __HAL_DBGMCU_FREEZE_IWDG1
+  __HAL_DBGMCU_FREEZE_IWDG1();
+  #endif
+  #ifdef __HAL_DBGMCU_FREEZE_WWDG1
+  __HAL_DBGMCU_FREEZE_WWDG1();
+  #endif
+
+  // Optional: keep debug active in low-power modes if you use them.
+  // HAL_DBGMCU_EnableDBGStopMode();
+  // HAL_DBGMCU_EnableDBGStandbyMode();
+#endif
+}
+
+// Optional: capture fault registers for post-mortem in the Watch window.
+// Enable by defining DBG_SAFETY_CAPTURE_FAULT_REGS before including this header.
+#if (defined(DEBUG) || defined(_DEBUG)) && defined(DBG_SAFETY_CAPTURE_FAULT_REGS)
+static volatile uint32_t g_hfsr, g_cfsr, g_bfar, g_mmfar, g_lr, g_pc;
+#endif
+
+// Break into the debugger on HardFault so you land at the fault site.
+// Only active in debug builds (DEBUG or _DEBUG defined).
+#if defined(DEBUG) || defined(_DEBUG)
+extern "C" void HardFault_Handler(void) {
+  // Optionally snapshot fault context
+  #if defined(DBG_SAFETY_CAPTURE_FAULT_REGS)
+  g_hfsr  = SCB->HFSR;
+  g_cfsr  = SCB->CFSR;
+  g_bfar  = SCB->BFAR;
+  g_mmfar = SCB->MMFAR;
+  register uint32_t lr asm("lr");
+  register uint32_t pc asm("pc");
+  g_lr = lr; g_pc = pc;
+  #endif
+
+  __asm volatile("BKPT #0");   // breaks only if a debugger is attached
+  while (1) { /* stay here for inspection */ }
+}
+#endif
+
+#endif // DEBUG_SAFETY_H
+
+
+
+#include "debug_safety.h"
+void setup() {
+  debug_safety_init();
+  // ...
+}

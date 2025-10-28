@@ -220,7 +220,7 @@ const unsigned long RFID_MS = 500;     // RFID poll
 const unsigned long RTC_MS  = 250;     // clock tick 250
 const unsigned long KEYS_MS = 50;      // keypad scan
 const unsigned long MEM_MS  = 3000;    // mem stats
-const unsigned long SERIAL_POLL_MS = 500;
+const unsigned long SERIAL_POLL_MS = 500;  // telnet scan
 
 
 // ---- timer state ----
@@ -346,12 +346,13 @@ void loop() {
         if (cmd.length() > 0) {
 
             if (cmd == "show config") {
+              Serial.println("===== SHOW CONFIG =====");
               domainManagerClass::getInstance()->printDebugContents();               
             } 
             
 
             else if (cmd == "show settings") {
-              Serial.println("===== SETTINGS =====");
+              Serial.println("===== SHOW SETTINGS =====");
               for (const auto& kv : stateManager->settings ) {
                   Serial.print(kv.first); Serial.print(" = "); Serial.println(kv.second);
               }
@@ -359,7 +360,7 @@ void loop() {
             }  
             
             else if (cmd == "reset settings") {
-              Serial.println("===== SETTINGS RESET =====");
+              Serial.println("===== RESET SETTINGS  =====");
               stateManager->resetSettingsFile();
             } else             
             
