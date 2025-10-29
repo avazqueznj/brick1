@@ -4,7 +4,12 @@
 
 //***************************************************** */
 
+LV_FONT_DECLARE(lv_font_montserrat_28);
 
+
+
+static lv_style_t style_font;
+static bool style_ready = false;
 class screenClass{
 public:
 
@@ -347,6 +352,71 @@ void addKeyboard(lv_obj_t* textarea) {
             Serial.println("Keyboard destroyed");
         }        
     }
+
+
+            //-------------------------------------------
+            // DIALOG
+
+            
+            lv_obj_t *overlay = NULL;
+            lv_obj_t *mbox = NULL;
+
+            virtual void createDialog( String message )
+            {
+
+                // if it does not exist, show it
+                if (overlay == NULL ) {
+                     
+                    static const char * btns[] = { "OK", "" };
+
+                    // Create overlay
+                    overlay = lv_obj_create(lv_scr_act());
+                    lv_obj_set_size(overlay, LV_PCT(100), LV_PCT(100));
+                    lv_obj_set_style_bg_color(overlay, lv_color_black(), 0);
+                    lv_obj_set_style_bg_opa(overlay, LV_OPA_50, 0);
+                    lv_obj_clear_flag(overlay, LV_OBJ_FLAG_SCROLLABLE);
+                    lv_obj_add_flag(overlay, LV_OBJ_FLAG_CLICKABLE); 
+
+                    // Create message box
+                    mbox = lv_msgbox_create(overlay, "", message.c_str() , btns, false);
+                    lv_obj_center(mbox);
+
+                    // One-time style init
+                    if (!style_ready) {
+                        lv_style_init(&style_font);
+                        lv_style_set_text_font(&style_font, &lv_font_montserrat_28);
+                        style_ready = true;
+                    }
+
+                    // Apply style to text and buttons
+                    lv_obj_add_style(lv_msgbox_get_text(mbox), &style_font, 0);
+                    lv_obj_t * btnm = lv_msgbox_get_btns(mbox);
+                    lv_obj_add_style(btnm, &style_font, 0);
+
+                    // Set callback on button matrix
+                      // Lambda callback: hide overlay on button press
+                        lv_obj_add_event_cb(btnm,
+                            [](lv_event_t* e) {
+                                if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
+                                    lv_obj_t* btnm = lv_event_get_target(e);
+                                    lv_obj_t* mbox = lv_obj_get_parent(btnm);
+                                    lv_obj_t* overlay = lv_obj_get_parent(mbox);
+                                    lv_obj_add_flag(overlay, LV_OBJ_FLAG_HIDDEN);
+                                }
+                            },
+                            LV_EVENT_ALL,
+                            nullptr
+                        );
+                } 
+
+                // if it exists, show  it
+                lv_label_set_text(lv_msgbox_get_text(mbox), message.c_str() );
+                lv_obj_clear_flag(overlay, LV_OBJ_FLAG_HIDDEN);
+                lv_obj_clear_flag(mbox, LV_OBJ_FLAG_HIDDEN);
+
+
+            }
+
 
 
 };

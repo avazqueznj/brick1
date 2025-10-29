@@ -218,8 +218,7 @@ public:
             // Wait for server response
             unsigned long timeout = millis();
             while (client.available() == 0) {
-                if (millis() - timeout > 5000) {
-                    createDialog("Client Timeout");
+                if (millis() - timeout > 5000) {                    
                     client.stop();
                     throw std::runtime_error("Server did not respond!"); 
                 }

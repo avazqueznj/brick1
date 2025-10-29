@@ -38,7 +38,7 @@ public:
             ( focused == objects.do_sync && key == "#" )
         ){
             try{
-                domainManagerClass::getInstance()->sync();
+                createDialog( domainManagerClass::getInstance()->sync() );
             }catch( const std::runtime_error& error ){
                 Serial.println( error.what() );            
                 createDialog( error.what() );  

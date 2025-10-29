@@ -368,7 +368,7 @@ public:
         return false;
     }
 
-    void sync(){
+    String sync(){
         
         spinnerStart();
 
@@ -398,9 +398,9 @@ public:
                     syncMessage += " Users \n";       
 
                     spinnerEnd();        
-                    
-                    createDialog( syncMessage.c_str() );                                
 
+                    return syncMessage;
+                                
 
         }catch( const std::runtime_error& error ){
             spinnerEnd();

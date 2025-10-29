@@ -61,7 +61,8 @@ public:
 
         if( target == objects.do_sync_2 ){
             try{
-                domainManagerClass::getInstance()->sync();
+                createDialog( domainManagerClass::getInstance()->sync() );
+                
             }catch( const std::runtime_error& error ){
                 Serial.println( error.what() );            
                 createDialog( error.what() );  
@@ -85,6 +86,8 @@ public:
                     String( lv_textarea_get_text( objects.login_password ) ) )
                 ){
                     navigateTo( SCREEN_ID_MAIN );
+                }else{
+                    createDialog( "Invalid credentials" );  
                 }
 
         }
@@ -113,6 +116,17 @@ public:
 
         Serial.println( "Login inited *********" );
     }
+
+
+    void start() override {
+
+        Serial.println( ">>>Setting Start *********" );        
+              
+        lv_textarea_set_text( objects.login_username , "" );
+        lv_textarea_set_text( objects.login_password , "" );
+
+        Serial.println( "<<<Setting started *********" );
+    }    
 
     virtual ~loginScreenClass(){
     };

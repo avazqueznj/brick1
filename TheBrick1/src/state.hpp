@@ -183,17 +183,13 @@ public:
       Serial.println(key);
 
       // are we in system modal ? ignore
-      if ( overlay != nullptr ) {    
-        Serial.println( "State: System modal" );
-        // dismiss dialog
-        if (key == "#" ) {    
-          Serial.println("Keyboard # -> closing dialog");
-          lv_obj_t * mbox = lv_obj_get_child(overlay, 0);  // If overlay only has the mbox.
-          lv_msgbox_close(mbox);
-          lv_obj_del(overlay);
-        }
-        return; // eat the events, simulate modal
+      if ( currentScreenState->overlay && !lv_obj_has_flag(currentScreenState->overlay, LV_OBJ_FLAG_HIDDEN)) {
+          if (key == "#") {
+              lv_obj_add_flag(currentScreenState->overlay, LV_OBJ_FLAG_HIDDEN);
+          }
+          return;
       }
+
 
 
       // are we in window modal ? ignore
