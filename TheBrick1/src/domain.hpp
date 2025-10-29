@@ -6,7 +6,7 @@
  * 
  ********************************************************************************************/
 
-
+void navigateTo(int screenId);
 
 
                                 // P R O B L E M  ***  D O M A I N 
@@ -26,6 +26,12 @@ public:
         password(passwordParam){}
 
     virtual ~userClass(){}
+
+    void clear(){
+        name = "";
+        username = "";
+        password = "";
+    }
 };
 
 
@@ -328,7 +334,19 @@ public:
         users.clear();
     }
 
-    void login(String usernameParam, String passwordParam) {
+    void logout(){
+
+        loggedUser.clear();
+        currentInspection.clear();
+
+        navigateTo( SCREEN_ID_LOGIN_SCREEN );
+    }
+
+
+    bool login(String usernameParam, String passwordParam) {
+
+
+        Serial.print("Login ....");
 
         if( users.size() == 0 ){
             throw std::runtime_error("No users loaded, cannot login");
@@ -341,12 +359,13 @@ public:
 
                 Serial.print("Login successful: ");
                 Serial.println(users[i].name);
-                return; // Exit once we find a match
+                
+                return true;
             }
         }
 
-        // else..
-        throw std::runtime_error("Invalid credentials");
+        Serial.print("Login .... INVALID");
+        return false;
     }
 
     void sync(){

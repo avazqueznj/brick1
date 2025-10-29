@@ -285,6 +285,7 @@ public:
                   
                   case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass( &settings ); break;
                   case SCREEN_ID_SETTINGS:            screenStates[nextScreen] = new settingsScreenClass( &settings ); break;
+                  case SCREEN_ID_MAIN:            screenStates[nextScreen] = new mainScreenClass( &settings ); break;
                   default:
                       throw std::runtime_error("Unknown screen ID in getOrCreateScreen()");
               }

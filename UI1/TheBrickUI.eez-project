@@ -378,7 +378,7 @@
                   "type": "LVGLLabelWidget",
                   "left": 18,
                   "top": 42,
-                  "width": 239,
+                  "width": 221,
                   "height": 30,
                   "customInputs": [],
                   "customOutputs": [],
@@ -418,7 +418,7 @@
                   },
                   "group": "",
                   "groupIndex": 0,
-                  "text": "1 Check / Inspect",
+                  "text": "Check / Inspect",
                   "textType": "literal",
                   "longMode": "WRAP",
                   "recolor": false
@@ -453,7 +453,7 @@
               "objID": "bd302c2e-40a9-4770-c404-a504eb2b2b18",
               "type": "LVGLButtonWidget",
               "left": 591,
-              "top": 116,
+              "top": 190,
               "width": 188,
               "height": 50,
               "customInputs": [],
@@ -485,7 +485,7 @@
                   "type": "LVGLLabelWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 143,
+                  "width": 119,
                   "height": 30,
                   "customInputs": [],
                   "customOutputs": [],
@@ -525,7 +525,7 @@
                   },
                   "group": "",
                   "groupIndex": 0,
-                  "text": "2 Sync  \\uF079",
+                  "text": "Sync  \\uF079",
                   "textType": "literal",
                   "longMode": "WRAP",
                   "recolor": false
@@ -557,117 +557,10 @@
               "groupIndex": 0
             },
             {
-              "objID": "3597e36b-7e2d-4055-dab2-25e03ecddecf",
-              "type": "LVGLButtonWidget",
-              "left": 592,
-              "top": 190,
-              "width": 188,
-              "height": 50,
-              "customInputs": [],
-              "customOutputs": [],
-              "style": {
-                "objID": "d9098fdf-8424-47ee-80d3-b8e569d2d3b7",
-                "useStyle": "default",
-                "conditionalStyles": [],
-                "childStyles": []
-              },
-              "timeline": [],
-              "eventHandlers": [
-                {
-                  "objID": "9a77b1a8-82a4-4d56-819f-c50870ac8433",
-                  "eventName": "PRESSED",
-                  "handlerType": "action",
-                  "action": "mainEventDispatcher",
-                  "userData": 0
-                }
-              ],
-              "identifier": "doSettings",
-              "leftUnit": "px",
-              "topUnit": "px",
-              "widthUnit": "px",
-              "heightUnit": "px",
-              "children": [
-                {
-                  "objID": "ac5a0d82-fb97-4ae8-a957-ad78ebc5139a",
-                  "type": "LVGLLabelWidget",
-                  "left": 0,
-                  "top": 0,
-                  "width": 141,
-                  "height": 30,
-                  "customInputs": [],
-                  "customOutputs": [],
-                  "style": {
-                    "objID": "ed1d1ebc-a11f-4bb8-8594-7409640b9945",
-                    "useStyle": "default",
-                    "conditionalStyles": [],
-                    "childStyles": []
-                  },
-                  "timeline": [],
-                  "eventHandlers": [],
-                  "leftUnit": "px",
-                  "topUnit": "px",
-                  "widthUnit": "content",
-                  "heightUnit": "content",
-                  "children": [],
-                  "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-                  "hiddenFlagType": "literal",
-                  "clickableFlagType": "literal",
-                  "flagScrollbarMode": "",
-                  "flagScrollDirection": "",
-                  "scrollSnapX": "",
-                  "scrollSnapY": "",
-                  "checkedStateType": "literal",
-                  "disabledStateType": "literal",
-                  "states": "",
-                  "localStyles": {
-                    "objID": "4cdf630b-b904-4969-de89-282f3258b6ae",
-                    "definition": {
-                      "MAIN": {
-                        "DEFAULT": {
-                          "align": "CENTER",
-                          "text_font": "MONTSERRAT_28"
-                        }
-                      }
-                    }
-                  },
-                  "group": "",
-                  "groupIndex": 0,
-                  "text": "3 Settings",
-                  "textType": "literal",
-                  "longMode": "WRAP",
-                  "recolor": false
-                }
-              ],
-              "widgetFlags": "GESTURE_BUBBLE|PRESS_LOCK|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_ON_FOCUS|SCROLL_WITH_ARROW|SNAPPABLE",
-              "hiddenFlagType": "literal",
-              "clickableFlag": true,
-              "clickableFlagType": "literal",
-              "flagScrollbarMode": "",
-              "flagScrollDirection": "",
-              "scrollSnapX": "",
-              "scrollSnapY": "",
-              "checkedStateType": "literal",
-              "disabledStateType": "literal",
-              "states": "",
-              "useStyle": "button_default",
-              "localStyles": {
-                "objID": "cbe50886-23ba-4710-bcba-e02e3f84a753",
-                "definition": {
-                  "MAIN": {
-                    "FOCUSED": {
-                      "bg_color": "#ff0000"
-                    }
-                  }
-                }
-              },
-              "group": "",
-              "groupIndex": 0
-            },
-            {
               "objID": "e2abcf62-d493-4753-88da-63087f1d3039",
               "type": "LVGLButtonWidget",
               "left": 591,
-              "top": 264,
+              "top": 381,
               "width": 188,
               "height": 50,
               "customInputs": [],
@@ -699,7 +592,7 @@
                   "type": "LVGLLabelWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 121,
+                  "width": 130,
                   "height": 30,
                   "customInputs": [],
                   "customOutputs": [],
@@ -739,7 +632,7 @@
                   },
                   "group": "",
                   "groupIndex": 0,
-                  "text": "4 logout",
+                  "text": "logout \\uF093",
                   "textType": "literal",
                   "longMode": "WRAP",
                   "recolor": false

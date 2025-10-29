@@ -27,9 +27,9 @@ public:
 
     void handleEvents( lv_event_t* e, String key ) override{
 
-        screenClass::handleEvents( e, key );    
-
-        lv_obj_t *target = lv_event_get_target(e);
+        screenClass::handleEvents( e, key );            
+        lv_obj_t* target = lv_event_get_target(e);
+        lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
         // add numeric input to focused text areas
         if( key != "A" && key != "B" && key != "C" && key != "D" && key != "*" && key != "#"  ){
@@ -74,7 +74,20 @@ public:
             navigateTo( SCREEN_ID_SETTINGS );
         }
 
+        if( 
+            ( target == objects.login && key == "" ) ||
+            ( lv_group_get_focused(inputGroup) == objects.login && key == "#" ) ||
+            ( lv_group_get_focused(inputGroup) == objects.login_password && key == "#" )
+        ){
+            if(
+                domainManagerClass::getInstance()->login(    
+                    String( lv_textarea_get_text( objects.login_username ) ),
+                    String( lv_textarea_get_text( objects.login_password ) ) )
+                ){
+                    navigateTo( SCREEN_ID_MAIN );
+                }
 
+        }
 
     }
 

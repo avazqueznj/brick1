@@ -34,6 +34,7 @@
       #include "screenClass.hpp"
       #include "loginScreen.hpp"
       #include "settingsScreen.hpp"
+      #include "mainScreen.hpp"
 
 #include "state.hpp"
 
