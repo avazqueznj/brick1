@@ -33,7 +33,7 @@
 class stateManagerClass{
 public:
 
-  configClass settings;
+  settingsClass settings;
 
 
   //-------------------------------------------------
@@ -53,11 +53,11 @@ public:
         Serial.println(msg); // optional
         resetSettingsFile();
     }
-    applySettingsFile();
+    readSettingsFile();
   }
      
 
-  void updateSettingsFile() {
+  void saveSettingsFile() {
 
     Serial.println( "*** Config has been update !! ***" );
 
@@ -82,7 +82,7 @@ public:
   }
 
 
-  void applySettingsFile(){
+  void readSettingsFile(){
 
     domainManagerClass::getInstance()->company  = settings[ "company" ] ;
 
@@ -115,7 +115,8 @@ public:
         settings.defaultKey( "wifi_ssid" , "irazu2G" );
         settings.defaultKey( "wifi_password" , "casiocasio" );  
         
-        applySettingsFile();
+        readSettingsFile();
+        saveSettingsFile();
   }
 
   virtual ~stateManagerClass(){   

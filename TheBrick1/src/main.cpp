@@ -238,7 +238,7 @@ void navigateTo(int screenId) {
 }
 
 void configChanged() {
-    stateManager->updateSettingsFile();
+    stateManager->saveSettingsFile();
 }
 
 void loop() {

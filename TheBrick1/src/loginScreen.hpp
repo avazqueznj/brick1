@@ -17,7 +17,7 @@ class loginScreenClass:public screenClass{
 public:
     
 
-    loginScreenClass( configClass* settings ): screenClass( settings, SCREEN_ID_LOGIN_SCREEN ){            
+    loginScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_LOGIN_SCREEN ){            
     }
 
     void clockTic( String time ) override {

@@ -260,7 +260,7 @@ void spinnerStart() {
 
 //-------------------------------------------------
 
-class configClass : public std::map<String, String> {
+class settingsClass : public std::map<String, String> {
 public:
 
     // Throwing operator[]
