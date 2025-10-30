@@ -29,7 +29,7 @@ public:
 
         screenClass::handleEvents( e, key );            
         lv_obj_t* target = lv_event_get_target(e);
-        lv_obj_t* focused = lv_group_get_focused(inputGroup);
+        //lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
         // add numeric input to focused text areas
         if( key != "A" && key != "B" && key != "C" && key != "D" && key != "*" && key != "#"  ){
@@ -80,15 +80,18 @@ public:
             ( lv_group_get_focused(inputGroup) == objects.login && key == "#" ) ||
             ( lv_group_get_focused(inputGroup) == objects.login_password && key == "#" )
         ){
-            if(
-                domainManagerClass::getInstance()->login(    
-                    String( lv_textarea_get_text( objects.login_username ) ),
-                    String( lv_textarea_get_text( objects.login_password ) ) )
-                ){
-                    navigateTo( SCREEN_ID_MAIN );
-                }else{
-                    createDialog( "Invalid credentials" );  
-                }
+
+            navigateTo( SCREEN_ID_MAIN );
+
+            // if(
+            //     domainManagerClass::getInstance()->login(    
+            //         String( lv_textarea_get_text( objects.login_username ) ),
+            //         String( lv_textarea_get_text( objects.login_password ) ) )
+            //     ){
+            //         navigateTo( SCREEN_ID_MAIN );
+            //     }else{
+            //         createDialog( "Invalid credentials" );  
+            //     }
 
         }
 

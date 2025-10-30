@@ -279,6 +279,7 @@ public:
           if (isNew) {
               switch (nextScreen) {
                   
+                  case SCREEN_ID_SELECT_ASSET_SCREEN:        screenStates[nextScreen] = new selectAssetScreenClass( &settings ); break;
                   case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass( &settings ); break;
                   case SCREEN_ID_SETTINGS:            screenStates[nextScreen] = new settingsScreenClass( &settings ); break;
                   case SCREEN_ID_MAIN:            screenStates[nextScreen] = new mainScreenClass( &settings ); break;
@@ -316,7 +317,7 @@ public:
       } catch (const std::runtime_error& error) {
           Serial.println("*** Screen transition error ***");
           Serial.println(error.what());
-          throw;
+          sosBlink();
       }
   }
 

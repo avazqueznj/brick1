@@ -53,6 +53,13 @@ public:
             domainManagerClass::getInstance()->logout();
         }    
         
+        if( 
+            ( target == objects.do_inspect_button ) ||
+            ( focused == objects.do_inspect_button && key == "#" )
+        ){
+
+            navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
+        }            
         
     }
 

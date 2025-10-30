@@ -35,7 +35,7 @@ void create_screen_main() {
             lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "2025/7/4 12:8:25");
+            lv_label_set_text(obj, "1972/6/22 12:8:25");
         }
         {
             // driver_name_main
@@ -250,8 +250,8 @@ void create_screen_select_asset_screen() {
             // selected_asset_list
             lv_obj_t *obj = lv_list_create(parent_obj);
             objects.selected_asset_list = obj;
-            lv_obj_set_pos(obj, 448, 146);
-            lv_obj_set_size(obj, 342, 271);
+            lv_obj_set_pos(obj, 441, 146);
+            lv_obj_set_size(obj, 349, 271);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
@@ -284,7 +284,7 @@ void create_screen_select_asset_screen() {
             // deSelectAsset
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.de_select_asset = obj;
-            lv_obj_set_pos(obj, 372, 246);
+            lv_obj_set_pos(obj, 367, 302);
             lv_obj_set_size(obj, 67, 56);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
@@ -298,7 +298,7 @@ void create_screen_select_asset_screen() {
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "\uF053");
+                    lv_label_set_text(obj, "\uF00D");
                 }
             }
         }
@@ -306,7 +306,7 @@ void create_screen_select_asset_screen() {
             // selectAsset
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.select_asset = obj;
-            lv_obj_set_pos(obj, 372, 173);
+            lv_obj_set_pos(obj, 367, 188);
             lv_obj_set_size(obj, 67, 56);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
@@ -373,7 +373,7 @@ void create_screen_select_asset_screen() {
             lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "2025/7/4 12:8:25");
+            lv_label_set_text(obj, "1972/6/22 12:8:25");
         }
         {
             // driver_name_asset
@@ -519,7 +519,7 @@ void create_screen_select_inspection_type() {
             lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "2025/7/4 12:8:25");
+            lv_label_set_text(obj, "1972/6/22 12:8:25");
         }
         {
             // driver_name_insptype
@@ -690,7 +690,7 @@ void create_screen_inspection_form() {
             lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "2025/7/4 12:8:25");
+            lv_label_set_text(obj, "1972/6/22 12:8:25");
         }
         {
             // driver_name_form
@@ -729,7 +729,7 @@ void create_screen_inspection_zones() {
             lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "2025/7/4 12:8:25");
+            lv_label_set_text(obj, "1972/6/22 12:8:25");
         }
         {
             // driver_name_zones
@@ -1011,6 +1011,16 @@ void create_screen_inspection_zones() {
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, false);
             lv_textarea_set_password_mode(obj, false);
+            lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
+            lv_obj_set_scroll_dir(obj, LV_DIR_VER);
+        }
+        {
+            lv_obj_t *obj = lv_dropdown_create(parent_obj);
+            lv_obj_set_pos(obj, 243, 88);
+            lv_obj_set_size(obj, 220, LV_SIZE_CONTENT);
+            lv_dropdown_set_options(obj, "Option 1\nOption 2\nOption 3");
+            lv_dropdown_set_selected(obj, 0);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
         }
     }
     
@@ -1053,7 +1063,7 @@ void create_screen_login_screen() {
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "2025-01-18 12 12:12:12");
+            lv_label_set_text(obj, "1972/6/22 12 12:12:12");
         }
         {
             // logo1_6
@@ -1354,7 +1364,7 @@ void create_screen_settings() {
             lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "2025/7/4 12:8:25");
+            lv_label_set_text(obj, "1972/6/22 12:8:25");
         }
     }
     

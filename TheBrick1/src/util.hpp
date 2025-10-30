@@ -46,40 +46,31 @@ void delayBlink() {
 }
 
 void sosBlink() {
-  const int dot = 200;    // ms
-  const int dash = 600;
-  const int gap = 200;
+    const int dot = 100;    // ms
+    const int dash = 500;
+    const int gap = 300;
 
-  // S : dot dot dot
-  for (int i = 0; i < 3; i++) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(dot);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(gap);
-  }
+    while( true ){
+        // S : dot dot dot
+        for (int i = 0; i < 3; i++) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(dot);
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(dot);
+        }
 
-  delay(gap);
+        delay(gap);
 
-  // O : dash dash dash
-  for (int i = 0; i < 3; i++) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(dash);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(gap);
-  }
+        // O : dash dash dash
+        for (int i = 0; i < 3; i++) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(dash);
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(dash);
+        }
 
-  delay(gap);
-
-  // S : dot dot dot
-  for (int i = 0; i < 3; i++) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(dot);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(gap);
-  }
-
-  // Gap between repetitions
-  delay(1000);
+        delay(1000);        
+    }
 }
 
 

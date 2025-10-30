@@ -52,8 +52,7 @@ public:
         lv_label_set_text( objects.clock_settings, time.c_str());
     }
 
-    void handleEvents( lv_event_t* e, String key ) override{
-        
+    void handleEvents( lv_event_t* e, String key ) override{       
         screenClass::handleEvents( e, key );        
         lv_obj_t *target = lv_event_get_target(e);
         lv_event_code_t code = lv_event_get_code(e);

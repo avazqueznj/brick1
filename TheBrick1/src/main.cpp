@@ -35,6 +35,7 @@
       #include "loginScreen.hpp"
       #include "settingsScreen.hpp"
       #include "mainScreen.hpp"
+      #include "selectAssetScreen.hpp"      
 
 #include "state.hpp"
 

@@ -270,7 +270,6 @@ public:
     String postInspectionsPath = "/brickServer1/inspections";
 
 private:
-
     // database
     std::vector<userClass> users;    
     std::vector<assetClass> assets;
@@ -282,21 +281,11 @@ private:
 
 public:
 
-    std::vector<userClass> getUsers() const {
-        return users;
-    }
-
-    std::vector<assetClass> getAssets() const {
-        return assets;
-    }
-
-    std::vector<layoutClass> getLayouts() const {
-        return layouts;
-    }
-
-    std::vector<inspectionTypeClass> getInspectionTypes() const {
-        return inspectionTypes;
-    }
+    // Const reference getters
+    const std::vector<userClass>* getUsers() const { return &users; }
+    const std::vector<assetClass>* getAssets() const { return &assets; }
+    const std::vector<layoutClass>* getLayouts() const { return &layouts; }
+    const std::vector<inspectionTypeClass>* getInspectionTypes() const { return &inspectionTypes; }
 
     // has
     bool isLoaded = false;
