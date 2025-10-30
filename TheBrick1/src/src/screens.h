@@ -30,7 +30,8 @@ typedef struct _objects_t {
     lv_obj_t *obj1;
     lv_obj_t *de_select_asset;
     lv_obj_t *select_asset;
-    lv_obj_t *search_assets;
+    lv_obj_t *search_asset;
+    lv_obj_t *clear_search_assets;
     lv_obj_t *obj2;
     lv_obj_t *clock_asset;
     lv_obj_t *driver_name_asset;

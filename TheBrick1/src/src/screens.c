@@ -325,9 +325,11 @@ void create_screen_select_asset_screen() {
             }
         }
         {
+            // searchAsset
             lv_obj_t *obj = lv_textarea_create(parent_obj);
-            lv_obj_set_pos(obj, 21, 79);
-            lv_obj_set_size(obj, 269, 45);
+            objects.search_asset = obj;
+            lv_obj_set_pos(obj, 21, 81);
+            lv_obj_set_size(obj, 270, 45);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, false);
             lv_textarea_set_password_mode(obj, false);
@@ -335,10 +337,10 @@ void create_screen_select_asset_screen() {
             add_style_text_area(obj);
         }
         {
-            // searchAssets
+            // clearSearchAssets
             lv_obj_t *obj = lv_btn_create(parent_obj);
-            objects.search_assets = obj;
-            lv_obj_set_pos(obj, 297, 79);
+            objects.clear_search_assets = obj;
+            lv_obj_set_pos(obj, 301, 81);
             lv_obj_set_size(obj, 66, 45);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
@@ -351,7 +353,7 @@ void create_screen_select_asset_screen() {
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "\uF06E");
+                    lv_label_set_text(obj, "\uF00D");
                 }
             }
         }

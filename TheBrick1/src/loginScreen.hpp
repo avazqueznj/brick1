@@ -83,15 +83,16 @@ public:
 
             navigateTo( SCREEN_ID_MAIN );
 
-            // if(
-            //     domainManagerClass::getInstance()->login(    
-            //         String( lv_textarea_get_text( objects.login_username ) ),
-            //         String( lv_textarea_get_text( objects.login_password ) ) )
-            //     ){
-            //         navigateTo( SCREEN_ID_MAIN );
-            //     }else{
-            //         createDialog( "Invalid credentials" );  
-            //     }
+        //    if(
+                domainManagerClass::getInstance()->login(    
+                    String( lv_textarea_get_text( objects.login_username ) ),
+                    String( lv_textarea_get_text( objects.login_password ) ) )
+                    ;
+          //      ){
+                    navigateTo( SCREEN_ID_MAIN );
+            //    }else{
+              //      createDialog( "Invalid credentials" );  
+//                }
 
         }
 
