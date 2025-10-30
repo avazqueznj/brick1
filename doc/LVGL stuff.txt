@@ -1,0 +1,9 @@
+
+
+press event is fast
+
+click is on lift, but it wont leak on modals
+
+value changed is for value
+
+click focusable to allow take focus

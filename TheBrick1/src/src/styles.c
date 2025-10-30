@@ -83,6 +83,7 @@ lv_style_t *get_style_button_default_MAIN_DISABLED() {
 
 void init_style_button_default_MAIN_FOCUSED(lv_style_t *style) {
     lv_style_set_radius(style, 2);
+    lv_style_set_bg_color(style, lv_color_hex(0xffff0000));
 };
 
 lv_style_t *get_style_button_default_MAIN_FOCUSED() {

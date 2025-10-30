@@ -111,8 +111,10 @@ public:
     //----------------------------------
 
     void handleEvents( lv_event_t* e, String key ) override{
-        screenClass::handleEvents( e, key );        
-        lv_obj_t *target = lv_event_get_target(e);    
+
+        screenClass::handleEvents( e, key );            
+        lv_obj_t* target = lv_event_get_target(e);
+        //lv_obj_t* focused = lv_group_get_focused(inputGroup);        
 
         Serial.print( key );
 
@@ -121,6 +123,7 @@ public:
         if (!list) return;
         selectedButton = nullptr;  // Reset
         
+        // find selected currently
         uint32_t count = lv_obj_get_child_cnt(list);
         for (uint32_t i = 0; i < count; ++i) {
             lv_obj_t* btn = lv_obj_get_child(list, i);
@@ -134,19 +137,45 @@ public:
             Serial.println("No CHECKED button found in list.");
         }
 
+
         // keyboard events
         if( key != "" ){
+            Serial.println("select: by key ..." + key );                         
+            lv_obj_t* focused = lv_group_get_focused(inputGroup);
+
+            if (key.length() == 1 && isdigit(key[0])) {
+                // key is a single digit character
+                if (focused == objects.search_asset) {
+                    lv_textarea_add_char(objects.search_asset, key[0]);
+                }
+            }
 
             // special short cut to add remove assets        
             if( key == "#" || key == "*" ){     
                  
-                Serial.println("select: by key ..." + key );                         
-                lv_obj_t* focused = lv_group_get_focused(inputGroup);
+
+                if( focused == objects.search_asset_clear && key == "#" ){
+                    lv_textarea_set_text(objects.search_asset, "");
+                }
+
+                // on the seatch and #
+                if (focused && focused == objects.search_asset   ){
+                    if( key == "#" ){
+                        doSelectAsset();
+                    }
+                }
+
+                // on the seatch and #
+                if (focused && focused == objects.search_asset   ){
+                    if( key == "*" ){
+                        deselectAsset();
+                        lv_textarea_set_text(objects.search_asset, "");
+                    }
+                }
 
                 // on the list and #
                 if (focused && focused == objects.asset_list   ){
                     if( key == "#" ){
-                        // clicked # enter ? then add assset short cut
                         doSelectAsset();
                     }
                 }
@@ -154,7 +183,6 @@ public:
                 // on the list and *
                 if (focused && focused == objects.asset_list   ){
                     if(  key == "*" ){
-                        // clicked # enter ? then add assset short cut
                         deselectAsset();
                     }
                 }
@@ -162,23 +190,29 @@ public:
                 // on ">"
                 if ( focused && focused == objects.select_asset  ){
                     if(  key == "#" ){
-                        // clicked # enter ? then add assset short cut
                         doSelectAsset();
                     }
                 }
 
-                // on X
+                // on "<"
                 if ( focused && focused == objects.de_select_asset ){
                     if(  key == "#" ){
-                        // clicked # enter ? then add assset short cut
+                        deselectAsset();                        
+                    }
+                    if(  key == "*" ){
                         deselectAsset();
                     }
+
                 }
             }
         }
 
         // non keyboard events
         if( key == "" ){
+            
+            if( target == objects.search_asset_clear  ){
+                lv_textarea_set_text(objects.search_asset, "");
+            }
 
             // CLICK select
             if( target == objects.select_asset  ){
@@ -213,6 +247,45 @@ public:
             }     
 
         }
+
+        // search 
+        if (target == objects.search_asset && lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {            
+            const char* searchText = lv_textarea_get_text(objects.search_asset);
+            if (searchText && strlen(searchText) > 0) {
+                // Lowercase for case-insensitive matching (if needed)
+                String query = String(searchText);
+                query.toLowerCase();
+
+                uint32_t count = lv_obj_get_child_cnt(objects.asset_list);
+                for (uint32_t i = 0; i < count; ++i) {
+                    lv_obj_t* btn = lv_obj_get_child(objects.asset_list, i);
+                    assetClass* asset = static_cast<assetClass*>(lv_obj_get_user_data(btn));
+                    if (asset) {
+                        String btnName = asset->buttonName;
+                        btnName.toLowerCase();
+                        if (btnName.indexOf(query) != -1) {
+                            // Match found: select visually and call doSelectAsset()
+                            selectedButton = btn;
+
+                            // Mark as checked, uncheck others
+                            for (uint32_t j = 0; j < count; ++j) {
+                                lv_obj_t* b = lv_obj_get_child(objects.asset_list, j);            
+                                if (b == btn) {
+                                    lv_obj_add_state(b, LV_STATE_CHECKED);
+                                } else {
+                                    lv_obj_clear_state(b, LV_STATE_CHECKED);
+                                }
+                            }
+
+                            lv_obj_scroll_to_view(selectedButton, LV_ANIM_ON);
+
+                            //doSelectAsset();
+                            break; // Only first match
+                        }
+                    }
+                }
+            }            
+        }        
 
     }
 
@@ -299,16 +372,26 @@ public:
 
             // default
             lv_group_add_obj(inputGroup, objects.asset_list  );
-            lv_group_add_obj(inputGroup, objects.select_asset);
-            lv_group_add_obj(inputGroup, objects.de_select_asset);
+            // lv_group_add_obj(inputGroup, objects.select_asset);
+            // lv_group_add_obj(inputGroup, objects.de_select_asset);
 
             // nav bar 
             lv_group_add_obj(inputGroup, objects.do_select_inspection_type);            
             lv_group_add_obj(inputGroup, objects.back_from_select_asset);            
 
+
+            lv_group_add_obj(inputGroup, objects.search_asset );            
+            lv_group_add_obj(inputGroup, objects.search_asset_clear);            
+
+
+
         }
         
         screenClass::init(); // always last, only if no issues
+
+
+        screenClass::makeKeyboard();
+        screenClass::addKeyboard( objects.search_asset);
     }
 
     void start() override{
@@ -337,6 +420,7 @@ public:
 
     }
 
+    // checkable for source list uncheckable to selected list
     lv_obj_t* addAssetToList( lv_obj_t* parent_obj, const assetClass* asset, bool checkable ){
                     
         lv_obj_t* button = lv_btn_create(parent_obj);

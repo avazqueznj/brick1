@@ -1,0 +1,35 @@
+Short answer: yes. The GIGA R1 (STM32H747, M7 @ 480 MHz + M4 @ 240 MHz) is plenty capable of TinyML, and people run TensorFlow Lite for Microcontrollers (TFLM) and Edge Impulse models on it today. ([Arduino Online Shop][1])
+
+## What works well
+
+* **TensorFlow Lite Micro (TFLM) on Arduino** – use the official Arduino-targeted TFLM repo/examples. It builds on ARM Cortex-M (like the H747 on GIGA) and is actively maintained. ([GitHub][2])
+* **Edge Impulse (EI) models** – you can export an EI project as a C/C++ library and run it on GIGA. There’s even a published EI project titled *“Fall Detection … – Arduino Giga R1 WiFi”* that discusses fitting a Transformer model into M7 RAM (notes the M7 has ~512 KB of the 1 MB internal RAM), i.e., it’s doable with careful sizing. ([Edge Impulse Documentation][3])
+
+## Caveats to know up front
+
+* **Official EI device support**: EI doesn’t list the GIGA as an officially supported “one-click” target; you may need to handle sensor/audio drivers yourself (e.g., mic input), but deployment via the C++ SDK works. ([Edge Impulse Forum][4])
+* **Library install**: the old “Arduino_TensorFlowLite” via Library Manager was removed; install TFLM from GitHub (or use a wrapper lib). Arduino’s own docs now say to download manually. ([Arduino Documentation][5])
+
+## Fastest paths (pick one)
+
+1. **Pure TFLM**
+   Grab `tflite-micro-arduino-examples` and start with `hello_world` or a sensor example; target the **M7 core**. ([GitHub][2])
+2. **Edge Impulse export**
+   Train in EI → *Deployment → C++ library* → drop into your PIO/Arduino project → call `run_classifier()` (or equivalent). The GIGA EI project above shows model sizing tips that fit in RAM. ([Edge Impulse Documentation][3])
+3. **EloquentTinyML wrapper**
+   A thin wrapper around TFLM that many use on H7-class boards (Portenta H7 == same H747 family). It’s architecture-agnostic per Arduino docs. ([Arduino Documentation][6])
+
+## GIGA-specific tips (from experience)
+
+* **Use M7 for inference.** Keep your UI/IO work off the hot path; if you’re pushing LVGL hard, consider moving housekeeping to M4 and reserving M7 cycles for ML.
+* **Plan the tensor arena.** Start around **200–300 KB** for simple models; scale up as needed. If you use the external SDRAM on GIGA, you can place the arena there to leave internal RAM to LVGL/framebuffers.
+* **Quantize** (INT8) whenever possible; it shrinks model + arena and speeds up CMSIS-NN kernels on Cortex-M. (TFLM uses CMSIS-NN on ARM under the hood.)
+
+If you want, I can sketch a tiny PlatformIO setup for either (a) TFLM “hello world” on the M7 or (b) an Edge Impulse C++ export wired into your LVGL loop.
+
+[1]: https://store-usa.arduino.cc/products/giga-r1-wifi?srsltid=AfmBOopmBl_jdunWmBqG5KTPf4rgY6amSovORYsu5_VYenxXQ5B6Z0x2&utm_source=chatgpt.com "Arduino GIGA R1 WiFi"
+[2]: https://github.com/tensorflow/tflite-micro-arduino-examples?utm_source=chatgpt.com "tensorflow/tflite-micro-arduino-examples"
+[3]: https://docs.edgeimpulse.com/projects/expert-network/fall-detection-with-transformer-model-arduino-giga-r1 "Fall Detection using a Transformer Model – Arduino Giga R1 WiFi - Edge Impulse Documentation"
+[4]: https://forum.edgeimpulse.com/t/classifying-audio-with-arduino-giga-r1-wifi/9229?utm_source=chatgpt.com "Classifying Audio with Arduino GIGA R1 WiFi - Help"
+[5]: https://docs.arduino.cc/tutorials/nano-33-ble-sense/get-started-with-machine-learning?utm_source=chatgpt.com "Get Started With Machine Learning on Arduino"
+[6]: https://docs.arduino.cc/libraries/eloquenttinyml/?utm_source=chatgpt.com "EloquentTinyML"
