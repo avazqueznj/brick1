@@ -152,7 +152,11 @@ public:
 
             // special short cut to add remove assets        
             if( key == "#" || key == "*" ){     
-                 
+
+                if( focused == objects.back_from_select_asset&& key == "#" ){
+                    navigateTo( SCREEN_ID_MAIN );
+                }
+
 
                 if( focused == objects.search_asset_clear && key == "#" ){
                     lv_textarea_set_text(objects.search_asset, "");
@@ -209,7 +213,16 @@ public:
 
         // non keyboard events
         if( key == "" ){
+
+            if( target == objects.back_from_select_asset){
+                navigateTo( SCREEN_ID_MAIN );
+            }
+            if( target == objects.do_select_inspection_type  ){
             
+            }
+
+            
+
             if( target == objects.search_asset_clear  ){
                 lv_textarea_set_text(objects.search_asset, "");
             }
@@ -345,26 +358,6 @@ public:
 
     void init() override {
 
-        domainManagerClass* domain = domainManagerClass::getInstance();        
-
-        domain->currentInspection.clear();
-    
-        // clean
-        lv_obj_clean(objects.asset_list); 
-        lv_obj_clean(objects.selected_asset_list); 
-
-        // add assets to select
-        // load all assets
-        for (const assetClass& asset : *(domain->getAssets()) ) {
-            addAssetToList(objects.asset_list, &asset, true);
-            for (assetClass& selected : domain->currentInspection.assets) {
-                if (asset.ID == selected.ID) {
-                    addAssetToList(objects.selected_asset_list, &asset, false);
-                    break;
-                }
-            }
-        }
-
 
         {
             //-------------------------------------
@@ -396,16 +389,34 @@ public:
 
     void start() override{
 
+        domainManagerClass* domain = domainManagerClass::getInstance();        
+        domain->currentInspection.clear();
+    
+        // clean
+        lv_obj_clean(objects.asset_list); 
+        lv_obj_clean(objects.selected_asset_list); 
+
+        // add assets to select
+        for (const assetClass& asset : *(domain->getAssets()) ) {
+            addAssetToList(objects.asset_list, &asset, true);
+            for (assetClass& selected : domain->currentInspection.assets) {
+                if (asset.ID == selected.ID) {
+                    addAssetToList(objects.selected_asset_list, &asset, false);
+                    break;
+                }
+            }
+        }
+
     }
 
     void stop() override{
 
-        domainManagerClass* domain = domainManagerClass::getInstance();    
-        domain->currentInspection.assets.clear();
+        domainManagerClass* domain = domainManagerClass::getInstance();            
         domain->currentInspection.driver_name = domain->loggedUser.name;
         domain->currentInspection.driver_username = domain->loggedUser.username;
 
         // Count selected asset buttons
+        domain->currentInspection.assets.clear();
         uint32_t child_count = lv_obj_get_child_cnt(objects.selected_asset_list);
         for (uint32_t i = 0; i < child_count; ++i) {
             lv_obj_t* child = lv_obj_get_child(objects.selected_asset_list, i);

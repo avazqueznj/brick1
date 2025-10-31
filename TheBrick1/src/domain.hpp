@@ -154,12 +154,6 @@ public:
             result += type->name;
             result += "\n";
 
-            result += "Driver: ";
-            result += driver_username;
-            result += " ";       
-            result += driver_name;
-            result += "\n";            
-
             result += "Layouts:\n";
             for (const auto& layout : type->layouts) {
                 result += " - ";
@@ -193,6 +187,13 @@ public:
         } else {
             result += "Type: NULL\n";
         }
+
+        result += "Driver: ";
+        result += driver_username;
+        result += " ";       
+        result += driver_name;
+        result += "\n";            
+
 
         result += "Submit time: ";
         result += submitTime;

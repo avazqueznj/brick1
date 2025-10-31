@@ -7,3 +7,29 @@ click is on lift, but it wont leak on modals
 value changed is for value
 
 click focusable to allow take focus
+
+
+
+Buy With Confidence:
+
+If the product says:
+
+“MIFARE Classic 1K/4K”
+
+“MIFARE Ultralight”
+
+“NTAG203/213/215/216”
+
+“NFC Type 2/4 Tag”
+
+“ISO14443A”
+
+Then: MFRC522 will read (and often write to) it.
+
+Do NOT buy:
+
+Anything that says “125 KHz”
+
+“EM4100”, “T5577”, “HID Prox”
+
+“FeliCa” or “ISO15693”

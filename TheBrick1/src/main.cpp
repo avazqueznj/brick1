@@ -360,13 +360,23 @@ void loop() {
               }
               Serial.println("=================");
             }  
+
             
             else if (cmd == "reset settings") {
               Serial.println("===== RESET SETTINGS  =====");
               stateManager->resetSettingsFile();
-            } else             
+            }              
             
-            {
+
+            else if (cmd == "show inspection") {
+              Serial.println("===== SHW INSPECTION  =====");
+              Serial.println( domainManagerClass::getInstance()->currentInspection.toString() );
+            } 
+            
+
+
+
+            else {
               Serial.println( "*** Unknown brick command  ***" );
             }
         }
