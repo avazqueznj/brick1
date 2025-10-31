@@ -395,6 +395,7 @@ public:
         // clean
         lv_obj_clean(objects.asset_list); 
         lv_obj_clean(objects.selected_asset_list); 
+        lv_textarea_set_text(objects.search_asset, "");
 
         // add assets to select
         for (const assetClass& asset : *(domain->getAssets()) ) {
