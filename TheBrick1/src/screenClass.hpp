@@ -136,7 +136,6 @@ public:
 
 
     // For list navigation ....
-
     lv_obj_t* get_prev_sibling(lv_obj_t* obj) {
         if (!obj) return nullptr;
 
