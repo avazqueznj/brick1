@@ -26,42 +26,70 @@ public:
         lv_label_set_text(  objects.driver_name_main, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }
 
-    void handleEvents( lv_event_t* e, String key ) override{
-        
-        screenClass::handleEvents( e, key );  
-        lv_obj_t* target = lv_event_get_target(e);
+
+   void handleKeyboardEvent( String key ) override {        
+        screenClass::handleKeyboardEvent( key );
         lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
-
         if( 
-            ( target == objects.do_sync ) ||
             ( focused == objects.do_sync && key == "#" )
         ){
             try{
-                createDialog( domainManagerClass::getInstance()->sync() );
+                showDialog( domainManagerClass::getInstance()->sync() );
             }catch( const std::runtime_error& error ){
                 Serial.println( error.what() );            
-                createDialog( error.what() );  
+                showDialog( error.what() );  
             }            
         }
 
         if( 
-            ( target == objects.logout ) ||
             ( focused == objects.logout && key == "#" )
         ){
 
             domainManagerClass::getInstance()->logout();
         }    
-        
+
         if( 
-            ( target == objects.do_inspect_button ) ||
             ( focused == objects.do_inspect_button && key == "#" )
         ){
 
             navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
-        }            
-        
+        }           
+
     }
+
+    void handleTouchEvent( lv_event_t* e ) override{
+        lv_obj_t* target = lv_event_get_target(e);
+
+
+        if( 
+            ( target == objects.do_sync ) 
+        ){
+            try{
+                showDialog( domainManagerClass::getInstance()->sync() );
+            }catch( const std::runtime_error& error ){
+                Serial.println( error.what() );            
+                showDialog( error.what() );  
+            }            
+        }
+
+        if( 
+            ( target == objects.logout ) 
+        ){
+
+            domainManagerClass::getInstance()->logout();
+        } 
+        
+        if( 
+            ( target == objects.do_inspect_button )        
+        ){
+
+            navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
+        }           
+
+    }
+
+    //--------------------------------------------------------
 
     void init() override {
 

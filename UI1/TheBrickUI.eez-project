@@ -6170,6 +6170,14 @@
                   "INDICATOR": {
                     "CHECKED": {
                       "bg_color": "#e4572e"
+                    },
+                    "FOCUSED": {
+                      "bg_color": "#ff0000"
+                    }
+                  },
+                  "KNOB": {
+                    "FOCUSED": {
+                      "bg_color": "#ff0000"
                     }
                   }
                 }

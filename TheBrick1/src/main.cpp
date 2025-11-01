@@ -36,6 +36,7 @@
       #include "settingsScreen.hpp"
       #include "mainScreen.hpp"
       #include "selectAssetScreen.hpp"      
+      #include "selectInspectionTypeScreen.hpp"      
 
 #include "state.hpp"
 

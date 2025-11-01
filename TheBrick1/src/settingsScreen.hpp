@@ -52,11 +52,29 @@ public:
         lv_label_set_text( objects.clock_settings, time.c_str());
     }
 
-    void handleEvents( lv_event_t* e, String key ) override{       
-        screenClass::handleEvents( e, key );        
-        lv_obj_t *target = lv_event_get_target(e);
-        lv_event_code_t code = lv_event_get_code(e);
+    void handleKeyboardEvent( String key ) override {        
+        screenClass::handleKeyboardEvent( key );
+        lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
+        if( focused == objects.back_from_settings && key == "#" ){
+            navigateTo( SCREEN_ID_LOGIN_SCREEN );            
+        }
+
+        if( focused == objects.dst && key == "#" ){
+            if ( lv_obj_has_state(objects.dst, LV_STATE_CHECKED)) {
+                lv_obj_clear_state(objects.dst, LV_STATE_CHECKED);  // Turn OFF
+            } else {
+                lv_obj_add_state(objects.dst, LV_STATE_CHECKED);    // Turn ON
+            }        
+            
+            lv_event_send(objects.dst, LV_EVENT_VALUE_CHANGED, NULL);          
+        }
+
+    }
+
+    void handleTouchEvent( lv_event_t* e ) override{
+        lv_obj_t* target = lv_event_get_target(e);
+        lv_event_code_t code = lv_event_get_code(e);
 
         if( target == objects.back_from_settings ){
             Serial.println( "Back to login screen!" );
@@ -95,8 +113,11 @@ public:
 
 
             }
-        }
-    }
+        }        
+
+    }    
+
+
 
     void init() override {
 
@@ -104,9 +125,15 @@ public:
         {
             lv_group_add_obj(inputGroup, objects.setting_company  );
             lv_group_add_obj(inputGroup, objects.settings_tz  );
+            lv_group_add_obj(inputGroup, objects.dst  );
+
+            lv_group_add_obj(inputGroup, objects.back_from_settings);                                                
+
             lv_group_add_obj(inputGroup, objects.setting_server_url  );
             lv_group_add_obj(inputGroup, objects.setting_wifi_name  );
             lv_group_add_obj(inputGroup, objects.setting_wifi_password  );                                                
+
+
 
         }
     

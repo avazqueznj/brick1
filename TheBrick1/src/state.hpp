@@ -154,6 +154,7 @@ public:
     }         
   }  
 
+  // >>>>>>>>>>>>> >>>>>>>>>>>>>>>>>>> >>>>>>>>>>>>>>
 
   // handle touch events
   void handleScreenEvents( lv_event_t* e ){
@@ -170,7 +171,16 @@ public:
       Serial.println("");
     }    
 
-    dispatchEventsToWindows( e , "" );
+    try{
+
+      if( currentScreenState != NULL ){ 
+        currentScreenState->handleTouchEvent( e );          
+      }
+
+    }catch( const std::runtime_error& error ){
+      Serial.println( "*** ERROR while handling event ***" );                    
+      Serial.println( error.what() );                    
+    }     
 
   }
 
@@ -190,8 +200,6 @@ public:
           return;
       }
 
-
-
       // are we in window modal ? ignore
       if( currentScreenState !=  NULL  ){ 
         if( currentScreenState->modalActive() ) {
@@ -200,53 +208,21 @@ public:
         }          
       }
 
-
-      dispatchEventsToWindows( nullptr , key );
+      if( currentScreenState != NULL ){ 
+        currentScreenState->handleKeyboardEvent( key );          
+      }
 
     }catch( const std::runtime_error& error ){
       Serial.println( "*** ERROR while handling keyboard event ***" );                    
       Serial.println( error.what() );                    
     }  
+
+
   }
 
   //********************************* */
 
-  void dispatchEventsToWindows( lv_event_t* e, String key ){        
-    
-      try{
-
-        if( currentScreenState != NULL ){ 
-          currentScreenState->handleEvents( e, key );          
-        }
-
-      }catch( const std::runtime_error& error ){
-        Serial.println( "*** ERROR while handling event ***" );                    
-        Serial.println( error.what() );                    
-      }      
-
-  }
-
-  //********************************* */  
-
-  // // SCREEN TO SCREEN NAVIGATION
-  // void openScreen( screenClass* screen ){        
-  //   try{
-
-  //     // ok well see if it opens
-  //     screen->open();         
-
-  //     // ok replace and go
-  //     delete currentScreenState;
-  //     currentScreenState = screen;
-
-  //   }catch( const std::runtime_error& error ){
-  //       // no delete 
-  //       Serial.println( "*** window closed but not recycled ***" );   
-  //       Serial.println( error.what() );            
-  //       createDialog( error.what() );  
-  //   }
-  // }
-
+  
 
   //=--------------------------------------------------------------------------------------------------
 
@@ -279,6 +255,7 @@ public:
           if (isNew) {
               switch (nextScreen) {
                   
+                  case SCREEN_ID_SELECT_INSPECTION_TYPE:       screenStates[nextScreen] = new selectInspectionTypeScreenClass( &settings ); break;
                   case SCREEN_ID_SELECT_ASSET_SCREEN:        screenStates[nextScreen] = new selectAssetScreenClass( &settings ); break;
                   case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass( &settings ); break;
                   case SCREEN_ID_SETTINGS:            screenStates[nextScreen] = new settingsScreenClass( &settings ); break;

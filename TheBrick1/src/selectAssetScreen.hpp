@@ -6,7 +6,6 @@
  * 
  ********************************************************************************************/
 
-#include <deque>
 
 extern "C" void action_main_event_dispatcher(lv_event_t * e);
 extern "C" void action_message_box_event_handler(lv_event_t * e);
@@ -74,7 +73,7 @@ public:
                 }
             }
             if (!matchedAsset) {
-                createDialog("No matching asset found for this tag!");
+                showDialog("No matching asset found for this tag!");
                 return;
             }
 
@@ -97,7 +96,7 @@ public:
 
         // 5) Check inspection type
         if (!hasCommonInspectionType(matchedAsset)) {
-            createDialog("Error: The assets selected do not have a common inspection type!");
+            showDialog("Error: The assets selected do not have a common inspection type!");
             return;
         }
 
@@ -110,115 +109,115 @@ public:
 
     //----------------------------------
 
-    void handleEvents( lv_event_t* e, String key ) override{
 
-        screenClass::handleEvents( e, key );            
-        lv_obj_t* target = lv_event_get_target(e);
-        //lv_obj_t* focused = lv_group_get_focused(inputGroup);        
+   void handleKeyboardEvent( String key ) override {        
+        screenClass::handleKeyboardEvent( key );
+        lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
-        Serial.print( key );
+        updateSelected();
 
-        // update if changes in main source asset list
-        lv_obj_t* list = objects.asset_list;
-        if (!list) return;
-        selectedButton = nullptr;  // Reset
-        
-        // find selected currently
-        uint32_t count = lv_obj_get_child_cnt(list);
-        for (uint32_t i = 0; i < count; ++i) {
-            lv_obj_t* btn = lv_obj_get_child(list, i);
-            if (lv_obj_has_state(btn, LV_STATE_CHECKED)) {
-                selectedButton = btn;
-                Serial.println("Updated selectedButton pointer from list");
-                break;
+        Serial.println("select: by key ..." + key );                         
+
+        if (key.length() == 1 && isdigit(key[0])) {
+            // key is a single digit character
+            if (focused == objects.search_asset) {
+                lv_textarea_add_char(objects.search_asset, key[0]);
             }
         }
-        if (!selectedButton) {
-            Serial.println("No CHECKED button found in list.");
-        }
+
+        // special short cut to add remove assets        
+        if( key == "#" || key == "*" ){     
 
 
-        // keyboard events
-        if( key != "" ){
-            Serial.println("select: by key ..." + key );                         
-            lv_obj_t* focused = lv_group_get_focused(inputGroup);
+            // NAVI  ++++++++++++++++++++++++++
+            if( focused == objects.back_from_select_asset && key == "#" ){
+                navigateTo( SCREEN_ID_MAIN );
+            }
+            if( focused == objects.do_select_inspection_type && key == "#" ){
 
-            if (key.length() == 1 && isdigit(key[0])) {
-                // key is a single digit character
-                if (focused == objects.search_asset) {
-                    lv_textarea_add_char(objects.search_asset, key[0]);
+                uint32_t child_count = lv_obj_get_child_cnt(objects.selected_asset_list);
+                if( child_count == 0 ){
+                    showDialog( "Error: select at least one asset" );
+                }else{
+                    navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
+                }                                                    
+            }
+
+
+            if( focused == objects.search_asset_clear && key == "#" ){
+                lv_textarea_set_text(objects.search_asset, "");
+            }
+
+            // on the seatch and #
+            if (focused && focused == objects.search_asset   ){
+                if( key == "#" ){
+                    doSelectAsset();
                 }
             }
 
-            // special short cut to add remove assets        
-            if( key == "#" || key == "*" ){     
-
-                if( focused == objects.back_from_select_asset&& key == "#" ){
-                    navigateTo( SCREEN_ID_MAIN );
-                }
-
-
-                if( focused == objects.search_asset_clear && key == "#" ){
+            // on the seatch and #
+            if (focused && focused == objects.search_asset   ){
+                if( key == "*" ){
+                    deselectAsset();
                     lv_textarea_set_text(objects.search_asset, "");
                 }
+            }
 
-                // on the seatch and #
-                if (focused && focused == objects.search_asset   ){
-                    if( key == "#" ){
-                        doSelectAsset();
-                    }
-                }
-
-                // on the seatch and #
-                if (focused && focused == objects.search_asset   ){
-                    if( key == "*" ){
-                        deselectAsset();
-                        lv_textarea_set_text(objects.search_asset, "");
-                    }
-                }
-
-                // on the list and #
-                if (focused && focused == objects.asset_list   ){
-                    if( key == "#" ){
-                        doSelectAsset();
-                    }
-                }
-
-                // on the list and *
-                if (focused && focused == objects.asset_list   ){
-                    if(  key == "*" ){
-                        deselectAsset();
-                    }
-                }
-
-                // on ">"
-                if ( focused && focused == objects.select_asset  ){
-                    if(  key == "#" ){
-                        doSelectAsset();
-                    }
-                }
-
-                // on "<"
-                if ( focused && focused == objects.de_select_asset ){
-                    if(  key == "#" ){
-                        deselectAsset();                        
-                    }
-                    if(  key == "*" ){
-                        deselectAsset();
-                    }
-
+            // on the list and #
+            if (focused && focused == objects.asset_list   ){
+                if( key == "#" ){
+                    doSelectAsset();
                 }
             }
-        }
 
-        // non keyboard events
-        if( key == "" ){
+            // on the list and *
+            if (focused && focused == objects.asset_list   ){
+                if(  key == "*" ){
+                    deselectAsset();
+                }
+            }
 
+            // on ">"
+            if ( focused && focused == objects.select_asset  ){
+                if(  key == "#" ){
+                    doSelectAsset();
+                }
+            }
+
+            // on "<"
+            if ( focused && focused == objects.de_select_asset ){
+                if(  key == "#" ){
+                    deselectAsset();                        
+                }
+                if(  key == "*" ){
+                    deselectAsset();
+                }
+
+            }
+        }        
+    }
+
+
+
+
+    void handleTouchEvent( lv_event_t* e ) override{
+        lv_obj_t* target = lv_event_get_target(e);
+
+        updateSelected();   
+        
+            // NAVI  ++++++++++++++++++++++++++
             if( target == objects.back_from_select_asset){
                 navigateTo( SCREEN_ID_MAIN );
             }
             if( target == objects.do_select_inspection_type  ){
-            
+
+                uint32_t child_count = lv_obj_get_child_cnt(objects.selected_asset_list);
+                if( child_count == 0 ){
+                    showDialog( "Error: select at least one asset" );
+                }else{
+                    navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
+                }
+                          
             }
 
             
@@ -257,10 +256,9 @@ public:
 
                     break;
                 }
-            }     
-
-        }
-
+            }  
+            
+            
         // search 
         if (target == objects.search_asset && lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {            
             const char* searchText = lv_textarea_get_text(objects.search_asset);
@@ -303,6 +301,29 @@ public:
     }
 
 
+    void updateSelected(){
+
+        // update if changes in main source asset list
+        lv_obj_t* list = objects.asset_list;
+        if (!list) return;
+        selectedButton = nullptr;  // Reset
+        
+        // find selected currently
+        uint32_t count = lv_obj_get_child_cnt(list);
+        for (uint32_t i = 0; i < count; ++i) {
+            lv_obj_t* btn = lv_obj_get_child(list, i);
+            if (lv_obj_has_state(btn, LV_STATE_CHECKED)) {
+                selectedButton = btn;
+                Serial.println("Updated selectedButton pointer from list");
+                break;
+            }
+        }
+        if (!selectedButton) {
+            Serial.println("No CHECKED button found in list.");
+        }        
+    }
+
+
     
     //----------------------------------
 
@@ -329,7 +350,7 @@ public:
             }
 
             if (!hasCommonInspectionType(asset)) {
-                createDialog("Error: The asset selected do have a common inspection type with selected asset!");
+                showDialog("Error: The asset selected do have a common inspection type with selected asset!");
                 return;
             }
 

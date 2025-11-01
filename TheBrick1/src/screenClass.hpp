@@ -23,7 +23,7 @@ public:
         inputGroup = lv_group_create();
     }
 
-    virtual void init(){};
+    virtual void init() {};
 
     virtual void start(){};
 
@@ -38,6 +38,58 @@ public:
 
     virtual void clockTic( String time ){
     }
+
+    virtual void handleKeyboardEvent( String key ) {
+        handleSystemKeys( key );
+    }
+
+    virtual void handleTouchEvent( lv_event_t* e ) {
+    }    
+
+    // -------------------------------------------------------------------
+
+    // base screen class key nav
+    void handleSystemKeys(String key) {
+
+        if( kb != nullptr )
+        {
+            lv_obj_add_flag( kb, LV_OBJ_FLAG_HIDDEN );
+        }
+        
+
+        // get the focused thing
+        Serial.print( "*** *** Screen Base: Key Handler: " );            
+        Serial.println( key );            
+
+        // LIST UP/DWN ---------------
+        Serial.print( "L" );            
+        keyListScrolling( key );
+
+        // DROPDOWN SCROLL ---------------
+        keyDropdownScrolling(key);        
+
+        // TAB NAVI ---------------
+        Serial.print( "Tab" );            
+        if (key == "C") {
+            lv_group_focus_prev(inputGroup);
+            checkTextAreaInView();
+            return;
+
+        } else if (key == "D") {
+            lv_group_focus_next(inputGroup);
+            checkTextAreaInView();
+            return;
+
+        } else if (key == "*") {
+            lv_group_send_data(inputGroup, LV_KEY_ESC);
+            return;
+        }
+        //--------------------------------
+
+        Serial.println( "3end" );                    
+        // else we are done, child class could do something special to the screen
+    }
+
 
     //---
     // LV_KEYBOARD_MODE_NUMBER 
@@ -177,7 +229,7 @@ public:
 
     void keyListScrolling( String key ){
 
-        Serial.print( "LIST: Scroll" );                    
+        Serial.print( "<<LIST>> Scroll" );                    
 
         // get target
         lv_obj_t* list = lv_group_get_focused(inputGroup);
@@ -246,7 +298,7 @@ public:
 
     void keyDropdownScrolling(String key) {
 
-        Serial.print("Dropdown scroll...");
+        Serial.print("<<Dropdown>> scroll...");
 
         lv_obj_t* focused = lv_group_get_focused(inputGroup);
         if (!focused || !lv_obj_check_type(focused, &lv_dropdown_class)) return;
@@ -279,59 +331,6 @@ public:
     }
 
 
-    // ===================================================
-
-    virtual void handleEvents(lv_event_t* e, String key) {
-
-      if( key != "" ){
-        keyboardEvent( key );
-      }    
-
-    }
-
-    // base screen class key nav
-    void keyboardEvent(String key) {
-
-        if( kb != nullptr )
-        {
-            lv_obj_add_flag( kb, LV_OBJ_FLAG_HIDDEN );
-        }
-        
-
-        // get the focused thing
-        Serial.print( "*** *** Screen Base: Key Handler: " );            
-        Serial.println( key );            
-
-        // LIST UP/DWN ---------------
-        Serial.print( "L" );            
-        keyListScrolling( key );
-
-        // DROPDOWN SCROLL ---------------
-        keyDropdownScrolling(key);        
-
-        // TAB NAVI ---------------
-        Serial.print( "Tab" );            
-        if (key == "C") {
-            lv_group_focus_prev(inputGroup);
-            checkTextAreaInView();
-            return;
-
-        } else if (key == "D") {
-            lv_group_focus_next(inputGroup);
-            checkTextAreaInView();
-            return;
-
-        } else if (key == "*") {
-            lv_group_send_data(inputGroup, LV_KEY_ESC);
-            return;
-        }
-        //--------------------------------
-
-        Serial.println( "3end" );                    
-        // else we are done, child class could do something special to the screen
-    }
-
-
     virtual ~screenClass(){
 
         if (inputGroup) {
@@ -354,7 +353,7 @@ public:
     lv_obj_t *overlay = NULL;
     lv_obj_t *mbox = NULL;
 
-    virtual void createDialog( String message )
+    virtual void showDialog( String message )
     {
 
         // if it does not exist, make it

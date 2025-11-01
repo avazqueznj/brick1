@@ -25,15 +25,14 @@ public:
     }
 
 
-    void handleEvents( lv_event_t* e, String key ) override{
+    void handleKeyboardEvent( String key ) override {
+        screenClass::handleKeyboardEvent( key );
 
-        screenClass::handleEvents( e, key );            
-        lv_obj_t* target = lv_event_get_target(e);
-        //lv_obj_t* focused = lv_group_get_focused(inputGroup);
+        lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
         // add numeric input to focused text areas
         if( key != "A" && key != "B" && key != "C" && key != "D" && key != "*" && key != "#"  ){
-            lv_obj_t* focused = lv_group_get_focused(inputGroup);
+           
             if (focused && lv_obj_check_type(focused, &lv_textarea_class)) {
                 lv_textarea_add_text(focused, key.c_str());                    
             }
@@ -41,7 +40,6 @@ public:
 
         // use * as backspace
         if (key == "*") {
-            lv_obj_t* focused = lv_group_get_focused(inputGroup);
             if (focused && lv_obj_check_type(focused, &lv_textarea_class)) {
                 String txt = lv_textarea_get_text(focused);  // copy the text
                 int len = txt.length();
@@ -59,26 +57,9 @@ public:
         }  
 
 
-        if( target == objects.do_sync_2 ){
-            try{
-                createDialog( domainManagerClass::getInstance()->sync() );
-                
-            }catch( const std::runtime_error& error ){
-                Serial.println( error.what() );            
-                createDialog( error.what() );  
-            }            
-        }
-
-        if( target == objects.do_settings_2 ){
-
-            Serial.println( "Open Settings!" );
-            navigateTo( SCREEN_ID_SETTINGS );
-        }
-
         if( 
-            ( target == objects.login && key == "" ) ||
-            ( lv_group_get_focused(inputGroup) == objects.login && key == "#" ) ||
-            ( lv_group_get_focused(inputGroup) == objects.login_password && key == "#" )
+            ( focused == objects.login && key == "#" ) ||
+            ( focused == objects.login_password && key == "#" )
         ){
 
             navigateTo( SCREEN_ID_MAIN );
@@ -92,11 +73,65 @@ public:
                     navigateTo( SCREEN_ID_MAIN );
             //    }else{
               //      createDialog( "Invalid credentials" );  
-//                }
+               //   }
 
         }
 
+        if( focused == objects.do_sync_2  && key == "#"  ){
+            try{
+                showDialog( domainManagerClass::getInstance()->sync() );                
+            }catch( const std::runtime_error& error ){
+                Serial.println( error.what() );            
+                showDialog( error.what() );  
+            }            
+        }
+
+        if( focused == objects.do_settings_2  && key == "#"  ){
+            Serial.println( "Open Settings!" );
+            navigateTo( SCREEN_ID_SETTINGS );
+        }        
+
     }
+
+    void handleTouchEvent( lv_event_t* e ) override{
+        lv_obj_t* target = lv_event_get_target(e);
+
+        if( target == objects.do_sync_2 ){
+            try{
+                showDialog( domainManagerClass::getInstance()->sync() );                
+            }catch( const std::runtime_error& error ){
+                Serial.println( error.what() );            
+                showDialog( error.what() );  
+            }            
+        }
+
+        if( target == objects.do_settings_2 ){
+            Serial.println( "Open Settings!" );
+            navigateTo( SCREEN_ID_SETTINGS );
+        }
+
+        if( 
+            ( target == objects.login  )
+        ){
+
+            navigateTo( SCREEN_ID_MAIN );
+
+        //    if(
+                domainManagerClass::getInstance()->login(    
+                    String( lv_textarea_get_text( objects.login_username ) ),
+                    String( lv_textarea_get_text( objects.login_password ) ) )
+                    ;
+          //      ){
+                    navigateTo( SCREEN_ID_MAIN );
+            //    }else{
+              //      createDialog( "Invalid credentials" );  
+               //   }
+
+        }
+
+    }    
+
+
 
     void init() override {
 
