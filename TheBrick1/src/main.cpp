@@ -353,6 +353,13 @@ void loop() {
               Serial.println("===== SHOW CONFIG =====");
               domainManagerClass::getInstance()->printDebugContents();               
             } 
+            if (cmd == "reset config") {
+              Serial.println("===== RESET CONFIG =====");
+              const std::vector<String> empty;
+              saveToKVStore( "/kv/config", &empty );     
+              domainManagerClass::getInstance()->emptyAll();
+              Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
+            } 
             
 
             else if (cmd == "show settings") {
