@@ -1,12 +1,16 @@
-#include "core/lv_event.h"
 /********************************************************************************************
  * CONFIDENTIAL AND PROPRIETARY
  * 
- * ZZZ2025 
+ * The Brick 1.0 
  * © [2025] [Alejandro Vazquez]. All rights reserved.
  * 
+ * Portions of this software are based on LVGL (https://lvgl.io),
+ * which is licensed under the MIT License.
+ *
  ********************************************************************************************/
 
+
+#include "core/lv_event.h"
 class selectInspectionTypeScreenClass:public screenClass{
 public:
 
@@ -47,19 +51,7 @@ public:
         }     
         
 
-        if(  key == "7" ){
-            navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
-        }
-        if(  key == "9"  ){
-
-            // uint32_t child_count = lv_obj_get_child_cnt(objects.selected_asset_list);
-            // if( child_count == 0 ){
-            //     showDialog( "Error: select at least one asset" );
-            // }else{
-            //     navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
-            // }                                                    
-        }          
-    
+ 
     }
 
     void handleTouchEvent( lv_event_t* e ) override{
@@ -126,10 +118,11 @@ public:
 
         // reset
         lv_obj_clean(objects.inspection_types);
-        // For each inspection type, check if asset matches ALL selected assets
-        for (const inspectionTypeClass& type : *(domain->getInspectionTypes()) ) {
+        
+        // add all inspi types shared with the selected asset
+        for (const inspectionTypeClass& type : *(domain->getInspectionTypes()) ) {  // for each layout
             bool valid = true;
-            for (const assetClass& asset : domain->currentInspection.assets) {
+            for (const assetClass& asset : domain->currentInspection.assets) { // is it compaible with all assets
                 bool found = false;
                 for (const String& layout : type.layouts) {
                     if (layout == "ALL" || layout == asset.layoutName) {
@@ -143,6 +136,7 @@ public:
                 }
             }
 
+            // yes compatible, add it to the list for selection
             if (valid) { // ie all assets share the type
 
                 // Create button for this inspection type
@@ -178,7 +172,7 @@ public:
 
         domainManagerClass* domain = domainManagerClass::getInstance();
 
-        // check inspe type ui
+        // save selected type
         uint32_t child_count = lv_obj_get_child_cnt(objects.inspection_types);
         for (uint32_t i = 0; i < child_count; ++i) {
 

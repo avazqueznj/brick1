@@ -1167,7 +1167,7 @@
               "scrollSnapY": "",
               "checkedStateType": "literal",
               "disabledStateType": "literal",
-              "states": "FOCUSED",
+              "states": "",
               "useStyle": "list",
               "localStyles": {
                 "objID": "90e50a59-b481-4d92-a5ef-f025972b3cae",
@@ -1592,7 +1592,7 @@
               "scrollSnapY": "",
               "checkedStateType": "literal",
               "disabledStateType": "literal",
-              "states": "",
+              "states": "FOCUSED",
               "useStyle": "text_area",
               "localStyles": {
                 "objID": "525861a9-5641-42e8-f387-bef7969cb744",
@@ -2013,10 +2013,10 @@
             {
               "objID": "6c2d7f22-9e0c-44ee-f228-d2ec23519ff8",
               "type": "LVGLListWidget",
-              "left": 167,
-              "top": 126,
-              "width": 466,
-              "height": 293,
+              "left": 171,
+              "top": 87,
+              "width": 459,
+              "height": 332,
               "customInputs": [],
               "customOutputs": [],
               "style": {

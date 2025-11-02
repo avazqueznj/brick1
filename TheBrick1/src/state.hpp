@@ -4,6 +4,9 @@
  * The Brick 1.0 
  * © [2025] [Alejandro Vazquez]. All rights reserved.
  * 
+ * Portions of this software are based on LVGL (https://lvgl.io),
+ * which is licensed under the MIT License.
+ *
  ********************************************************************************************/
 
 

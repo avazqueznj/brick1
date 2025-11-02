@@ -1,11 +1,13 @@
 /********************************************************************************************
  * CONFIDENTIAL AND PROPRIETARY
  * 
- * ZZZ2025 
+ * The Brick 1.0 
  * © [2025] [Alejandro Vazquez]. All rights reserved.
  * 
+ * Portions of this software are based on LVGL (https://lvgl.io),
+ * which is licensed under the MIT License.
+ *
  ********************************************************************************************/
-
 
 extern "C" void action_main_event_dispatcher(lv_event_t * e);
 extern "C" void action_message_box_event_handler(lv_event_t * e);
@@ -384,7 +386,9 @@ public:
             //-------------------------------------
             // Add focusable widgets
 
-            // default
+            lv_group_add_obj(inputGroup, objects.search_asset );            
+            lv_group_add_obj(inputGroup, objects.search_asset_clear);            
+
             lv_group_add_obj(inputGroup, objects.asset_list  );
             // lv_group_add_obj(inputGroup, objects.select_asset);
             // lv_group_add_obj(inputGroup, objects.de_select_asset);
@@ -392,12 +396,6 @@ public:
             // nav bar 
             lv_group_add_obj(inputGroup, objects.do_select_inspection_type);            
             lv_group_add_obj(inputGroup, objects.back_from_select_asset);            
-
-
-            lv_group_add_obj(inputGroup, objects.search_asset );            
-            lv_group_add_obj(inputGroup, objects.search_asset_clear);            
-
-
 
         }
         

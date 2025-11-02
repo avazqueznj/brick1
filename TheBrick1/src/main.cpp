@@ -360,9 +360,7 @@ void loop() {
                   Serial.print(kv.first); Serial.print(" = "); Serial.println(kv.second);
               }
               Serial.println("=================");
-            }  
-
-            
+            }              
             else if (cmd == "reset settings") {
               Serial.println("===== RESET SETTINGS  =====");
               stateManager->resetSettingsFile();

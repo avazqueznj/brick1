@@ -216,7 +216,6 @@ void create_screen_select_asset_screen() {
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
-            lv_obj_add_state(obj, LV_STATE_FOCUSED);
             add_style_list(obj);
             lv_obj_set_style_border_color(obj, lv_color_hex(0xffff0000), LV_PART_MAIN | LV_STATE_FOCUSED);
             lv_obj_set_style_pad_left(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -343,6 +342,7 @@ void create_screen_select_asset_screen() {
             lv_textarea_set_password_mode(obj, false);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_VALUE_CHANGED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+            lv_obj_add_state(obj, LV_STATE_FOCUSED);
             add_style_text_area(obj);
             lv_obj_set_style_pad_left(obj, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_right(obj, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -439,8 +439,8 @@ void create_screen_select_inspection_type() {
             // inspectionTypes
             lv_obj_t *obj = lv_list_create(parent_obj);
             objects.inspection_types = obj;
-            lv_obj_set_pos(obj, 167, 126);
-            lv_obj_set_size(obj, 466, 293);
+            lv_obj_set_pos(obj, 171, 87);
+            lv_obj_set_size(obj, 459, 332);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);

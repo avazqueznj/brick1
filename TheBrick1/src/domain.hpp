@@ -365,7 +365,7 @@ public:
         try{
 
                 comms->connectToWifi();
-                std::vector<String> config = comms->GET( serverURL , getConfigPath );
+                std::vector<String> config = comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company );
 
                 parse( &config );
                 saveToKVStore( "/kv/config", &config );                
@@ -414,8 +414,8 @@ public:
             // HEADER ----->
             if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");            
             std::vector<String> tokens = tokenize( *iterator , '*' );     
-            if( tokens[ 0 ] == "2025CONFIG" ){ 
-                Serial.println( "[2025CONFIG] found..." );
+            if( tokens[ 0 ] == "BRICKCONFIG" ){ 
+                Serial.println( "[BRICKCONFIG] found..." );
 
                 // ASSETS ----->
                 if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
@@ -586,7 +586,7 @@ public:
                     throw std::runtime_error( "Parse error un expected token" );                    
                 }
 
-            } // header found
+            }
         } // scanning
 
         throw std::runtime_error( "Parse error: unexpected end of file." );   
