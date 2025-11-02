@@ -257,5 +257,31 @@ public:
 
 //-------------------------------------------------
 
+void scroll_widget_into_view( lv_obj_t* widget )
+{
+    if(!widget) return;
+
+    // Find the first scrollable ancestor
+    lv_obj_t* scrollable = lv_obj_get_parent(widget);
+    lv_obj_t* target = widget;
+    while(scrollable) {
+        if(lv_obj_has_flag(scrollable, LV_OBJ_FLAG_SCROLLABLE)) {
+            // Found the scrollable container
+            break;
+        }
+        target = scrollable;
+        scrollable = lv_obj_get_parent(scrollable);
+    }
+
+    if(scrollable) {
+        // Find the Y position of the target within the scrollable
+        lv_coord_t y = lv_obj_get_y(target);
+        lv_obj_scroll_to_y(scrollable, y, LV_ANIM_OFF);
+    }
+    // else: not in a scrollable, do nothing
+}
+
+//-------------------------------------------------
+
 #endif
 

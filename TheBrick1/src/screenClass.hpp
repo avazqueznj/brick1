@@ -149,9 +149,7 @@ public:
 
                 // Show keyboard
                 lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
-                lv_keyboard_set_textarea(self->kb, ta);
-
-
+                lv_keyboard_set_textarea(self->kb, ta);                       
 
             },
             LV_EVENT_PRESSED,

@@ -3160,7 +3160,7 @@
               "type": "LVGLLabelWidget",
               "left": 18,
               "top": 101,
-              "width": 253,
+              "width": 287,
               "height": 16,
               "customInputs": [],
               "customOutputs": [],
@@ -3200,7 +3200,7 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "Use A, B to select fields, * to delete",
+              "text": "Use tab (C,D) to select fields, * to delete",
               "textType": "literal",
               "longMode": "WRAP",
               "recolor": false

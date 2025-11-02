@@ -697,7 +697,7 @@ void create_screen_inspection_form() {
             lv_obj_set_pos(obj, 18, 101);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "Use A, B to select fields, * to delete");
+            lv_label_set_text(obj, "Use tab (C,D) to select fields, * to delete");
         }
         {
             // clock_form

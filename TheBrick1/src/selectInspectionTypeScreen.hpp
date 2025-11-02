@@ -40,6 +40,7 @@ public:
             }
         }    
         
+        // NAVI ================================
         if( focused == objects.back_from_select_insp&& key == "#" ){
             navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
         }

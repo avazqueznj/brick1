@@ -14,7 +14,6 @@
 class formFieldsScreenClass : public screenClass {
 public:
 
-    lv_obj_t* kb = NULL;                   
     std::vector<lv_obj_t*> textareas;     
 
     formFieldsScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_INSPECTION_FORM ){    
@@ -24,9 +23,6 @@ public:
         lv_label_set_text( objects.clock_form, time.c_str());
         lv_label_set_text(  objects.driver_name_form, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }    
-
-
-
 
 
    void handleKeyboardEvent( String key ) override {        
@@ -55,13 +51,51 @@ public:
             }
         }
 
+        // NAVI ================================
+        if( focused == objects.back_from_form_fields && key == "#" ){
+            navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
+        }
+
+        if( focused == objects.do_inspect_button && key == "#"  ){
+                                        
+        }             
+
     }
 
     void handleTouchEvent( lv_event_t* e ) override{
         lv_obj_t* target = lv_event_get_target(e);
+
+
+        // NAVI  ++++++++++++++++++++++++++
+        if( target == objects.back_from_form_fields ){
+            navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
+        }
+
+        if( target == objects.do_inspect_button   ){
+                                                                                           
+        }            
+
     }
 
     void init() override {
+
+        screenClass::makeKeyboard();
+
+
+        {
+            // default
+            //lv_group_add_obj(inputGroup, objects.form_fields  );
+
+            // nav bar
+            lv_group_add_obj(inputGroup, objects.do_zones );            
+            lv_group_add_obj(inputGroup, objects.back_from_form_fields);       
+        }
+
+        screenClass::init();
+    }
+
+    void start() override{
+
         domainManagerClass* domain = domainManagerClass::getInstance();
         inspectionTypeClass* currentType = domain->currentInspection.type;
         inspectionClass* currentInspection = &domain->currentInspection;
@@ -79,8 +113,6 @@ public:
         // get list
         lv_obj_t* parent_obj = objects.form_fields;
         lv_obj_clean(parent_obj);
-
-        screenClass::makeKeyboard();
 
         // Make the Form Fields ====================================================
         for (size_t i = 0; i < currentType->formFields.size(); ++i) {
@@ -160,7 +192,7 @@ public:
 
                     // , LV_EVENT_PRESSED, this);
 
-                    screenClass::addKeyboard( textarea );
+                    addKeyboardHacked( textarea );
         }
 
         // keyboard spacer ============
@@ -169,16 +201,7 @@ public:
         lv_obj_clear_flag(spacer, LV_OBJ_FLAG_SCROLLABLE); 
         lv_obj_set_style_bg_opa(spacer, LV_OPA_TRANSP, 0);                 
 
-        {
-            // default
-            //lv_group_add_obj(inputGroup, objects.form_fields  );
 
-            // nav bar
-            lv_group_add_obj(inputGroup, objects.do_zones );            
-            lv_group_add_obj(inputGroup, objects.back_from_form_fields);       
-        }
-
-        screenClass::init();
     }
 
     void  stop() override{
@@ -215,5 +238,37 @@ public:
             Serial.println("Keyboard destroyed by formFieldsScreenClass destructor.");
         }
     }
+
+    void addKeyboardHacked(lv_obj_t* textarea) {
+        if (!kb) {
+            throw std::runtime_error("Keyboard not created before addKeyboard()!");
+        }
+        Serial.println("Keyboard attached");
+
+        lv_obj_add_event_cb(
+            textarea,
+            [](lv_event_t* e) {
+                lv_obj_t* ta = lv_event_get_target(e);
+                screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
+
+                // Show keyboard
+                lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
+                lv_keyboard_set_textarea(self->kb, ta);  
+                                
+                // work around for lvgl no able to do it on its own
+                lv_obj_t* row = lv_obj_get_parent(ta);
+                if (row != nullptr) {
+                    // Get Y offset of row inside form_fields
+                    lv_coord_t y = lv_obj_get_y(row);
+                    // Scroll to exact Y offset — brute force
+                    lv_obj_scroll_to_y(objects.form_fields, y, LV_ANIM_ON );
+                }                
+
+            },
+            LV_EVENT_PRESSED,
+            this
+        );
+    }
+
 };
 

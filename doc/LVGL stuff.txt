@@ -39,3 +39,41 @@ Anything that says “125 KHz”
 DEBUG by stlink - needs the card on DFU load = double tap reset
 
 **********
+
+Great clarification!
+If you want the LVGL text area to be scrolled into view automatically when the keyboard covers it, here’s what to do:
+
+1. Use lv_obj_scroll_to_view() or lv_obj_scroll_to_view_recursive()
+
+If your text area is inside a scrollable container (like a page, flex, or other parent), call:
+
+lv_obj_scroll_to_view(textarea, LV_ANIM_ON); // or LV_ANIM_OFF
+
+
+This scrolls the parent so the entire text area becomes visible.
+
+If your UI is deeply nested and you want all ancestor scroll containers to scroll if needed:
+
+lv_obj_scroll_to_view_recursive(textarea, LV_ANIM_ON);
+
+2. How to use in keyboard event
+
+When you show the keyboard and set it as the input device for the text area, immediately after, call:
+
+lv_obj_scroll_to_view_recursive(my_textarea, LV_ANIM_ON);
+
+
+Typical workflow:
+
+lv_keyboard_set_textarea(kb, my_textarea);
+lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN); // show the keyboard
+lv_obj_scroll_to_view_recursive(my_textarea, LV_ANIM_ON); // ensure textarea is visible
+
+3. Context
+
+If you use the default LVGL keyboard, this is NOT automatic—you must handle it yourself by calling the scroll function when the keyboard appears.
+
+
+--------------------
+
+
