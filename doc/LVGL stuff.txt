@@ -33,3 +33,9 @@ Anything that says “125 KHz”
 “EM4100”, “T5577”, “HID Prox”
 
 “FeliCa” or “ISO15693”
+
+**********
+
+DEBUG by stlink - needs the card on DFU load = double tap reset
+
+**********

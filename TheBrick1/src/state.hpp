@@ -253,11 +253,17 @@ public:
       try {
           lv_obj_t* oldRoot = lv_scr_act();
 
+         // close previous / save
+          if( currentScreenState != nullptr ){
+            currentScreenState->stop();
+          }
+
           // ---- Minimal "just check for null" pattern ----
           bool isNew = (screenStates[nextScreen] == nullptr);
           if (isNew) {
               switch (nextScreen) {
                   
+                  case SCREEN_ID_INSPECTION_FORM:       screenStates[nextScreen] = new formFieldsScreenClass( &settings ); break;
                   case SCREEN_ID_SELECT_INSPECTION_TYPE:       screenStates[nextScreen] = new selectInspectionTypeScreenClass( &settings ); break;
                   case SCREEN_ID_SELECT_ASSET_SCREEN:        screenStates[nextScreen] = new selectAssetScreenClass( &settings ); break;
                   case SCREEN_ID_LOGIN_SCREEN:        screenStates[nextScreen] = new loginScreenClass( &settings ); break;
@@ -270,11 +276,6 @@ public:
                   throw std::runtime_error("Failed to create screen instance for ID: ");
           }
 
-          // close previous / save
-          if( currentScreenState != nullptr ){
-            currentScreenState->stop();
-          }
-          
           // load / display new
           currentScreenState = screenStates[nextScreen];
           loadScreen((ScreensEnum)nextScreen);

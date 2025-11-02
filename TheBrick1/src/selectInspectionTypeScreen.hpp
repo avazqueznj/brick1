@@ -32,22 +32,24 @@ public:
         if (key == "#") {
             lv_obj_t* focused = lv_group_get_focused(inputGroup);
             if (focused == objects.inspection_types) {
-                // navigate to next screen
-                return;
+                if( !saveSelected() ){
+                    showDialog( "Error: Select an inspection type" );
+                }else{
+                    navigateTo( SCREEN_ID_INSPECTION_FORM );                
+                }                                               
             }
         }    
         
         if( focused == objects.back_from_select_insp&& key == "#" ){
             navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
         }
-        if( focused == objects.do_inspection_form && key == "#"  ){
 
-            // uint32_t child_count = lv_obj_get_child_cnt(objects.selected_asset_list);
-            // if( child_count == 0 ){
-            //     showDialog( "Error: select at least one asset" );
-            // }else{
-            //     navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
-            // }                                                    
+        if( focused == objects.do_inspection_form && key == "#"  ){
+            if( !saveSelected() ){
+                showDialog( "Error: Select an inspection type" );
+            }else{
+                navigateTo( SCREEN_ID_INSPECTION_FORM );                
+            }                                               
         }     
         
 
@@ -60,34 +62,39 @@ public:
         // make sure one button is selected at a time
         if (lv_obj_check_type(target, &lv_btn_class)) {
 
+            // find button and buffer it
+            lv_obj_t* selected = NULL;
+
             uint32_t child_count = lv_obj_get_child_cnt(objects.inspection_types);
+
             for (uint32_t i = 0; i < child_count; ++i) {
                 lv_obj_t* btn = lv_obj_get_child(objects.inspection_types, i);
                 if (!lv_obj_check_type(btn, &lv_btn_class)) continue;
-
-                if (btn == target) {
-                    Serial.println("inspection type: click button ...");
-                    // LVGL toggles state automatically
-                } else {
-                    lv_obj_clear_state(btn, LV_STATE_CHECKED);
-                }
+                if (btn == target) selected = btn;
             }
+
+            if( selected !=  NULL ){
+                for (uint32_t i = 0; i < child_count; ++i) {
+                    lv_obj_t* btn = lv_obj_get_child(objects.inspection_types, i);
+                    if (!lv_obj_check_type(btn, &lv_btn_class)) continue;
+                    if (btn != selected) lv_obj_clear_state(btn, LV_STATE_CHECKED);
+                }
+            }            
         }              
 
         // NAVI  ++++++++++++++++++++++++++
         if( target == objects.back_from_select_insp ){
             navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
         }
-        if( target == objects.do_inspection_form   ){
 
-            // uint32_t child_count = lv_obj_get_child_cnt(objects.selected_asset_list);
-            // if( child_count == 0 ){
-            //     showDialog( "Error: select at least one asset" );
-            // }else{
-            //     navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
-            // }                                                    
+        if( target == objects.do_inspection_form   ){
+            if( !saveSelected() ){
+                showDialog( "Error: Select an inspection type" );
+            }else{
+                navigateTo( SCREEN_ID_INSPECTION_FORM );                
+            }                                                                                              
         }            
-}
+    }
 
 
     void init() override {
@@ -168,8 +175,8 @@ public:
 
     }
 
-   void stop() override {
-
+   
+    bool saveSelected(){
         domainManagerClass* domain = domainManagerClass::getInstance();
 
         // save selected type
@@ -187,15 +194,21 @@ public:
 
                 if (selectedType != NULL) {
                     domain->currentInspection.type = selectedType;
-                    Serial.println("syncToInspection: Selected inspection type set by user_data.");
+                    Serial.println("SAVED selected " +  selectedType->name );
+                    return true;
                 } else {
                     domain->currentInspection.type = NULL;
-                    Serial.println("syncToInspection: WARNING — user_data is NULL!");
+                    Serial.println("Type in button was NULL");
                     sosBlink();
                 }
-                return; // found checked → done
             }
-        }
+        }   
+        
+        return false;
+    }
+
+
+    void stop() override {
 
     }
 

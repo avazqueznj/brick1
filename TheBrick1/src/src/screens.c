@@ -585,7 +585,7 @@ void create_screen_inspection_form() {
             // doZones
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.do_zones = obj;
-            lv_obj_set_pos(obj, 680, 437);
+            lv_obj_set_pos(obj, 687, 436);
             lv_obj_set_size(obj, 94, 40);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
@@ -599,7 +599,7 @@ void create_screen_inspection_form() {
                     lv_obj_set_pos(obj, 0, 0);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "9\uF054");
+                    lv_label_set_text(obj, "\uF054");
                 }
             }
         }
@@ -607,7 +607,7 @@ void create_screen_inspection_form() {
             // backFromFormFields
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.back_from_form_fields = obj;
-            lv_obj_set_pos(obj, 21, 437);
+            lv_obj_set_pos(obj, 17, 436);
             lv_obj_set_size(obj, 94, 40);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
@@ -623,7 +623,7 @@ void create_screen_inspection_form() {
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "\uF0537");
+                    lv_label_set_text(obj, "\uF053");
                 }
             }
         }
@@ -631,8 +631,8 @@ void create_screen_inspection_form() {
             // formFields
             lv_obj_t *obj = lv_list_create(parent_obj);
             objects.form_fields = obj;
-            lv_obj_set_pos(obj, 26, 126);
-            lv_obj_set_size(obj, 748, 293);
+            lv_obj_set_pos(obj, 17, 126);
+            lv_obj_set_size(obj, 764, 302);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_AUTO);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
@@ -684,19 +684,20 @@ void create_screen_inspection_form() {
             // InspectionTypeName
             lv_obj_t *obj = lv_label_create(parent_obj);
             objects.inspection_type_name = obj;
-            lv_obj_set_pos(obj, 26, 83);
+            lv_obj_set_pos(obj, 18, 66);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "Inspection type");
+            lv_label_set_text(obj, "<inspection name>");
         }
         {
             // formsInfoLabel
             lv_obj_t *obj = lv_label_create(parent_obj);
             objects.forms_info_label = obj;
-            lv_obj_set_pos(obj, 392, 97);
+            lv_obj_set_pos(obj, 18, 101);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_label_set_text(obj, "Use  * to delete,  Use C and D to  move around fields.");
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(obj, "Use A, B to select fields, * to delete");
         }
         {
             // clock_form

@@ -17,9 +17,8 @@ public:
     lv_obj_t* kb = NULL;                   
     std::vector<lv_obj_t*> textareas;     
 
-    formFieldsScreenClass() : screenClass(SCREEN_ID_INSPECTION_FORM) {
+    formFieldsScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_INSPECTION_FORM ){    
     }
-
 
     void clockTic( String time ) override {
         lv_label_set_text( objects.clock_form, time.c_str());
@@ -27,10 +26,14 @@ public:
     }    
 
 
-    void keyboardEvent(String key) override {        
-        screenClass::keyboardEvent( key );
 
-        // add key to values if it is numeric
+
+
+   void handleKeyboardEvent( String key ) override {        
+        screenClass::handleKeyboardEvent( key );
+        lv_obj_t* focused = lv_group_get_focused(inputGroup);
+
+        // if numeric send to the current field in the form 
         if( key != "A" && key != "B" && key != "C" && key != "D" && key != "*" && key != "#"  ){
             lv_obj_t* focused = lv_group_get_focused(inputGroup);
             if (focused && lv_obj_check_type(focused, &lv_textarea_class)) {
@@ -46,12 +49,7 @@ public:
                 int len = txt.length();
                 if (len > 0) {
                     txt = txt.substring(0, len - 1);  // remove last character
-                    //lv_textarea_set_text(focused, txt.c_str());
-                    //lv_textarea_add_text(focused, "*" );   
-
-                    // lvgl bug ??
-                    // One for the ghost, one for the real char
-                    lv_textarea_del_char( focused );
+                    lv_textarea_del_char( focused ); // oohh ok, some lgvl bug. second is the good one
                     lv_textarea_del_char( focused );                                         
                 }
             }
@@ -59,10 +57,11 @@ public:
 
     }
 
-    void handleEvents(lv_event_t* e) override {
+    void handleTouchEvent( lv_event_t* e ) override{
+        lv_obj_t* target = lv_event_get_target(e);
     }
 
-    void open() override {
+    void init() override {
         domainManagerClass* domain = domainManagerClass::getInstance();
         inspectionTypeClass* currentType = domain->currentInspection.type;
         inspectionClass* currentInspection = &domain->currentInspection;
@@ -77,29 +76,13 @@ public:
         // Clear old textarea handles
         textareas.clear();
 
-        // Use  EEZ-generated list container
+        // get list
         lv_obj_t* parent_obj = objects.form_fields;
         lv_obj_clean(parent_obj);
 
-        // Create floating keyboard 
-        if (kb == NULL) {
-            kb = lv_keyboard_create(objects.inspection_form);
-            lv_obj_set_size(kb, 800, 200);
-            lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        screenClass::makeKeyboard();
 
-            lv_obj_add_event_cb(kb, [](lv_event_t* e) {
-                lv_event_code_t code = lv_event_get_code(e);
-                formFieldsScreenClass* self = static_cast<formFieldsScreenClass*>(lv_event_get_user_data(e));
-                if (code == LV_EVENT_CANCEL || code == LV_EVENT_READY) {
-                    lv_obj_add_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
-                    Serial.println("Keyboard hidden (OK/Cancel).");
-                }
-            }, LV_EVENT_ALL, this);
-        }
-
-        // Form Fields ====================================================
-
+        // Make the Form Fields ====================================================
         for (size_t i = 0; i < currentType->formFields.size(); ++i) {
             const std::vector<String>& row = currentType->formFields[i];
 
@@ -160,22 +143,24 @@ public:
                     lv_group_add_obj(inputGroup, textarea );
 
                     // Hook: show keyboard on focus
-                    lv_obj_add_event_cb(textarea, 
+                    // lv_obj_add_event_cb(textarea, 
                     
-                        [](lv_event_t* e) { 
+                    //     [](lv_event_t* e) { 
 
-                            // get the form field
-                            lv_obj_t* ta = lv_event_get_target(e);
-                            formFieldsScreenClass* self = static_cast<formFieldsScreenClass*>(lv_event_get_user_data(e));
+                    //         // get the form field
+                    //         lv_obj_t* ta = lv_event_get_target(e);
+                    //         formFieldsScreenClass* self = static_cast<formFieldsScreenClass*>(lv_event_get_user_data(e));
 
-                            // unhide kb
-                            lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
-                            lv_keyboard_set_textarea(self->kb, ta);                                
+                    //         // unhide kb
+                    //         lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
+                    //         lv_keyboard_set_textarea(self->kb, ta);                                
 
-                            Serial.println("Keyboard opened for textarea.");
-                        }
+                    //         Serial.println("Keyboard opened for textarea.");
+                    //     }
 
-                    , LV_EVENT_PRESSED, this);
+                    // , LV_EVENT_PRESSED, this);
+
+                    screenClass::addKeyboard( textarea );
         }
 
         // keyboard spacer ============
@@ -193,10 +178,10 @@ public:
             lv_group_add_obj(inputGroup, objects.back_from_form_fields);       
         }
 
-        screenClass::open();
+        screenClass::init();
     }
 
-    void syncToInspection() {
+    void  stop() override{
         domainManagerClass* domain = domainManagerClass::getInstance();
         inspectionClass* currentInspection = &domain->currentInspection; // FIXED
         inspectionTypeClass* currentType = currentInspection->type;
@@ -220,6 +205,7 @@ public:
             Serial.print("] ");
             Serial.println(currentInspection->inspectionFormFieldValues[i]);
         }
+
     }
 
     virtual ~formFieldsScreenClass() {

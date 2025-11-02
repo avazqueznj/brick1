@@ -2685,8 +2685,8 @@
             {
               "objID": "236e0f47-e5f0-45c4-c577-f54e9bf78e6c",
               "type": "LVGLButtonWidget",
-              "left": 680,
-              "top": 437,
+              "left": 687,
+              "top": 436,
               "width": 94,
               "height": 40,
               "customInputs": [],
@@ -2718,7 +2718,7 @@
                   "type": "LVGLLabelWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 35,
+                  "width": 18,
                   "height": 30,
                   "customInputs": [],
                   "customOutputs": [],
@@ -2757,7 +2757,7 @@
                   },
                   "group": "",
                   "groupIndex": 0,
-                  "text": "9\\uF054",
+                  "text": "\\uF054",
                   "textType": "literal",
                   "longMode": "WRAP",
                   "recolor": false
@@ -2794,8 +2794,8 @@
             {
               "objID": "5eef612f-5a7c-4353-e542-ed045ca04267",
               "type": "LVGLButtonWidget",
-              "left": 21,
-              "top": 437,
+              "left": 17,
+              "top": 436,
               "width": 94,
               "height": 40,
               "customInputs": [],
@@ -2827,7 +2827,7 @@
                   "type": "LVGLLabelWidget",
                   "left": 0,
                   "top": 0,
-                  "width": 35,
+                  "width": 18,
                   "height": 30,
                   "customInputs": [],
                   "customOutputs": [],
@@ -2868,7 +2868,7 @@
                   },
                   "group": "",
                   "groupIndex": 0,
-                  "text": "\\uF0537",
+                  "text": "\\uF053",
                   "textType": "literal",
                   "longMode": "WRAP",
                   "recolor": false
@@ -2902,10 +2902,10 @@
             {
               "objID": "78695a25-68b2-4a2e-96cb-718e72ff7bb2",
               "type": "LVGLListWidget",
-              "left": 26,
+              "left": 17,
               "top": 126,
-              "width": 748,
-              "height": 293,
+              "width": 764,
+              "height": 302,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -3107,9 +3107,9 @@
             {
               "objID": "53bacdb7-5629-4ff8-cea3-184f37285c2d",
               "type": "LVGLLabelWidget",
-              "left": 26,
-              "top": 83,
-              "width": 222,
+              "left": 18,
+              "top": 66,
+              "width": 273,
               "height": 30,
               "customInputs": [],
               "customOutputs": [],
@@ -3150,7 +3150,7 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "Inspection type",
+              "text": "<inspection name>",
               "textType": "literal",
               "longMode": "WRAP",
               "recolor": false
@@ -3158,9 +3158,9 @@
             {
               "objID": "92143dab-8a6e-48a4-e909-56a5f3af5a9e",
               "type": "LVGLLabelWidget",
-              "left": 392,
-              "top": 97,
-              "width": 383,
+              "left": 18,
+              "top": 101,
+              "width": 253,
               "height": 16,
               "customInputs": [],
               "customOutputs": [],
@@ -3189,11 +3189,18 @@
               "disabledStateType": "literal",
               "states": "",
               "localStyles": {
-                "objID": "0256e52d-a996-4715-8039-b04ccc89cf57"
+                "objID": "0256e52d-a996-4715-8039-b04ccc89cf57",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "text_color": "#ffffff"
+                    }
+                  }
+                }
               },
               "group": "",
               "groupIndex": 0,
-              "text": "Use  * to delete,  Use C and D to  move around fields.",
+              "text": "Use A, B to select fields, * to delete",
               "textType": "literal",
               "longMode": "WRAP",
               "recolor": false
