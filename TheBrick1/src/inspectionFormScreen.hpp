@@ -260,7 +260,7 @@ public:
                 if (row != nullptr) {
                     // Get Y offset of row inside form_fields
                     lv_coord_t y = lv_obj_get_y(row);
-                    // Scroll to exact Y offset — brute force
+                    // Scroll the list to the row
                     lv_obj_scroll_to_y(objects.form_fields, y, LV_ANIM_ON );
                 }                
 
