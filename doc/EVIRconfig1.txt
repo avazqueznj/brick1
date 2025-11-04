@@ -1,0 +1,135 @@
+BRICKCONFIG*2
+
+
+ASSETS
+AS*121*TRUCK*123
+AS*122*TRUCK*123456
+AS*123*TRUCK*123456
+AS*127*TRUCK*123456
+AS*128*LIGHT DUTY*123456
+AS*129*LIGHT DUTY*123456
+AS*130*LIGHT DUTY*123456
+AS*131*MIXER*123
+AS*132*MIXER*123456
+AS*133*MIXER*123456
+AS*220*TRUCK*123
+AS*221TAG2*TRUCK*::4:111:48:2:177:115:128
+AS*222*TRUCK*123456
+AS*223*TRUCK*123456
+AS*227*TRUCK*123456
+AS*228*LIGHT DUTY*123456
+AS*229*LIGHT DUTY*123456
+AS*230*LIGHT DUTY*123456
+AS*231TAG3*MIXER*::130:47:106:5
+AS*232*MIXER*123456
+AS*233*MIXER*123456
+AS*322*TRUCK*123456
+AS*323*TRUCK*123456
+AS*327*TRUCK*123456
+AS*328*LIGHT DUTY*123456
+AS*329*LIGHT DUTY*123456
+AS*330*LIGHT DUTY*123456
+AS*331*MIXER*123
+AS*332*MIXER*123456
+AS*333*MIXER*123456
+
+
+LAYOUTS
+
+
+
+LAY*TRUCK
+
+LAYZONE*1*front
+ZONECOMP*light left*broken*missing*blown
+ZONECOMP*light right*broken*missing*blown
+
+LAYZONE*2*engine
+ZONECOMP*oil*low*leaking
+ZONECOMP*break fluid*low*leaking
+
+LAYZONE*3*cabin
+ZONECOMP*license*missing*coffee stain
+ZONECOMP*wind shield*broken
+ZONECOMP*seat*damaged*missing
+ZONECOMP*wind shield1*broken2
+
+
+LAYZONE*4*cargo area
+ZONECOMP*cargo*loose*missing*damaged
+
+LAYZONE*5*cargo area 2
+ZONECOMP*cargo*loose*missing*damaged
+
+LAYZONE*6*rear
+ZONECOMP*light left*broken*missing*blown
+ZONECOMP*light right*broken*missing*blown
+
+
+LAY*LIGHT DUTY
+
+LAYZONE*1*front
+ZONECOMP*light left*broken*missing*blown
+ZONECOMP*light right*broken*missing*blown
+
+LAYZONE*2*engine
+ZONECOMP*oil*low*leaking
+ZONECOMP*break fluid*low*leaking
+
+LAYZONE*3*cabin
+ZONECOMP*license*missing*coffee stain
+ZONECOMP*wind shield*broken
+ZONECOMP*seat*damaged*missing
+
+LAYZONE*4*rear
+ZONECOMP*light left*broken*missing*blown
+ZONECOMP*light right*broken*missing*blown
+
+
+LAY*MIXER
+
+LAYZONE*1*front
+ZONECOMP*light left*broken*missing*blown
+ZONECOMP*light right*broken*missing*blown
+
+LAYZONE*2*engine
+ZONECOMP*oil*low*leaking
+ZONECOMP*break fluid*low*leaking
+
+LAYZONE*3*cabin
+ZONECOMP*license*missing*coffee stain
+ZONECOMP*wind shield*broken
+ZONECOMP*seat*damaged*missing
+
+LAYZONE*4*mixer
+ZONECOMP*mixer container*leaking*damaged
+ZONECOMP*mixer control*damaged*failed
+
+LAYZONE*5*rear
+ZONECOMP*light left*broken*missing*blown
+ZONECOMP*light right*broken*missing*blown
+
+
+INSPTYPES
+
+INSP*pre-trip*ALL
+INSPFF*Odometer*text*10
+INSPFF*Fuel level*text*15
+INSPFF*Route*int*10
+INSPFF*Cost*usd*15
+INSPFF*Test2*usd*15
+
+INSP*post-trip*TRUCK*LIGHT DUTY
+INSPFF*Odometer*text*10
+INSPFF*Fuel level*text*15
+
+INSP*mixer weight*MIXER
+INSPFF*Odometer*text*10
+INSPFF*mix weight*text*10
+
+USERS
+
+USER*Alejandro Vazquez*123*456
+USER*Peter Smith*111*222
+
+END

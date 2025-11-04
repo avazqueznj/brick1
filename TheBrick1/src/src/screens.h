@@ -15,6 +15,7 @@ typedef struct _objects_t {
     lv_obj_t *inspection_zones;
     lv_obj_t *login_screen;
     lv_obj_t *settings;
+    lv_obj_t *sandbox;
     lv_obj_t *clock;
     lv_obj_t *driver_name_main;
     lv_obj_t *logo1;
@@ -103,6 +104,7 @@ enum ScreensEnum {
     SCREEN_ID_INSPECTION_ZONES = 5,
     SCREEN_ID_LOGIN_SCREEN = 6,
     SCREEN_ID_SETTINGS = 7,
+    SCREEN_ID_SANDBOX = 8,
 };
 
 void create_screen_main();
@@ -125,6 +127,9 @@ void tick_screen_login_screen();
 
 void create_screen_settings();
 void tick_screen_settings();
+
+void create_screen_sandbox();
+void tick_screen_sandbox();
 
 void tick_screen_by_id(enum ScreensEnum screenId);
 void tick_screen(int screen_index);

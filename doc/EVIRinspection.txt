@@ -1,0 +1,486 @@
+
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-15 20:11:09
+Assets:
+ - ID: 122, Layout: TRUCK, Tag: 123456
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 122, Zone: 1, Component: light left, Type: broken, Severity: 1, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 00:11:20
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 1, Component: light left, Type: broken, Severity: 1, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 00:13:07
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 1, Component: light left, Type: broken, Severity: 1, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => wede
+  Row 1: Fuel level, text, 15 => vvv
+Submit time: 2025-10-18 00:14:45
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 3, Component: wind shield1, Type: broken2, Severity: 1, Notes: <<a note>>
+ - Asset ID: 121, Zone: 3, Component: seat, Type: damaged, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 01:54:21
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 2, Component: break fluid, Type: low, Severity: 1, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 16:10:33
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 3, Component: wind shield, Type: broken, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-18 16:11:02
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 3, Component: seat, Type: damaged, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 17:12:58
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 17:42:38
+Assets:
+ - ID: 123, Layout: TRUCK, Tag: 123456
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 123, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+ - Asset ID: 121, Zone: 4, Component: cargo, Type: loose, Severity: 1, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 17:47:33
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+ - Asset ID: 120CARLSTRK, Zone: 2, Component: oil, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 1, Component: light left, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 1, Component: light right, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 3, Component: license, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 3, Component: wind shield, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 3, Component: seat, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 3, Component: wind shield1, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 4, Component: cargo, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 6, Component: light left, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 6, Component: light right, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 120CARLSTRK, Zone: 5, Component: cargo, Type: GOOD, Severity: 0, Notes: << NOTES >>
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-18 17:53:47
+Assets:
+ - ID: 122, Layout: TRUCK, Tag: 123456
+ - ID: 127, Layout: TRUCK, Tag: 123456
+Defects (sev == 0):
+ - Asset ID: 127, Zone: 4, Component: cargo, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 3, Component: license, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 3, Component: wind shield, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 3, Component: seat, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 3, Component: wind shield1, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 1, Component: light left, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 1, Component: light right, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 2, Component: oil, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 2, Component: break fluid, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 6, Component: light left, Type: GOOD, Severity: 0, Notes: << NOTES >>
+ - Asset ID: 127, Zone: 6, Component: light right, Type: GOOD, Severity: 0, Notes: << NOTES >>
+Defects (sev > 0):
+ - Asset ID: 122, Zone: 2, Component: break fluid, Type: low, Severity: 1, Notes: <<a note>>
+ - Asset ID: 127, Zone: 5, Component: cargo, Type: loose, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-18 17:54:44
+Assets:
+ - ID: 122, Layout: TRUCK, Tag: 123456
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 122, Zone: 3, Component: seat, Type: damaged, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-18 18:12:36
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-18 18:17:33
+Assets:
+ - ID: 122, Layout: TRUCK, Tag: 123456
+Defects (sev == 0):
+ - Asset ID: 122, Zone: 2, Component: oil, Type: GOOD, Severity: 0, Notes: << NOTES >>
+Defects (sev > 0):
+ - Asset ID: 122, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-18 18:18:46
+Assets:
+ - ID: 122, Layout: TRUCK, Tag: 123456
+Defects (sev == 0):
+ - Asset ID: 122, Zone: 2, Component: oil, Type: GOOD, Severity: 0, Notes: << NOTES >>
+Defects (sev > 0):
+ - Asset ID: 122, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 12
+  Row 1: Fuel level, text, 15 => 12
+Submit time: 2025-10-19 00:31:04
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 5, Component: cargo, Type: loose, Severity: 1, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-19 01:19:29
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 3, Component: wind shield, Type: broken, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-20 18:59:00
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 3, Component: wind shield, Type: broken, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-20 20:34:33
+Assets:
+ - ID: 121, Layout: TRUCK, Tag: 123
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 121, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: 123 Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-21 03:38:02
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: 123 Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-21 03:47:22
+Assets:
+ - ID: 122, Layout: TRUCK, Tag: 123456
+Defects (sev == 0):
+ - Asset ID: 122, Zone: 2, Component: oil, Type: GOOD, Severity: 0, Notes: << NOTES >>
+Defects (sev > 0):
+ - Asset ID: 122, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: 123 Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-21 03:49:05
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 2, Component: break fluid, Type: low, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: 123 Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-21 03:50:46
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 1, Component: light left, Type: broken, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: post-trip
+Driver: 123 Alejandro Vazquez
+Layouts:
+ - TRUCK
+ - LIGHT DUTY
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+Submit time: 2025-10-21 03:50:59
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 1, Component: light left, Type: broken, Severity: 10, Notes: <<a note>>
+
+========================================================================
+INSPECTION
+Type: pre-trip
+Driver: 123 Alejandro Vazquez
+Layouts:
+ - ALL
+Form Fields:
+  Row 0: Odometer, text, 10 => 
+  Row 1: Fuel level, text, 15 => 
+  Row 2: Route, int, 10 => 
+  Row 3: Cost, usd, 15 => 
+  Row 4: Test2, usd, 15 => 
+Submit time: 2025-10-23 02:10:06
+Assets:
+ - ID: 120CARLSTRK, Layout: TRUCK, Tag: ::181:250:35:35
+Defects (sev == 0):
+Defects (sev > 0):
+ - Asset ID: 120CARLSTRK, Zone: 2, Component: break fluid, Type: low, Severity: 1, Notes: <<a note>>

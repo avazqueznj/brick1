@@ -262,7 +262,8 @@ public:
           bool isNew = (screenStates[nextScreen] == nullptr);
           if (isNew) {
               switch (nextScreen) {
-                  
+
+                  case SCREEN_ID_INSPECTION_ZONES:       screenStates[nextScreen] = new inspectionZonesScreenClass( &settings ); break;
                   case SCREEN_ID_INSPECTION_FORM:       screenStates[nextScreen] = new formFieldsScreenClass( &settings ); break;
                   case SCREEN_ID_SELECT_INSPECTION_TYPE:       screenStates[nextScreen] = new selectInspectionTypeScreenClass( &settings ); break;
                   case SCREEN_ID_SELECT_ASSET_SCREEN:        screenStates[nextScreen] = new selectAssetScreenClass( &settings ); break;

@@ -38,6 +38,7 @@
       #include "selectAssetScreen.hpp"      
       #include "selectInspectionTypeScreen.hpp"  
       #include "inspectionFormScreen.hpp"    
+      #include "inspectionScreen.hpp"
 
 #include "state.hpp"
 
@@ -293,6 +294,15 @@ void loop() {
         lastUIDLength = mfrc522->uid.size;
         if (lastUIDLength > sizeof(lastUID)) lastUIDLength = sizeof(lastUID);
         memcpy(lastUID, mfrc522->uid.uidByte, lastUIDLength);
+
+        // Build tag string in your style
+        String data = "RFID event [";
+        for (byte i = 0; i < mfrc522->uid.size; i++) {
+            data += ":";
+            data += String(mfrc522->uid.uidByte[i]);
+        }
+        data += "]";
+        Serial .println( data );
 
         stateManager->rfidEvent(mfrc522->uid.uidByte, mfrc522->uid.size);
       }

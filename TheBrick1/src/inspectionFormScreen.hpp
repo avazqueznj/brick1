@@ -56,8 +56,8 @@ public:
             navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
         }
 
-        if( focused == objects.do_inspect_button && key == "#"  ){
-                                        
+        if( focused == objects.do_zones && key == "#"  ){
+            navigateTo( SCREEN_ID_INSPECTION_ZONES );                                        
         }             
 
     }
@@ -71,8 +71,8 @@ public:
             navigateTo( SCREEN_ID_SELECT_INSPECTION_TYPE );
         }
 
-        if( target == objects.do_inspect_button   ){
-                                                                                           
+        if( target == objects.do_zones  ){
+            navigateTo( SCREEN_ID_INSPECTION_ZONES );                                                                                                                                   
         }            
 
     }

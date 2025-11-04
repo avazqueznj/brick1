@@ -1072,7 +1072,7 @@ void create_screen_login_screen() {
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_align(obj, LV_ALIGN_RIGHT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "v 0.9.3");
+            lv_label_set_text(obj, "v 0.9.5");
         }
         {
             // CLOCK_LOGIN
@@ -1396,6 +1396,27 @@ void create_screen_settings() {
 void tick_screen_settings() {
 }
 
+void create_screen_sandbox() {
+    lv_obj_t *obj = lv_obj_create(0);
+    objects.sandbox = obj;
+    lv_obj_set_pos(obj, 0, 0);
+    lv_obj_set_size(obj, 800, 480);
+    {
+        lv_obj_t *parent_obj = obj;
+        {
+            lv_obj_t *obj = lv_msgbox_create(parent_obj, "", "", 0, true);
+            lv_obj_set_pos(obj, 76, 39);
+            lv_obj_set_size(obj, 647, 401);
+            lv_obj_set_style_align(obj, LV_ALIGN_DEFAULT, LV_PART_MAIN | LV_STATE_DEFAULT);
+        }
+    }
+    
+    tick_screen_sandbox();
+}
+
+void tick_screen_sandbox() {
+}
+
 
 
 typedef void (*tick_screen_func_t)();
@@ -1407,6 +1428,7 @@ tick_screen_func_t tick_screen_funcs[] = {
     tick_screen_inspection_zones,
     tick_screen_login_screen,
     tick_screen_settings,
+    tick_screen_sandbox,
 };
 void tick_screen(int screen_index) {
     tick_screen_funcs[screen_index]();
@@ -1427,4 +1449,5 @@ void create_screens() {
     create_screen_inspection_zones();
     create_screen_login_screen();
     create_screen_settings();
+    create_screen_sandbox();
 }
