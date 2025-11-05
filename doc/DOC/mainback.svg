@@ -1,0 +1,17 @@
+<svg width="90mm" height="56mm" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simple isometric cube, all white -->
+  <!-- Top face -->
+  <polygon points="200,200 300,160 400,200 300,240" fill="#fff" stroke="#fff" stroke-width="2"></polygon>
+  <!-- Left face -->
+  <polygon points="200,200 300,240 300,360 200,320" fill="#fff" stroke="#fff" stroke-width="2"></polygon>
+  <!-- Right face -->
+  <polygon points="400,200 300,240 300,360 400,320" fill="#fff" stroke="#fff" stroke-width="2"></polygon>
+  
+  <!-- Logo text, all white, left-aligned with the cube -->
+  <text x="430" y="210" font-family="Courier New, Courier, monospace" font-size="70" font-weight="bold" fill="#fff">INSPECTION</text>
+  <text x="430" y="290" font-family="Courier New, Courier, monospace" font-size="90" font-weight="bold" fill="#fff">BRICK</text>
+  
+  <!-- Contact info at lower left, white -->
+  <text x="200" y="500" font-family="Arial, Helvetica, sans-serif" font-size="38" fill="#fff">InspectionBrick.com</text>
+  <text x="200" y="540" font-family="Arial, Helvetica, sans-serif" font-size="32" fill="#fff">Brick M1   (206) 427-6133</text>
+</svg>
