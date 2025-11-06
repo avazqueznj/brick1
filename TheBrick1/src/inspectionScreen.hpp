@@ -185,7 +185,12 @@ public:
         }     
 
         screenClass::handleKeyboardEvent(key);
-      
+        lv_obj_t* focused = lv_group_get_focused(inputGroup);
+
+        if ( key == "#" and focused == objects.back_from_form_zones  ) {
+            navigateTo( SCREEN_ID_INSPECTION_FORM );
+            return;              
+        }
 
         /*
             updateAssetSeverityLabels();
@@ -245,13 +250,15 @@ public:
             refreshZoneAndComponentFlags();
             return;              
         }
-        /*
-        if (key == "4") {
-            Serial.println("submitInspection");                                                
+        
+        if (
+        (key == "4") ||
+        ( key == "#" && focused == objects.submit  )
+        ){
             submitInspection();
             return;              
         }
-        */
+        
 
 
 
@@ -376,6 +383,12 @@ public:
             refreshZoneAndComponentFlags();
             return;
         }
+
+        if ( target == objects.submit  ) {
+            submitInspection();
+            return;              
+        }
+
 
         // =====================================================
         // DEFECTO dialog ---
@@ -1356,6 +1369,47 @@ public:
     }    
 
 //==============================================
+
+    void submitInspection(){
+
+            Serial.println("Submit ...");
+            spinnerStart();
+
+            try{
+
+                domainManagerClass* domain = domainManagerClass::getInstance(); 
+                // guard            
+                if (domain->currentInspection.defects.size() == 0) {
+                    spinnerEnd(); 
+                    showDialog("ERROR: Cannot submit empty inspection.");
+                    return;
+                } 
+
+                // for the record
+                Serial.println( domain->postInspectionsPath + "?company=" + domain->company );                
+                Serial.println( domain->currentInspection.toString() );                                      
+
+                domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));       
+                domain->currentInspection.company = domain->company;
+                String result =  domain->comms->POST(
+                    domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toString() );
+                domainManagerClass::getInstance()->currentInspection.clear();                        
+                Serial.println("Submit ... done!");
+                spinnerEnd();      
+
+                showDialog( "Submitted, reply:" + result );
+
+                navigateTo( SCREEN_ID_MAIN );
+                
+            }catch( const std::runtime_error& error ){
+                spinnerEnd();       
+                String chainedError = String( "ERROR: Could not POST: " ) + error.what();           
+                showDialog( chainedError.c_str() );
+            }
+                       
+    }
+
+//==============================================    
    
 };
 

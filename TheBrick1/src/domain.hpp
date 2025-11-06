@@ -124,6 +124,9 @@ public:
 
 class inspectionClass {
 public:
+
+    String company;  
+
     inspectionTypeClass* type = NULL;
     std::vector<assetClass> assets;    
     std::vector<defectClass> defects;
@@ -136,6 +139,7 @@ public:
     inspectionClass(){}
 
     void clear() {
+        company = "";
         type = NULL;
         assets.clear();
         defects.clear();
@@ -147,6 +151,8 @@ public:
 
     String toString() const {
         String result = "INSPECTION\n";
+
+        Serial.println( "Company: " + company );
 
         // --- Inspection Type ---
         if (type != NULL) {

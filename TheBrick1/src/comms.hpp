@@ -212,10 +212,11 @@ public:
             request += "Connection: close\r\n";
             request += "\r\n";
             request += payload;
+            
+            Serial.println( request );
+            Serial.println( "Sending ..." );
 
-            client.print(request);
-
-            // Wait for server response
+            client.print(request); // send - 
             unsigned long timeout = millis();
             while (client.available() == 0) {
                 if (millis() - timeout > 5000) {                    
