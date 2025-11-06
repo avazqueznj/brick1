@@ -283,5 +283,28 @@ void scroll_widget_into_view( lv_obj_t* widget )
 
 //-------------------------------------------------
 
+String newUUID() {
+    uint8_t uuid[16];
+    for (int i = 0; i < 16; ++i) {
+        uuid[i] = random(0, 256); // On Arduino, random(max) is [0, max)
+    }
+    // Set the UUID version (4) and variant (RFC 4122)
+    uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
+    uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1 (10xxxxxx)
+
+    char buf[37];
+    snprintf(buf, sizeof(buf),
+        "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+        uuid[0], uuid[1], uuid[2], uuid[3],
+        uuid[4], uuid[5],
+        uuid[6], uuid[7],
+        uuid[8], uuid[9],
+        uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]
+    );
+    return String(buf);
+}
+
+//-------------------------------------------------
+
 #endif
 

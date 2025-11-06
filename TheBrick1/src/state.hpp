@@ -246,6 +246,12 @@ public:
 
 
   void processPendingScreenTransition() {
+
+      // wait for the modal
+      if( currentScreenState != nullptr ){
+        if( currentScreenState->modalActive() ) return;
+      }
+
       int nextScreen = setOrGetPendingScreenId();
       if (nextScreen == 0) return;
       setOrGetPendingScreenId(0);

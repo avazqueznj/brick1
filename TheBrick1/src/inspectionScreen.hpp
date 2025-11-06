@@ -272,6 +272,11 @@ public:
         lv_obj_t* target = lv_event_get_target(e);  // The object that triggered the event
         lv_obj_t* parent = lv_obj_get_parent(target);
 
+        if ( target == objects.back_from_form_zones  ) {
+            navigateTo( SCREEN_ID_INSPECTION_FORM );
+            return;              
+        }
+
         // =====================================================
         // CLICK ASSET ----
         if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == objects.zone_asset_list ) {
@@ -303,13 +308,13 @@ public:
                     Serial.println( (*asset).ID );
 
                     // has the asset changed from last ?
-                    if (asset == lastSelectedAsset) {
-                        return; // nothing to do                        
-                    }else{
+                    // if (asset == lastSelectedAsset) {
+                    //     return; // nothing to do                        
+                    // }else{
                         // yes update and render
                         lastSelectedAsset = asset;  // new selection   
                         render  = true;
-                    }
+                    
                 }                        
             }
 
@@ -449,14 +454,7 @@ public:
             return;                
         }
 
-        //-------
 
-        /*
-        if (target == objects.submit) {
-            submitInspection();
-            return;  
-        }
-        */
 
     }
 
@@ -1385,19 +1383,20 @@ public:
                     return;
                 } 
 
-                // for the record
-                Serial.println( domain->postInspectionsPath + "?company=" + domain->company );                
-                Serial.println( domain->currentInspection.toString() );                                      
-
+                // for the record                        
                 domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));       
                 domain->currentInspection.company = domain->company;
-                String result =  domain->comms->POST(
-                    domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toString() );
+
+                Serial.println( domain->currentInspection.toString() );                                      
+
+                String result = "<<TEST NO SUBMIT>>";                
+                result =  domain->comms->POST( domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toString() );
+
                 domainManagerClass::getInstance()->currentInspection.clear();                        
                 Serial.println("Submit ... done!");
                 spinnerEnd();      
 
-                showDialog( "Submitted, reply:" + result );
+                showDialog( "Submitted, reply: \n" + result );
 
                 navigateTo( SCREEN_ID_MAIN );
                 

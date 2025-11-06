@@ -125,6 +125,7 @@ public:
 class inspectionClass {
 public:
 
+    String id;
     String company;  
 
     inspectionTypeClass* type = NULL;
@@ -136,9 +137,12 @@ public:
     String driver_username;    
     String driver_name;
 
-    inspectionClass(){}
+    inspectionClass(){
+        id = newUUID();
+    }
 
     void clear() {
+        id = newUUID();
         company = "";
         type = NULL;
         assets.clear();
@@ -152,7 +156,18 @@ public:
     String toString() const {
         String result = "INSPECTION\n";
 
-        Serial.println( "Company: " + company );
+        result += "ID: " + id + "\n";
+        result += "Company: " + company + "\n";
+
+        result += "Driver: ";
+        result += driver_username;
+        result += " ";       
+        result += driver_name;
+        result += "\n";            
+
+        result += "Submit time: ";
+        result += submitTime;
+        result += "\n";           
 
         // --- Inspection Type ---
         if (type != NULL) {
@@ -192,18 +207,7 @@ public:
 
         } else {
             result += "Type: NULL\n";
-        }
-
-        result += "Driver: ";
-        result += driver_username;
-        result += " ";       
-        result += driver_name;
-        result += "\n";            
-
-
-        result += "Submit time: ";
-        result += submitTime;
-        result += "\n";        
+        }      
 
         // --- Assets ---
         result += "Assets:\n";

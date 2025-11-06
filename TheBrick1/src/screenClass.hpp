@@ -42,7 +42,14 @@ public:
     virtual void stop(){};    
 
     virtual bool modalActive(){
-        return false;
+        
+        if( !overlay ) return false;
+
+        if ( lv_obj_has_flag(overlay, LV_OBJ_FLAG_HIDDEN) ){
+            return false;
+        }else{
+            return true;
+        }
     };
 
     virtual void rfidEvent( byte *uid, byte length ){
@@ -399,15 +406,18 @@ public:
                 // Lambda callback: hide overlay on button press
                 lv_obj_add_event_cb(btnm,
                     [](lv_event_t* e) {
+
+
                         if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
                             lv_obj_t* btnm = lv_event_get_target(e);
                             lv_obj_t* mbox = lv_obj_get_parent(btnm);
                             lv_obj_t* overlay = lv_obj_get_parent(mbox);
                             lv_obj_add_flag(overlay, LV_OBJ_FLAG_HIDDEN);
                         }
+                        
                     },
                     LV_EVENT_ALL,
-                    nullptr
+                    NULL
                 );
         } 
 
@@ -416,9 +426,7 @@ public:
         lv_obj_clear_flag(overlay, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(mbox, LV_OBJ_FLAG_HIDDEN);
 
-
     }
-
 
 
 };

@@ -180,6 +180,15 @@ void setup() {
       rtc->adjust(DateTime(2025, 7, 4, 12, 0, 0));
     }
     rtcUp = true;
+
+    // seed random generator with RTC time
+    DateTime now = rtc->now();
+    uint32_t seed = now.unixtime(); 
+    seed ^= millis();
+    randomSeed(seed);
+
+    Serial.print("Random seeded with: ");
+    Serial.println(seed);    
   }
 
   // Init keypad pins
