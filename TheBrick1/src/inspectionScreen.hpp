@@ -161,7 +161,7 @@ public:
             refreshZoneAndComponentFlags();  
             return;                        
         }
-        if( key == "*" ){
+        if( key == "4" ){
             closeDefectDialog();
             refreshZoneAndComponentFlags();
             return;                
@@ -541,7 +541,7 @@ public:
                 compName,
                 "GOOD",
                 0,
-                "<< NOTES >>"
+                ""
             );
 
             defects.push_back(newDefect);
@@ -618,7 +618,7 @@ public:
                     compName,
                     "GOOD",
                     0,
-                    "<< NOTES >>"
+                    ""
                 );
                 defects.push_back(newDefect);
                 ++newDefectsCount;
@@ -686,6 +686,11 @@ public:
             throw std::runtime_error("Selected defect string is empty!");
         }
 
+        String notes = "";
+        if( severity > 0  ){
+            notes = lv_textarea_get_text( objects.defect_dialog_notes );
+        }
+
         // assemble a tentative defect
         if( selected_defect !=  nullptr ){        
             defectClass newDefect(
@@ -694,7 +699,7 @@ public:
                 selected_component_name,
                 selected_defect ? *selected_defect : String(""),
                 severity,
-                "<<a note>>"
+                notes
             );
 
             // is there a sibling already there - delete it
@@ -1065,6 +1070,9 @@ public:
             lv_obj_del(close_btn);         
         } 
         lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
+
+        makeKeyboard();
+        addKeyboard( objects.defect_dialog_notes );
     }
 
     void start() override {
@@ -1132,7 +1140,8 @@ public:
     void closeDefectDialog(){
         Serial.println("Close defect dialog ...");                
         if( defectDialogOpen ){
-            lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);            
+            lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);   
+            lv_textarea_set_text( objects.defect_dialog_notes, "" );         
         }
         defectDialogOpen = false;
     }
@@ -1260,19 +1269,13 @@ public:
                     }
                 }
 
+                if( existingDefect ){
+                    lv_textarea_set_text( objects.defect_dialog_notes, existingDefect->notes.c_str() );
+                }else{
+                    lv_textarea_set_text( objects.defect_dialog_notes, "" );
+                }
             }
         }
-
-
-
-        // restore if this is an edit ....
-        for (auto& d : domain->currentInspection.defects) {
-            if (d.asset.ID == (*selected_asset).ID && d.zoneName == selected_zone->tag && d.componentName == selected_component_name) {
-                existingDefect = &d;
-                break;
-            }
-        }
-
 
         lv_obj_clear_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
         defectDialogOpen = true;       

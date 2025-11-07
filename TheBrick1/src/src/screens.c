@@ -1112,7 +1112,7 @@ void create_screen_inspection_zones() {
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-                            lv_label_set_text(obj, "\uF00d");
+                            lv_label_set_text(obj, "4 \uF00d");
                         }
                     }
                 }

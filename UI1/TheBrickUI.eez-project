@@ -4857,7 +4857,7 @@
                       "type": "LVGLLabelWidget",
                       "left": 0,
                       "top": 0,
-                      "width": 19,
+                      "width": 46,
                       "height": 30,
                       "customInputs": [],
                       "customOutputs": [],
@@ -4897,7 +4897,7 @@
                       },
                       "group": "",
                       "groupIndex": 0,
-                      "text": "\\uF00d",
+                      "text": "4 \\uF00d",
                       "textType": "literal",
                       "longMode": "WRAP",
                       "recolor": false
