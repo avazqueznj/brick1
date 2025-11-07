@@ -72,6 +72,16 @@ typedef struct _objects_t {
     lv_obj_t *back_from_form_1;
     lv_obj_t *save_insp;
     lv_obj_t *submit_label_1;
+    lv_obj_t *defect_dialog;
+    lv_obj_t *defect_dialog_close_btn_v2;
+    lv_obj_t *defect_dialog_title;
+    lv_obj_t *obj6;
+    lv_obj_t *defect_dialog_notes;
+    lv_obj_t *defect_dialog_list;
+    lv_obj_t *zone_template_1;
+    lv_obj_t *defect_dialog_delete;
+    lv_obj_t *defect_dialog_minor;
+    lv_obj_t *defect_dialog_major;
     lv_obj_t *version_label;
     lv_obj_t *clock_login;
     lv_obj_t *logo1_6;
@@ -82,17 +92,17 @@ typedef struct _objects_t {
     lv_obj_t *do_sync_2;
     lv_obj_t *logo1_2;
     lv_obj_t *back_from_settings;
-    lv_obj_t *obj6;
     lv_obj_t *obj7;
+    lv_obj_t *obj8;
     lv_obj_t *setting_wifi_name;
     lv_obj_t *setting_wifi_password;
     lv_obj_t *setting_server_url;
-    lv_obj_t *obj8;
-    lv_obj_t *setting_company;
     lv_obj_t *obj9;
+    lv_obj_t *setting_company;
+    lv_obj_t *obj10;
     lv_obj_t *settings_tz;
     lv_obj_t *dst;
-    lv_obj_t *obj10;
+    lv_obj_t *obj11;
     lv_obj_t *clock_settings;
 } objects_t;
 

@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/6",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/4",
     "selectedStyleObject": "[TheBrickUI.eez-project]:/lvglStyles/styles/3",
     "subnavigationSelectedItems": {}
   },
@@ -188,17 +188,17 @@
             {
               "type": "tabset",
               "id": "EDITORS",
-              "weight": 42.86511600491427,
+              "weight": 38.2066735924972,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
                 {
                   "type": "tab",
                   "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
-                  "name": "settings",
+                  "name": "inspectionZones",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[TheBrickUI.eez-project]:/userPages/6",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/4",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -208,7 +208,7 @@
             {
               "type": "tabset",
               "id": "#cdf4dea9-5043-49e7-8ec6-80f7c45964f4",
-              "weight": 20.875487411422,
+              "weight": 25.53392982383906,
               "children": [
                 {
                   "type": "tab",
@@ -1296,19 +1296,21 @@
     "[TheBrickUI.eez-project]:/userPages/6[flow-state]": {
       "selection": {
         "0": {
-          "1": {},
+          "1": {
+            "0": {
+              "$selected": true
+            }
+          },
           "5": {},
           "8": {},
           "10": {},
-          "13": {
-            "$selected": true
-          }
+          "13": {}
         }
       },
       "transform": {
         "translate": {
           "x": -255,
-          "y": -230
+          "y": -130
         },
         "scale": 0.67
       },
@@ -1320,11 +1322,18 @@
       }
     },
     "[TheBrickUI.eez-project]:/userPages/1[flow-state]": {
-      "selection": {},
+      "selection": {
+        "0": {
+          "3": {},
+          "5": {
+            "$selected": true
+          }
+        }
+      },
       "transform": {
         "translate": {
-          "x": -400,
-          "y": -240
+          "x": -279,
+          "y": -226
         },
         "scale": 0.67
       },
@@ -1336,11 +1345,16 @@
       }
     },
     "[TheBrickUI.eez-project]:/userPages/2[flow-state]": {
-      "selection": {},
+      "selection": {
+        "0": {
+          "3": {},
+          "4": {}
+        }
+      },
       "transform": {
         "translate": {
-          "x": -400,
-          "y": -240
+          "x": -300,
+          "y": -233
         },
         "scale": 0.67
       },
@@ -1354,15 +1368,20 @@
     "[TheBrickUI.eez-project]:/userPages/3[flow-state]": {
       "selection": {
         "0": {
-          "4": {
+          "2": {
             "$selected": true
-          }
+          },
+          "3": {},
+          "4": {
+            "0": {}
+          },
+          "6": {}
         }
       },
       "transform": {
         "translate": {
-          "x": -400,
-          "y": -240
+          "x": -276,
+          "y": -228
         },
         "scale": 0.67
       },
@@ -1374,7 +1393,15 @@
       }
     },
     "[TheBrickUI.eez-project]:/userPages/4[flow-state]": {
-      "selection": {},
+      "selection": {
+        "0": {
+          "10": {},
+          "11": {
+            "$selected": true
+          },
+          "14": {}
+        }
+      },
       "transform": {
         "translate": {
           "x": -316,
@@ -1393,6 +1420,28 @@
       "3": {
         "$selected": true
       }
+    },
+    "[TheBrickUI.eez-project]:/userPages/7[flow-state]": {
+      "selection": {
+        "0": {
+          "0": {
+            "$selected": true
+          }
+        }
+      },
+      "transform": {
+        "translate": {
+          "x": -289,
+          "y": -229
+        },
+        "scale": 0.67
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
     }
   },
   "activeOutputSection": 0,
@@ -1406,16 +1455,16 @@
   "showComponentDescriptions": true,
   "logsPanelFilter": "all",
   "selectedStylePropertyName": "",
-  "lvglPart": "INDICATOR",
-  "lvglState": "CHECKED",
+  "lvglPart": "MAIN",
+  "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
     "MISCELLANEOUS",
     "TEXT",
-    "BORDER",
     "LAYOUT",
     "POSITION AND SIZE",
     "BACKGROUND",
-    "MARGIN"
+    "MARGIN",
+    "BORDER"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,

@@ -100,7 +100,7 @@ public:
 
     void handleModalkeyboardEvent( String key ){
 
-        lv_obj_t* list = defect_list;
+        lv_obj_t* list = objects.defect_dialog_list;
         lv_obj_t* selected = nullptr;
 
         // find current selection in the defect list
@@ -399,12 +399,12 @@ public:
         // DEFECTO dialog ---
 
         // defect list scroll reset 
-        if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == defect_list ) {
+        if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == objects.defect_dialog_list ) {
             Serial.println("defecto click");
             
-            uint32_t child_count = lv_obj_get_child_cnt( defect_list ); 
+            uint32_t child_count = lv_obj_get_child_cnt( objects.defect_dialog_list ); 
             for (uint32_t i = 0; i < child_count; ++i) {                
-                lv_obj_t* btn = lv_obj_get_child( defect_list , i);
+                lv_obj_t* btn = lv_obj_get_child( objects.defect_dialog_list , i);
                 if (!lv_obj_check_type(btn, &lv_btn_class)) continue;
 
                 if (btn != target) {
@@ -428,25 +428,23 @@ public:
         }
 
         // close defecto dialog <-- just call close below
-        if( close_btn != nullptr ){
-            if (  (lv_event_get_code(e) == LV_EVENT_CLICKED)  &&  lv_obj_check_type(target, &lv_btn_class) &&  target == close_btn ) {
-                closeDefectDialog();
-                refreshZoneAndComponentFlags();
-                return;                
-            }
+
+        if (  target == objects.defect_dialog_close_btn_v2 ) {
+            closeDefectDialog();
+            refreshZoneAndComponentFlags();
+            return;                
         }
+
 
   
         if (  
-                ( (lv_event_get_code(e) == LV_EVENT_CLICKED)  &&  lv_obj_check_type(target, &lv_btn_class) ) 
-                &&  
-                ( target == major_btn || target == minor_btn || target == del_btn )
+                ( target == objects.defect_dialog_delete || target ==  objects.defect_dialog_minor || target ==  objects.defect_dialog_major )
             ){
 
             int severity = 0;
-            if( target == major_btn ) severity = 10;
-            if( target == minor_btn ) severity = 1;
-            if( target == del_btn ) severity = -1;
+            if( target == objects.defect_dialog_major ) severity = 10;
+            if( target == objects.defect_dialog_minor ) severity = 1;
+            if( target == objects.defect_dialog_delete ) severity = -1;
 
             saveDefect( severity );
             refreshZoneAndComponentFlags();
@@ -674,7 +672,19 @@ public:
         domainManagerClass* domain = domainManagerClass::getInstance();
 
         // get selection
-        String* selected_defect = static_cast<String*>(lv_obj_get_user_data(get_checked_child(defect_list)));
+        lv_obj_t* checked_btn = get_checked_child(objects.defect_dialog_list);
+        if (!checked_btn) {
+            throw std::runtime_error("No defect selected in dialog: checked_btn is null!");
+        }
+
+        String* selected_defect = static_cast<String*>(lv_obj_get_user_data(checked_btn));
+        if (!selected_defect) {
+            throw std::runtime_error("Selected defect button has null user data!");
+        }
+
+        if (selected_defect->isEmpty()) {
+            throw std::runtime_error("Selected defect string is empty!");
+        }
 
         // assemble a tentative defect
         if( selected_defect !=  nullptr ){        
@@ -1050,8 +1060,11 @@ public:
 
         screenClass::init();
 
-
-
+        lv_obj_t* close_btn = lv_msgbox_get_close_btn(objects.defect_dialog);
+        if (close_btn){
+            lv_obj_del(close_btn);         
+        } 
+        lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
     }
 
     void start() override {
@@ -1101,7 +1114,6 @@ public:
             }
         }
 
-
     }
 
     void stop() override{
@@ -1119,24 +1131,20 @@ public:
     bool defectDialogOpen = false;
     void closeDefectDialog(){
         Serial.println("Close defect dialog ...");                
-        if( defectDialogOpen ) lv_msgbox_close_async(dialog1);       
+        if( defectDialogOpen ){
+            lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);            
+        }
         defectDialogOpen = false;
     }
 
         
     //---------------------------------------------    
 
-    lv_obj_t *dialog1 = nullptr;
-    lv_obj_t *close_btn = nullptr;
-    lv_obj_t *del_btn = nullptr;
-    lv_obj_t *minor_btn = nullptr;
-    lv_obj_t *major_btn = nullptr;
-    lv_obj_t *defect_list = nullptr;
-
     assetClass* selected_asset = nullptr;
     layoutZoneClass* selected_zone = nullptr;
+
     std::vector<String>* selected_component_vec = nullptr;
-    String selected_component_name;
+    String selected_component_name;    
     void openDefectDialog( std::vector<String>* compVec ){
 
 
@@ -1202,165 +1210,72 @@ public:
                 existingDefect = &d;
                 break;
             }
-        }
+        }        
+    
+        // defect dialog ==========
+        if (compVec->size() >= 2) {
+            String compName = (*compVec)[1];
+            Serial.print("Selected component: ");
+            Serial.println(compName);
 
-        // Create defectDialog
-        dialog1 = lv_msgbox_create(NULL, "", "", 0, true);      
-        defectDialogOpen = true;
+            // Defective component label            
+            lv_obj_set_style_text_font(objects.defect_dialog_title, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(objects.defect_dialog_title, compName.c_str());
 
-        lv_obj_set_pos(dialog1, 89, 39);
-        lv_obj_set_size(dialog1, 626, 400); // Make dialog taller to fit keyboard
-        lv_obj_clear_flag(dialog1, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_CHAIN_HOR | LV_OBJ_FLAG_SCROLL_CHAIN_VER |
-                                    LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_WITH_ARROW);
-        lv_obj_set_style_align(dialog1, LV_ALIGN_DEFAULT, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_layout(dialog1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+            // Add defect buttons
+            lv_obj_clean(objects.defect_dialog_list);
+            for (size_t i = 2; i < compVec->size(); ++i) {
+                String defectName = (*compVec)[i];
 
-        // add event handler
-        close_btn = lv_msgbox_get_close_btn(dialog1);
-        if (close_btn) {
-            Serial.println("set handler!");            
-            lv_obj_add_event_cb(close_btn, action_main_event_dispatcher, LV_EVENT_PRESSED, (void*)0);
-        }
+                lv_obj_t* defect_btn = lv_btn_create(objects.defect_dialog_list);
+                lv_obj_set_size(defect_btn, 230, 50);
 
-        {
-            lv_obj_t *parent_obj = dialog1;
+                lv_obj_set_user_data(defect_btn, (void*)&(*compVec)[i] );
+                
+                lv_obj_add_event_cb(defect_btn, action_main_event_dispatcher, LV_EVENT_PRESSED, (void*)&(*compVec)[i]);
 
-            // delete button
-            del_btn = lv_btn_create(parent_obj);
-            lv_obj_set_pos(del_btn, 20, 305);
-            lv_obj_set_size(del_btn, 164, 40);
-                lv_obj_add_event_cb(del_btn, action_main_event_dispatcher, LV_EVENT_CLICKED, (void *)0);
-            lv_obj_set_style_text_font(del_btn, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_t *del_label = lv_label_create(del_btn);
-            lv_obj_set_style_align(del_label, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(del_label, "1 delete");
+                lv_obj_set_style_bg_color(defect_btn, lv_color_hex(0xffdddddd), LV_PART_MAIN | LV_STATE_DEFAULT);
+                lv_obj_set_style_text_color(defect_btn, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+                lv_obj_set_style_layout(defect_btn, LV_LAYOUT_FLEX, LV_PART_MAIN | LV_STATE_DEFAULT);
+                lv_obj_set_style_flex_track_place(defect_btn, LV_FLEX_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-            // minorButton
-            minor_btn = lv_btn_create(parent_obj);
-            lv_obj_set_pos(minor_btn, 202, 305);
-            lv_obj_set_size(minor_btn, 164, 40);
-                lv_obj_add_event_cb(minor_btn, action_main_event_dispatcher, LV_EVENT_CLICKED, (void *)0);
-            lv_obj_set_style_text_font(minor_btn, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_t *minor_label = lv_label_create(minor_btn);
-            lv_obj_set_style_align(minor_label, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(minor_label, "2 minor");
+                //lv_obj_add_flag(defect_btn, LV_OBJ_FLAG_CHECKABLE);
 
-            // majorButton
-            major_btn = lv_btn_create(parent_obj);
-            lv_obj_set_pos(major_btn, 385, 305);
-            lv_obj_set_size(major_btn, 164, 40);
-                lv_obj_add_event_cb(major_btn, action_main_event_dispatcher, LV_EVENT_CLICKED, (void *)0);
-            lv_obj_set_style_text_font(major_btn, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_t *major_label = lv_label_create(major_btn);
-            lv_obj_set_style_align(major_label, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(major_label, "3 major");
+                lv_obj_t* label = lv_label_create(defect_btn);
+                lv_obj_set_style_text_font(label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+                lv_label_set_text(label, defectName.c_str());
 
-                //----
-
-            // (defect list)
-            defect_list = lv_list_create(parent_obj);
-            lv_obj_set_pos(defect_list, -1, 52);
-            lv_obj_set_size(defect_list, 250, 227);
-            lv_obj_clear_flag(defect_list, LV_OBJ_FLAG_SCROLL_CHAIN_HOR | LV_OBJ_FLAG_SCROLL_CHAIN_VER | LV_OBJ_FLAG_SCROLL_ELASTIC);
-            lv_obj_set_scrollbar_mode(defect_list, LV_SCROLLBAR_MODE_ON);
-            lv_obj_set_scroll_dir(defect_list, LV_DIR_VER);
-            lv_obj_set_style_pad_top(defect_list, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_left(defect_list, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_right(defect_list, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-            if (compVec->size() >= 2) {
-                String compName = (*compVec)[1];
-                Serial.print("Selected component: ");
-                Serial.println(compName);
-
-                // Defective component label
-                lv_obj_t *defective_component_label = lv_label_create(parent_obj);
-                lv_obj_set_style_text_font(defective_component_label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-                lv_obj_set_pos(defective_component_label, 170, 6);
-                lv_obj_set_style_text_color(defective_component_label, lv_color_hex(0xff2196f3), LV_PART_MAIN | LV_STATE_DEFAULT);
-                lv_label_set_text(defective_component_label, compName.c_str());
-
-                // Add defect buttons
-                for (size_t i = 2; i < compVec->size(); ++i) {
-                    String defectName = (*compVec)[i];
-
-                    lv_obj_t* defect_btn = lv_btn_create(defect_list);
-                    lv_obj_set_size(defect_btn, 230, 50);
-
-                    lv_obj_set_user_data(defect_btn, (void*)&(*compVec)[i] );
-                    
-                    lv_obj_add_event_cb(defect_btn, action_main_event_dispatcher, LV_EVENT_PRESSED, (void*)&(*compVec)[i]);
-
-                    lv_obj_set_style_bg_color(defect_btn, lv_color_hex(0xffdddddd), LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_text_color(defect_btn, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_layout(defect_btn, LV_LAYOUT_FLEX, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_flex_track_place(defect_btn, LV_FLEX_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-                    //lv_obj_add_flag(defect_btn, LV_OBJ_FLAG_CHECKABLE);
-
-                    lv_obj_t* label = lv_label_create(defect_btn);
-                    lv_obj_set_style_text_font(label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(label, defectName.c_str());
-
-                    if (existingDefect && defectName == existingDefect->defectType) {
-                        lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
-                    }
-                    else if (i == 2 && !existingDefect) {                     
-                        lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
-                    }
-                    else if (i == 2 && existingDefect) {
-                        if( existingDefect->defectType == "GOOD" ){ 
-                            lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
-                        }
-                    }
-
+                // restore
+                if (existingDefect && defectName == existingDefect->defectType) {
+                    lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
                 }
+                // or default
+                else if (i == 2 && !existingDefect) {                     
+                    lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
+                }
+                // if the defect is good defect also choose 2
+                else if (i == 2 && existingDefect) {
+                    if( existingDefect->defectType == "GOOD" ){ 
+                        lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
+                    }
+                }
+
             }
-
-            // Static defect label
-            lv_obj_t *defect_label = lv_label_create(parent_obj);
-            lv_obj_set_style_text_font(defect_label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_pos(defect_label, 56, 6);
-            lv_label_set_text(defect_label, "Defect:");
-
-            // Notes label
-            lv_obj_t *notes_label = lv_label_create(parent_obj);
-            lv_obj_set_pos(notes_label, 255, 52);
-            lv_label_set_text(notes_label, "Notes:");
-
-            // Notes textarea
-            lv_obj_t *notes_textarea = lv_textarea_create(parent_obj);
-            lv_obj_set_style_text_font(notes_textarea, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_pos(notes_textarea, 255, 80);
-            lv_obj_set_size(notes_textarea, 323, 190);
-            lv_textarea_set_max_length(notes_textarea, 128);
-            lv_textarea_set_one_line(notes_textarea, false);
-            lv_textarea_set_password_mode(notes_textarea, false);
-            if (existingDefect) {
-                lv_textarea_set_text(notes_textarea, existingDefect->notes.c_str());
-            }                    
-
-            // Keyboard for textarea
-            lv_obj_t *kb = lv_keyboard_create(parent_obj);
-            lv_obj_set_size(kb, 323, 150);
-            lv_obj_set_pos(kb, 255, 280); // below textarea
-            lv_keyboard_set_textarea(kb, notes_textarea);
-
-            // Show/hide keyboard on focus
-            lv_obj_add_event_cb(notes_textarea, [](lv_event_t * e) {
-                lv_event_code_t code = lv_event_get_code(e);
-                lv_obj_t *kb_obj = (lv_obj_t *) lv_event_get_user_data(e);
-
-                if (code == LV_EVENT_FOCUSED) {
-                    Serial.println("Show kb");
-                    lv_obj_clear_flag(kb_obj, LV_OBJ_FLAG_HIDDEN);
-                }
-
-            }, LV_EVENT_ALL, kb);
-
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
         }
+
+
+
+        // restore if this is an edit ....
+        for (auto& d : domain->currentInspection.defects) {
+            if (d.asset.ID == (*selected_asset).ID && d.zoneName == selected_zone->tag && d.componentName == selected_component_name) {
+                existingDefect = &d;
+                break;
+            }
+        }
+
+
+        lv_obj_clear_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
+        defectDialogOpen = true;       
 
         Serial.println("defect click done!");
 
