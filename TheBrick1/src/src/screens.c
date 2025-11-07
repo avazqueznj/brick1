@@ -1147,6 +1147,7 @@ void create_screen_inspection_zones() {
                     lv_textarea_set_password_mode(obj, false);
                     lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
                     lv_obj_set_scroll_dir(obj, LV_DIR_VER);
+                    lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
                 }
                 {
                     // defect_dialog_list

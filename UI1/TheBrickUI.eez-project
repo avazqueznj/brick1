@@ -5064,7 +5064,14 @@
                   "disabledStateType": "literal",
                   "states": "",
                   "localStyles": {
-                    "objID": "677097a0-7484-4c60-895a-5163794b21f1"
+                    "objID": "677097a0-7484-4c60-895a-5163794b21f1",
+                    "definition": {
+                      "MAIN": {
+                        "DEFAULT": {
+                          "text_font": "MONTSERRAT_28"
+                        }
+                      }
+                    }
                   },
                   "group": "",
                   "groupIndex": 0,
