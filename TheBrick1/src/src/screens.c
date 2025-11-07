@@ -1089,7 +1089,7 @@ void create_screen_inspection_zones() {
                     lv_obj_set_scroll_dir(obj, LV_DIR_VER);
                     lv_obj_set_style_bg_color(obj, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_bg_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_border_width(obj, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_border_width(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_border_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_border_color(obj, lv_color_hex(0xffe4572e), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_border_side(obj, LV_BORDER_SIDE_FULL, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1109,8 +1109,8 @@ void create_screen_inspection_zones() {
                             // defect_dialog_close_btn_v2
                             lv_obj_t *obj = lv_btn_create(parent_obj);
                             objects.defect_dialog_close_btn_v2 = obj;
-                            lv_obj_set_pos(obj, 531, 1);
-                            lv_obj_set_size(obj, 79, 60);
+                            lv_obj_set_pos(obj, 541, 1);
+                            lv_obj_set_size(obj, 69, 58);
                             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
                             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
                             add_style_button_default(obj);
@@ -1128,15 +1128,25 @@ void create_screen_inspection_zones() {
                             }
                         }
                         {
+                            // component_label
+                            lv_obj_t *obj = lv_label_create(parent_obj);
+                            objects.component_label = obj;
+                            lv_obj_set_pos(obj, -6, -10);
+                            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_label_set_text(obj, "component:");
+                        }
+                        {
                             // defect_dialog_title
                             lv_obj_t *obj = lv_label_create(parent_obj);
                             objects.defect_dialog_title = obj;
-                            lv_obj_set_pos(obj, -6, 7);
+                            lv_obj_set_pos(obj, -6, 20);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_label_set_long_mode(obj, LV_LABEL_LONG_CLIP);
                             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_text_color(obj, lv_color_hex(0xff6f88c6), LV_PART_MAIN | LV_STATE_DEFAULT);
-                            lv_label_set_text(obj, "the defect goes here 12345");
+                            lv_label_set_text(obj, "the component goes here  XXXX  123");
                         }
                         {
                             lv_obj_t *obj = lv_label_create(parent_obj);

@@ -75,6 +75,7 @@ typedef struct _objects_t {
     lv_obj_t *inspection_zones_overlay;
     lv_obj_t *defect_dialog;
     lv_obj_t *defect_dialog_close_btn_v2;
+    lv_obj_t *component_label;
     lv_obj_t *defect_dialog_title;
     lv_obj_t *obj6;
     lv_obj_t *defect_dialog_notes;
