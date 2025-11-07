@@ -1060,7 +1060,7 @@ public:
 
             // nav bar -- also too complicated, use numbers this will never work
             lv_group_add_obj(inputGroup, objects.back_from_form_zones );            
-            lv_group_add_obj(inputGroup, objects.submit);       
+            //lv_group_add_obj(inputGroup, objects.submit);       
         }
 
         screenClass::init();
@@ -1070,6 +1070,7 @@ public:
             lv_obj_del(close_btn);         
         } 
         lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
+        lv_obj_add_flag(  objects.inspection_zones_overlay, LV_OBJ_FLAG_HIDDEN);     
 
         makeKeyboard();
         addKeyboard( objects.defect_dialog_notes );
@@ -1141,6 +1142,7 @@ public:
         Serial.println("Close defect dialog ...");                
         if( defectDialogOpen ){
             lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);   
+            lv_obj_add_flag(  objects.inspection_zones_overlay, LV_OBJ_FLAG_HIDDEN);   
             lv_textarea_set_text( objects.defect_dialog_notes, "" );         
         }
         defectDialogOpen = false;
@@ -1278,6 +1280,7 @@ public:
         }
 
         lv_obj_clear_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
+        lv_obj_clear_flag(  objects.inspection_zones_overlay, LV_OBJ_FLAG_HIDDEN);     
         defectDialogOpen = true;       
 
         Serial.println("defect click done!");
