@@ -381,21 +381,18 @@ public:
                 saveToKVStore( "/kv/config", &config );                
 
                     String syncMessage = "Sync successful. \n";
-                    syncMessage += "Loaded: \n";
 
                     syncMessage += domainManagerClass::getInstance()->assets.size();
-                    syncMessage += " assets \n";
-
+                    syncMessage += " assets, ";
 
                     syncMessage += domainManagerClass::getInstance()->layouts.size();
-                    syncMessage += " layouts \n";
-
+                    syncMessage += " layouts, ";
 
                     syncMessage += domainManagerClass::getInstance()->inspectionTypes.size();
-                    syncMessage += " Inspection types \n";
+                    syncMessage += " types, ";
 
                     syncMessage += domainManagerClass::getInstance()->users.size();
-                    syncMessage += " Users \n";       
+                    syncMessage += " users. ";       
 
                     spinnerEnd();        
 

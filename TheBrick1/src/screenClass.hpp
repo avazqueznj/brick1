@@ -397,7 +397,7 @@ public:
         mbox = lv_msgbox_create(overlay, "", message.c_str(), btns, false);
         lv_obj_center(mbox);
 
-        lv_obj_set_size(mbox, 400, 210);  
+        lv_obj_set_size(mbox, 400, 250);  // *******************
 
         // One-time style init
         if (!style_ready) {
@@ -411,7 +411,7 @@ public:
         lv_obj_t* btnm = lv_msgbox_get_btns(mbox);
         lv_obj_add_style(btnm, &style_font, 0);
 
-        lv_obj_set_size(btnm, 300 , 100 );
+        lv_obj_set_size(btnm, 400 , 100 );
 
         // --------- NEW: Make buttons larger ---------
         lv_obj_set_style_min_width(btnm, 180, 0);
