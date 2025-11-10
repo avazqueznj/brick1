@@ -764,8 +764,8 @@ void create_screen_inspection_zones() {
             // allOkButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.all_ok_button = obj;
-            lv_obj_set_pos(obj, 637, 32);
-            lv_obj_set_size(obj, 148, 40);
+            lv_obj_set_pos(obj, 411, 90);
+            lv_obj_set_size(obj, 120, 55);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
             add_style_button_default(obj);
@@ -786,8 +786,8 @@ void create_screen_inspection_zones() {
             // compOkButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.comp_ok_button = obj;
-            lv_obj_set_pos(obj, 637, 81);
-            lv_obj_set_size(obj, 148, 40);
+            lv_obj_set_pos(obj, 538, 90);
+            lv_obj_set_size(obj, 120, 55);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
             add_style_button_default(obj);
@@ -808,8 +808,8 @@ void create_screen_inspection_zones() {
             // defectButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.defect_button = obj;
-            lv_obj_set_pos(obj, 637, 131);
-            lv_obj_set_size(obj, 148, 40);
+            lv_obj_set_pos(obj, 665, 90);
+            lv_obj_set_size(obj, 120, 55);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
             add_style_button_default(obj);
@@ -831,8 +831,8 @@ void create_screen_inspection_zones() {
             lv_obj_t *obj = lv_list_create(parent_obj);
             objects.zone_asset_list = obj;
             lv_obj_set_pos(obj, 14, 56);
-            lv_obj_set_size(obj, 200, 113);
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC);
+            lv_obj_set_size(obj, 296, 115);
+            lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
             add_style_list(obj);
@@ -880,7 +880,7 @@ void create_screen_inspection_zones() {
             lv_obj_t *obj = lv_list_create(parent_obj);
             objects.zone_list = obj;
             lv_obj_set_pos(obj, 12, 179);
-            lv_obj_set_size(obj, 202, 246);
+            lv_obj_set_size(obj, 244, 246);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
@@ -922,8 +922,8 @@ void create_screen_inspection_zones() {
             // zoneComponentList
             lv_obj_t *obj = lv_list_create(parent_obj);
             objects.zone_component_list = obj;
-            lv_obj_set_pos(obj, 230, 179);
-            lv_obj_set_size(obj, 246, 246);
+            lv_obj_set_pos(obj, 268, 179);
+            lv_obj_set_size(obj, 247, 246);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
@@ -967,6 +967,17 @@ void create_screen_inspection_zones() {
             lv_obj_set_size(obj, 800, 50);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
             add_style_bottom_panel(obj);
+        }
+        {
+            // arrow
+            lv_obj_t *obj = lv_label_create(parent_obj);
+            objects.arrow = obj;
+            lv_obj_set_pos(obj, 321, -125);
+            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+            lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(obj, "\uF077\n\uF078");
         }
         {
             // logo1_5
@@ -1027,21 +1038,13 @@ void create_screen_inspection_zones() {
         }
         {
             lv_obj_t *obj = lv_textarea_create(parent_obj);
-            lv_obj_set_pos(obj, 488, 179);
-            lv_obj_set_size(obj, 297, 246);
+            lv_obj_set_pos(obj, 523, 179);
+            lv_obj_set_size(obj, 262, 168);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, false);
             lv_textarea_set_password_mode(obj, false);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
-        }
-        {
-            lv_obj_t *obj = lv_dropdown_create(parent_obj);
-            lv_obj_set_pos(obj, 243, 88);
-            lv_obj_set_size(obj, 220, LV_SIZE_CONTENT);
-            lv_dropdown_set_options(obj, "Option 1\nOption 2\nOption 3");
-            lv_dropdown_set_selected(obj, 0);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
         }
         {
             // save_insp
@@ -1071,7 +1074,7 @@ void create_screen_inspection_zones() {
             // inspection_zones_overlay
             lv_obj_t *obj = lv_obj_create(parent_obj);
             objects.inspection_zones_overlay = obj;
-            lv_obj_set_pos(obj, -20, -19);
+            lv_obj_set_pos(obj, -23, -20);
             lv_obj_set_size(obj, 846, 538);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_style_bg_color(obj, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);

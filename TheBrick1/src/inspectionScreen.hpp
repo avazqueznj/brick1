@@ -1089,7 +1089,7 @@ public:
 
             lv_obj_t* btn = lv_btn_create(objects.zone_asset_list);
 
-            lv_obj_set_size(btn, 182, 84);
+            lv_obj_set_size(btn, 280, 50);
             lv_obj_add_event_cb(btn, action_main_event_dispatcher, LV_EVENT_PRESSED, this);
             //lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
             lv_obj_set_user_data(btn, static_cast<void*>(&asset));
@@ -1108,7 +1108,7 @@ public:
             lv_obj_t* label = lv_label_create(btn);
             lv_obj_set_style_align(label, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(label, asset.ID.c_str());
+            lv_label_set_text(label, asset.buttonName.c_str() );
 
         }
 

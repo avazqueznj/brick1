@@ -65,6 +65,7 @@ typedef struct _objects_t {
     lv_obj_t *zone_template;
     lv_obj_t *zone_component_list;
     lv_obj_t *compo_template;
+    lv_obj_t *arrow;
     lv_obj_t *logo1_5;
     lv_obj_t *submit;
     lv_obj_t *submit_label;
