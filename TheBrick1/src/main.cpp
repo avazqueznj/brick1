@@ -372,8 +372,8 @@ void loop() {
               Serial.println("===== SHOW CONFIG =====");
               domainManagerClass::getInstance()->printDebugContents();               
             } 
-            if (cmd == "reset config") {
-              Serial.println("===== RESET CONFIG =====");
+            if (cmd == "delete config") {
+              Serial.println("===== delete CONFIG =====");
               const std::vector<String> empty;
               saveToKVStore( "/kv/config", &empty );     
               domainManagerClass::getInstance()->emptyAll();
@@ -401,6 +401,16 @@ void loop() {
             
 
 
+
+            else if (cmd == "?") {
+              Serial.println("show config");
+              Serial.println("delete config");
+
+              Serial.println("reset settings");
+              Serial.println("show config");
+              
+              Serial.println("show inspection");
+            }             
 
             else {
               Serial.println( "*** Unknown brick command  ***" );
