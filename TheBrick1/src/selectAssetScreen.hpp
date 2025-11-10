@@ -387,7 +387,7 @@ public:
             // Add focusable widgets
 
             lv_group_add_obj(inputGroup, objects.search_asset );            
-            lv_group_add_obj(inputGroup, objects.search_asset_clear);            
+            //lv_group_add_obj(inputGroup, objects.search_asset_clear);            
 
             lv_group_add_obj(inputGroup, objects.asset_list  );
             // lv_group_add_obj(inputGroup, objects.select_asset);

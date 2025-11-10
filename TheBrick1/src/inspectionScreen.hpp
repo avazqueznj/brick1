@@ -1383,10 +1383,13 @@ public:
         
         if (!isInspectionComplete()) {
             static const char* btns[] = { "Ok", "Cancel", "" };
-            showDialog( "Submit incomplete inspection?", "Submit", btns );
+            showDialog( "Submit <<incomplete>> inspection?", "Submit", btns );
             return;
         }
-        doSubmitInspection(); // If complete, go ahead
+        
+        static const char* btns[] = { "Ok", "Cancel", "" };
+        showDialog( "Submit inspection?", "Submit", btns );
+        return;
     }
 
     void doSubmitInspection(){
@@ -1441,6 +1444,16 @@ public:
             doSubmitInspection();
         }
     }
+
+    virtual void modalDialogKey( String key ){    
+        screenClass::modalDialogKey( key );
+
+        Serial.println( "Inspection modal key " + modalAction + ":" + key );
+
+        if( modalAction == "Submit" && key == "#" ){
+            doSubmitInspection();
+        }
+    }    
 
 };
 

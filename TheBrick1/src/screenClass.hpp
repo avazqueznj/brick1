@@ -371,7 +371,7 @@ public:
         
     lv_obj_t* overlay = NULL;
     lv_obj_t* mbox = NULL;
-
+    String modalAction = "";
 
     virtual void showDialog(String message) {
         static const char* btns[] = { "OK", "" };
@@ -379,6 +379,8 @@ public:
     }
 
     virtual void showDialog(String message, String action, const char* btns[]) {
+
+        modalAction = action;
 
         if (!overlay) {
             overlay = lv_obj_create(lv_scr_act());
@@ -450,5 +452,11 @@ public:
     virtual void modalDialogEvent(const String action, const String button) {
 
         Serial.println( "Modal event " + action + ":" + button );
+    }
+
+    virtual void modalDialogKey( String key ){
+
+        //hide the current window
+        lv_obj_add_flag(overlay, LV_OBJ_FLAG_HIDDEN);
     }
 };

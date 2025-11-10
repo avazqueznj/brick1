@@ -195,16 +195,17 @@ public:
   void keyboardEvent( String key ){    
     try{
 
-      Serial.print("*** Key event:");
-      Serial.println(key);
 
       // are we in system modal ? ignore
       if ( currentScreenState->overlay && !lv_obj_has_flag(currentScreenState->overlay, LV_OBJ_FLAG_HIDDEN)) {
-          if (key == "#") {
-              lv_obj_add_flag(currentScreenState->overlay, LV_OBJ_FLAG_HIDDEN);
-          }
+          Serial.println("*** Modal Key event:" + key);
+          currentScreenState->modalDialogKey( key );
           return;
       }
+
+      Serial.print("*** Key event:");
+      Serial.println(key);
+
 
       // are we in window modal ? ignore
       if( currentScreenState !=  NULL  ){ 
