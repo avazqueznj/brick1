@@ -84,7 +84,6 @@ public:
     settings.save( settingsFileName ); 
   }
 
-
   void readSettingsFile(){
 
     domainManagerClass::getInstance()->company  = settings[ "company" ] ;
@@ -126,6 +125,10 @@ public:
   }
 
   // BASE DISPATCH ----------------------------------------
+
+  void modalDialogEvent(const String& action, const String& button) {
+    currentScreenState->modalDialogEvent( action, button );
+  }
 
    void rfidEvent( byte *uid, byte length ){
     try{

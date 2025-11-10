@@ -17,6 +17,7 @@
 //***************************************************** */
 
 LV_FONT_DECLARE(lv_font_montserrat_28);
+void fireModalDialogEvent( String action, String button );
 
 static lv_style_t style_font;
 static bool style_ready = false;
@@ -366,67 +367,88 @@ public:
     //-------------------------------------------
     // MODAL DIALOG
 
-    
-    lv_obj_t *overlay = NULL;
-    lv_obj_t *mbox = NULL;
 
-    virtual void showDialog( String message )
-    {
-
-        // if it does not exist, make it
-        if (overlay == NULL ) {
-                
-            static const char * btns[] = { "OK", "" };
-
-            // Create overlay
-            overlay = lv_obj_create(lv_scr_act());
-            lv_obj_set_size(overlay, LV_PCT(100), LV_PCT(100));
-            lv_obj_set_style_bg_color(overlay, lv_color_black(), 0);
-            lv_obj_set_style_bg_opa(overlay, LV_OPA_50, 0);
-            lv_obj_clear_flag(overlay, LV_OBJ_FLAG_SCROLLABLE);
-            lv_obj_add_flag(overlay, LV_OBJ_FLAG_CLICKABLE); 
-
-            // Create message box
-            mbox = lv_msgbox_create(overlay, "", message.c_str() , btns, false);
-            lv_obj_center(mbox);
-
-            // One-time style init
-            if (!style_ready) {
-                lv_style_init(&style_font);
-                lv_style_set_text_font(&style_font, &lv_font_montserrat_28);
-                style_ready = true;
-            }
-
-            // Apply style to text and buttons
-            lv_obj_add_style(lv_msgbox_get_text(mbox), &style_font, 0);
-            lv_obj_t * btnm = lv_msgbox_get_btns(mbox);
-            lv_obj_add_style(btnm, &style_font, 0);
-
-            // Set callback on button matrix
-                // Lambda callback: hide overlay on button press
-                lv_obj_add_event_cb(btnm,
-                    [](lv_event_t* e) {
+        
+    lv_obj_t* overlay = NULL;
+    lv_obj_t* mbox = NULL;
 
 
-                        if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
-                            lv_obj_t* btnm = lv_event_get_target(e);
-                            lv_obj_t* mbox = lv_obj_get_parent(btnm);
-                            lv_obj_t* overlay = lv_obj_get_parent(mbox);
-                            lv_obj_add_flag(overlay, LV_OBJ_FLAG_HIDDEN);
-                        }
-                        
-                    },
-                    LV_EVENT_ALL,
-                    NULL
-                );
-        } 
-
-        // if it exists, show  it
-        lv_label_set_text(lv_msgbox_get_text(mbox), message.c_str() );
-        lv_obj_clear_flag(overlay, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_clear_flag(mbox, LV_OBJ_FLAG_HIDDEN);
-
+    virtual void showDialog(String message) {
+        static const char* btns[] = { "OK", "" };
+        showDialog(message, "default", btns);
     }
 
+    virtual void showDialog(String message, String action, const char* btns[]) {
 
+        if (!overlay) {
+            overlay = lv_obj_create(lv_scr_act());
+        }else{
+            lv_obj_clear_flag(overlay, LV_OBJ_FLAG_HIDDEN);
+        }
+
+        lv_obj_set_size(overlay, LV_PCT(100), LV_PCT(100));
+        lv_obj_set_style_bg_color(overlay, lv_color_black(), 0);
+        lv_obj_set_style_bg_opa(overlay, LV_OPA_50, 0);
+        lv_obj_clear_flag(overlay, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_add_flag(overlay, LV_OBJ_FLAG_CLICKABLE);
+
+        mbox = lv_msgbox_create(overlay, "", message.c_str(), btns, false);
+        lv_obj_center(mbox);
+
+        lv_obj_set_size(mbox, 400, 210);  
+
+        // One-time style init
+        if (!style_ready) {
+            lv_style_init(&style_font);
+            lv_style_set_text_font(&style_font, &lv_font_montserrat_28);
+            style_ready = true;
+        }
+
+        // Apply style to text and buttons
+        lv_obj_add_style(lv_msgbox_get_text(mbox), &style_font, 0);
+        lv_obj_t* btnm = lv_msgbox_get_btns(mbox);
+        lv_obj_add_style(btnm, &style_font, 0);
+
+        lv_obj_set_size(btnm, 300 , 100 );
+
+        // --------- NEW: Make buttons larger ---------
+        lv_obj_set_style_min_width(btnm, 180, 0);
+        lv_obj_set_style_min_height(btnm, 80, 0);
+        lv_obj_set_style_pad_hor(btnm, 16, 0);
+        lv_obj_set_style_pad_ver(btnm, 12, 0);    
+
+        // Set callback, pass action string as heap-allocated String
+        lv_obj_add_event_cb(btnm, dialog_btn_callback, LV_EVENT_ALL, new String(action));
+
+        lv_obj_clear_flag(overlay, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(mbox, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    static void dialog_btn_callback(lv_event_t* e) {
+
+        if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
+                    
+            // Hide overlay
+            lv_obj_t* btnm = lv_event_get_target(e);
+            lv_obj_t* mbox = lv_obj_get_parent(btnm);
+            lv_obj_t* overlay = lv_obj_get_parent(mbox);
+            lv_obj_add_flag(overlay, LV_OBJ_FLAG_HIDDEN);
+
+            String* actionPtr = (String*)lv_event_get_user_data(e);
+            if( actionPtr ){
+                String action = *actionPtr;
+                delete actionPtr; // Clean up   !!!!!!!!!!!!!!!!! 
+                actionPtr = NULL;
+
+                const char* btn_txt = lv_msgbox_get_active_btn_text(lv_obj_get_parent(lv_event_get_target(e)));
+                fireModalDialogEvent(action, btn_txt ? String(btn_txt) : String(""));
+            }
+        }
+    }
+
+    // and we will get the result here , much later ....
+    virtual void modalDialogEvent(const String action, const String button) {
+
+        Serial.println( "Modal event " + action + ":" + button );
+    }
 };

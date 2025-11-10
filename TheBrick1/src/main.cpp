@@ -255,6 +255,10 @@ void configChanged() {
     stateManager->saveSettingsFile();
 }
 
+void fireModalDialogEvent( String action, String button ){
+  stateManager->modalDialogEvent( action, button );
+}
+
 void loop() {
 
   // wait for start

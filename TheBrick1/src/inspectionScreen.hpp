@@ -866,96 +866,96 @@ public:
         updateComponentSeverityLabels();
     }        
 
-void updateAssetSeverityLabels() {
-    domainManagerClass* domain = domainManagerClass::getInstance();
+    void updateAssetSeverityLabels() {
+        domainManagerClass* domain = domainManagerClass::getInstance();
 
-    Serial.println("Refresh Asset flags:");
+        Serial.println("Refresh Asset flags:");
 
-    uint32_t count = lv_obj_get_child_cnt(objects.zone_asset_list);
-    for (uint32_t i = 0; i < count; ++i) {
+        uint32_t count = lv_obj_get_child_cnt(objects.zone_asset_list);
+        for (uint32_t i = 0; i < count; ++i) {
 
-        // get the asset button
-        lv_obj_t* assetButton = lv_obj_get_child(objects.zone_asset_list, i);
-        if (!assetButton) continue;
+            // get the asset button
+            lv_obj_t* assetButton = lv_obj_get_child(objects.zone_asset_list, i);
+            if (!assetButton) continue;
 
-        // get the asset in the button
-        assetClass* asset = static_cast<assetClass*>(lv_obj_get_user_data(assetButton));
-        if (!asset) continue;
+            // get the asset in the button
+            assetClass* asset = static_cast<assetClass*>(lv_obj_get_user_data(assetButton));
+            if (!asset) continue;
 
-        Serial.print(asset->ID);
-        Serial.print(" Defect?");
+            Serial.print(asset->ID);
+            Serial.print(" Defect?");
 
-        // ---- Find the layout for this asset ----
-        const layoutClass* layout = nullptr;
-        for (const auto& l : *domain->getLayouts()) {
-            if (l.name == asset->layoutName) {
-                layout = &l;
-                break;
-            }
-        }
-        if (!layout) {
-            // HARD FAIL: logic/config error
-            throw std::runtime_error("Layout not found for asset: " );
-        }
-
-        bool allInspected = true;
-        int maxSeverity = -1;
-
-        // ---- Check every zone/component ----
-        for (const layoutZoneClass& zone : layout->zones) {
-            for (const auto& componentRow : zone.components) {
-
-                if (componentRow.size() < 2) {
-                    throw std::runtime_error("Malformed component definition in config: expected at least key and label.");
-                }
-
-                String componentLabel = componentRow[1];  //<<<<<
-
-                bool found = false;
-                // Check if there is ANY defect entry (including "good") for this component
-                for (const defectClass& defect : domain->currentInspection.defects) {
-
-                    if (defect.asset.ID == asset->ID &&
-                        defect.zoneName == zone.tag &&
-                        defect.componentName == componentLabel) 
-                    {
-                        found = true;
-                        if (defect.severity > maxSeverity) maxSeverity = defect.severity;
-                        break;
-                    }
-                }       
-                if (!found) {
-                    allInspected = false;
+            // ---- Find the layout for this asset ----
+            const layoutClass* layout = nullptr;
+            for (const auto& l : *domain->getLayouts()) {
+                if (l.name == asset->layoutName) {
+                    layout = &l;
                     break;
                 }
             }
-            if (!allInspected) break;
-        }
+            if (!layout) {
+                // HARD FAIL: logic/config error
+                throw std::runtime_error("Layout not found for asset: " );
+            }
 
-        // ---- Build the flag prefix ----
-        String prefix;
-        if (!allInspected) {
-            prefix = ""; // No flag if not all components inspected
-        } else if (maxSeverity == 10) {
-            prefix = String(LV_SYMBOL_CLOSE) + " ";
-        } else if (maxSeverity == 1) {
-            prefix = String(LV_SYMBOL_WARNING) + " ";
-        } else if (maxSeverity == 0) {
-            prefix = String(LV_SYMBOL_OK) + " ";
-        } else {
-            prefix = "";
-        }
+            bool allInspected = true;
+            int maxSeverity = -1;
 
-        lv_obj_t* label = lv_obj_get_child(assetButton, 0);
-        if (label) {
-            String newText = prefix + asset->buttonName;
-            lv_label_set_text(label, newText.c_str());
+            // ---- Check every zone/component ----
+            for (const layoutZoneClass& zone : layout->zones) {
+                for (const auto& componentRow : zone.components) {
 
-            Serial.print(" -> ");
-            Serial.println(newText);
+                    if (componentRow.size() < 2) {
+                        throw std::runtime_error("Malformed component definition in config: expected at least key and label.");
+                    }
+
+                    String componentLabel = componentRow[1];  //<<<<<
+
+                    bool found = false;
+                    // Check if there is ANY defect entry (including "good") for this component
+                    for (const defectClass& defect : domain->currentInspection.defects) {
+
+                        if (defect.asset.ID == asset->ID &&
+                            defect.zoneName == zone.tag &&
+                            defect.componentName == componentLabel) 
+                        {
+                            found = true;
+                            if (defect.severity > maxSeverity) maxSeverity = defect.severity;
+                            break;
+                        }
+                    }       
+                    if (!found) {
+                        allInspected = false;
+                        break;
+                    }
+                }
+                if (!allInspected) break;
+            }
+
+            // ---- Build the flag prefix ----
+            String prefix;
+            if (!allInspected) {
+                prefix = ""; // No flag if not all components inspected
+            } else if (maxSeverity == 10) {
+                prefix = String(LV_SYMBOL_CLOSE) + " ";
+            } else if (maxSeverity == 1) {
+                prefix = String(LV_SYMBOL_WARNING) + " ";
+            } else if (maxSeverity == 0) {
+                prefix = String(LV_SYMBOL_OK) + " ";
+            } else {
+                prefix = "";
+            }
+
+            lv_obj_t* label = lv_obj_get_child(assetButton, 0);
+            if (label) {
+                String newText = prefix + asset->buttonName;
+                lv_label_set_text(label, newText.c_str());
+
+                Serial.print(" -> ");
+                Serial.println(newText);
+            }
         }
     }
-}
 
     void updateZoneSeverityLabels() {
 
@@ -1335,48 +1335,113 @@ void updateAssetSeverityLabels() {
 
 //==============================================
 
-    void submitInspection(){
+    bool isInspectionComplete() {
+        domainManagerClass* domain = domainManagerClass::getInstance();
+        uint32_t count = lv_obj_get_child_cnt(objects.zone_asset_list);
+        for (uint32_t i = 0; i < count; ++i) {
+            lv_obj_t* assetButton = lv_obj_get_child(objects.zone_asset_list, i);
+            if (!assetButton) continue;
+            assetClass* asset = static_cast<assetClass*>(lv_obj_get_user_data(assetButton));
+            if (!asset) continue;
 
-            Serial.println("Submit ...");
-            spinnerStart();
-
-            try{
-
-                domainManagerClass* domain = domainManagerClass::getInstance(); 
-                // guard            
-                if (domain->currentInspection.defects.size() == 0) {
-                    spinnerEnd(); 
-                    showDialog("ERROR: Cannot submit empty inspection.");
-                    return;
-                } 
-
-                // for the record                        
-                domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));       
-                domain->currentInspection.company = domain->company;
-
-                Serial.println( domain->currentInspection.toString() );                                      
-
-                String result = "<<TEST NO SUBMIT>>";                
-                result =  domain->comms->POST( domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toString() );
-
-                domainManagerClass::getInstance()->currentInspection.clear();                        
-                Serial.println("Submit ... done!");
-                spinnerEnd();      
-
-                showDialog( "Submitted, reply: \n" + result );
-
-                navigateTo( SCREEN_ID_MAIN );
-                
-            }catch( const std::runtime_error& error ){
-                spinnerEnd();       
-                String chainedError = String( "ERROR: Could not POST: " ) + error.what();           
-                showDialog( chainedError.c_str() );
+            // Find layout for this asset
+            const layoutClass* layout = nullptr;
+            for (const auto& l : *domain->getLayouts()) {
+                if (l.name == asset->layoutName) {
+                    layout = &l;
+                    break;
+                }
             }
+            if (!layout) throw std::runtime_error("Layout not found for asset.");
+
+            // For every component, check if there's a defect entry (any severity)
+            for (const layoutZoneClass& zone : layout->zones) {
+                for (const auto& componentRow : zone.components) {
+                    if (componentRow.size() < 2)
+                        throw std::runtime_error("Malformed component definition in config: expected at least key and label.");
+                    String componentLabel = componentRow[1];
+
+                    bool found = false;
+                    for (const defectClass& defect : domain->currentInspection.defects) {
+                        if (defect.asset.ID == asset->ID &&
+                            defect.zoneName == zone.tag &&
+                            defect.componentName == componentLabel)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        return false; // As soon as one missing, inspection incomplete
+                }
+            }
+        }
+        return true; // All components for all assets are inspected
+    }
+
+    void submitInspection() {
+        
+        if (!isInspectionComplete()) {
+            static const char* btns[] = { "Ok", "Cancel", "" };
+            showDialog( "Submit incomplete inspection?", "Submit", btns );
+            return;
+        }
+        doSubmitInspection(); // If complete, go ahead
+    }
+
+    void doSubmitInspection(){
+
+        Serial.println("Submit ...");
+        spinnerStart();
+
+        try{
+
+            domainManagerClass* domain = domainManagerClass::getInstance(); 
+            // guard            
+            if (domain->currentInspection.defects.size() == 0) {
+                spinnerEnd(); 
+                Serial.println("ERROR: Cannot submit empty inspection.");
+                showDialog("ERROR: Cannot submit empty inspection.");
+                return;
+            } 
+
+            // for the record                        
+            domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));       
+            domain->currentInspection.company = domain->company;
+
+            Serial.println( domain->currentInspection.toString() );                                      
+
+            String result = "<<TEST NO SUBMIT>>";                
+            result =  domain->comms->POST( domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toString() );
+
+            domainManagerClass::getInstance()->currentInspection.clear();                        
+            Serial.println("Submit ... done!");
+            spinnerEnd();      
+
+            showDialog( "Submitted!" );
+
+            navigateTo( SCREEN_ID_MAIN );
+            
+        }catch( const std::runtime_error& error ){
+            spinnerEnd();       
+            String chainedError = String( "ERROR: Could not POST: " ) + error.what();           
+            showDialog( chainedError.c_str() );
+        }
                        
     }
 
 //==============================================    
    
+    
+    void modalDialogEvent(const String action, const String button) override {
+
+        Serial.println( "Override Modal event " + action + ":" + button );
+
+        if( action == "Submit" && button == "Ok" ){
+            doSubmitInspection();
+        }
+    }
+
 };
 
 
