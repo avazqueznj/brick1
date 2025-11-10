@@ -866,56 +866,96 @@ public:
         updateComponentSeverityLabels();
     }        
 
-    void updateAssetSeverityLabels() {
-        domainManagerClass* domain = domainManagerClass::getInstance();
+void updateAssetSeverityLabels() {
+    domainManagerClass* domain = domainManagerClass::getInstance();
 
-        Serial.println("Refresh Asset flags:");
+    Serial.println("Refresh Asset flags:");
 
-        uint32_t count = lv_obj_get_child_cnt(objects.zone_asset_list);
-        for (uint32_t i = 0; i < count; ++i) {
+    uint32_t count = lv_obj_get_child_cnt(objects.zone_asset_list);
+    for (uint32_t i = 0; i < count; ++i) {
 
-            // get the asset button
-            lv_obj_t* assetButton = lv_obj_get_child(objects.zone_asset_list, i);
-            if (!assetButton) continue;
+        // get the asset button
+        lv_obj_t* assetButton = lv_obj_get_child(objects.zone_asset_list, i);
+        if (!assetButton) continue;
 
-            // get the cargo
-            assetClass* asset = static_cast<assetClass*>(lv_obj_get_user_data(assetButton));
-            if (!asset) continue;
+        // get the asset in the button
+        assetClass* asset = static_cast<assetClass*>(lv_obj_get_user_data(assetButton));
+        if (!asset) continue;
 
-            Serial.print(asset->ID);
-            Serial.print(" Defect?");
+        Serial.print(asset->ID);
+        Serial.print(" Defect?");
 
-            // check against defects
-            int maxSeverity = -1;
-            for (const defectClass& defect : domain->currentInspection.defects) {
-                if (defect.asset.ID == asset->ID) {
-
-                    Serial.print( defect.severity );  // report over fix
-                    Serial.print(" ");
-
-                    if (defect.severity > maxSeverity) {
-                        maxSeverity = defect.severity;
-                    }
-                }
-            }
-
-            String prefix;
-            if (maxSeverity == 10) prefix = String(LV_SYMBOL_CLOSE) + " ";
-            else if (maxSeverity == 1) prefix = String(LV_SYMBOL_WARNING) + " ";
-            else if (maxSeverity == 0) prefix = String(LV_SYMBOL_OK) + " ";
-            else prefix = "";
-
-            lv_obj_t* label = lv_obj_get_child(assetButton, 0);
-            if (label) {
-                String newText = prefix + asset->buttonName;
-                lv_label_set_text(label, newText.c_str());
-
-                Serial.print(" -> ");
-                Serial.println(newText);
+        // ---- Find the layout for this asset ----
+        const layoutClass* layout = nullptr;
+        for (const auto& l : *domain->getLayouts()) {
+            if (l.name == asset->layoutName) {
+                layout = &l;
+                break;
             }
         }
-    }
+        if (!layout) {
+            // HARD FAIL: logic/config error
+            throw std::runtime_error("Layout not found for asset: " );
+        }
 
+        bool allInspected = true;
+        int maxSeverity = -1;
+
+        // ---- Check every zone/component ----
+        for (const layoutZoneClass& zone : layout->zones) {
+            for (const auto& componentRow : zone.components) {
+
+                if (componentRow.size() < 2) {
+                    throw std::runtime_error("Malformed component definition in config: expected at least key and label.");
+                }
+
+                String componentLabel = componentRow[1];  //<<<<<
+
+                bool found = false;
+                // Check if there is ANY defect entry (including "good") for this component
+                for (const defectClass& defect : domain->currentInspection.defects) {
+
+                    if (defect.asset.ID == asset->ID &&
+                        defect.zoneName == zone.tag &&
+                        defect.componentName == componentLabel) 
+                    {
+                        found = true;
+                        if (defect.severity > maxSeverity) maxSeverity = defect.severity;
+                        break;
+                    }
+                }       
+                if (!found) {
+                    allInspected = false;
+                    break;
+                }
+            }
+            if (!allInspected) break;
+        }
+
+        // ---- Build the flag prefix ----
+        String prefix;
+        if (!allInspected) {
+            prefix = ""; // No flag if not all components inspected
+        } else if (maxSeverity == 10) {
+            prefix = String(LV_SYMBOL_CLOSE) + " ";
+        } else if (maxSeverity == 1) {
+            prefix = String(LV_SYMBOL_WARNING) + " ";
+        } else if (maxSeverity == 0) {
+            prefix = String(LV_SYMBOL_OK) + " ";
+        } else {
+            prefix = "";
+        }
+
+        lv_obj_t* label = lv_obj_get_child(assetButton, 0);
+        if (label) {
+            String newText = prefix + asset->buttonName;
+            lv_label_set_text(label, newText.c_str());
+
+            Serial.print(" -> ");
+            Serial.println(newText);
+        }
+    }
+}
 
     void updateZoneSeverityLabels() {
 
@@ -1118,8 +1158,15 @@ public:
             lv_obj_t* first_asset_btn = lv_obj_get_child(objects.zone_asset_list, 0);
             if (lv_obj_check_type(first_asset_btn, &lv_btn_class)) {
                 Serial.println("Activate first asset in list.");
-
-                //TODO:                 
+                lv_obj_add_state(first_asset_btn, LV_STATE_CHECKED);
+                assetClass* asset = static_cast<assetClass*>(lv_obj_get_user_data(first_asset_btn));
+                if (!asset) {
+                    throw std::runtime_error("inspectionZonesScreenClass: asset in button is null ?");
+                }else{
+                    lastSelectedAsset = asset;  // new selection   
+                    renderAssetZones();
+                    refreshZoneAndComponentFlags();                
+                }
             }
         }
 
@@ -1153,7 +1200,6 @@ public:
 
     assetClass* selected_asset = nullptr;
     layoutZoneClass* selected_zone = nullptr;
-
     std::vector<String>* selected_component_vec = nullptr;
     String selected_component_name;    
     void openDefectDialog( std::vector<String>* compVec ){
