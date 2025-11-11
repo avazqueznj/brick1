@@ -100,10 +100,25 @@ public:
     domainManagerClass::getInstance()->comms->pass = settings[ "wifi_password" ] ;
   }
 
+  void printLoadedSettings(){
+    Serial.println( "company=" + domainManagerClass::getInstance()->company  );
+
+    Serial.println( "timeZoneIndex=" + String( domainManagerClass::getInstance()->timeZoneIndex ) );
+    Serial.println( "timeOffsetFromUTC=" + String( domainManagerClass::getInstance()->timeOffsetFromUTC ) );
+    Serial.println( "DST=" + String( domainManagerClass::getInstance()->DST  ) );
+
+    Serial.println( "serverURL=" + domainManagerClass::getInstance()->serverURL );
+    Serial.println( "getConfigPath=" + domainManagerClass::getInstance()->getConfigPath );
+    Serial.println( "postInspectionsPath=" + domainManagerClass::getInstance()->postInspectionsPath  );
+
+    Serial.println( "wifi_ssid=" + domainManagerClass::getInstance()->comms->ssid  );
+    Serial.println( "wifi_password=" + domainManagerClass::getInstance()->comms->pass  );
+  }
+
   void resetSettingsFile(){
 
         // domain
-        settings.defaultKey( "company" , "DEMO" );
+        settings.defaultKey( "company" , "NEC" );
 
         settings.defaultKey( "timeZoneIndex" , "2" );
         settings.defaultKey( "timeOffsetFromUTC" , "-420" );

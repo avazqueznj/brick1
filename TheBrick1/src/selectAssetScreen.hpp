@@ -431,9 +431,15 @@ public:
 
     void stop() override{
 
-        domainManagerClass* domain = domainManagerClass::getInstance();            
+        domainManagerClass* domain = domainManagerClass::getInstance();         
+        
+        // prepare new inspection
         domain->currentInspection.driver_name = domain->loggedUser.name;
         domain->currentInspection.driver_username = domain->loggedUser.username;
+        domain->currentInspection.company = domain->company;
+        domain->currentInspection.startTime = lv_label_get_text( objects.clock_asset );
+        domain->currentInspection.offset = String( domain->timeOffsetFromUTC );
+        domain->currentInspection.dst = String( domain->DST );
 
         // Count selected asset buttons
         domain->currentInspection.assets.clear();

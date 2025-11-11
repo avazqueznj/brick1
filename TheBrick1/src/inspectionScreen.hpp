@@ -541,7 +541,8 @@ public:
                 compName,
                 "GOOD",
                 0,
-                ""
+                "",
+                lv_label_get_text( objects.clock_zones )
             );
 
             defects.push_back(newDefect);
@@ -618,7 +619,8 @@ public:
                     compName,
                     "GOOD",
                     0,
-                    ""
+                    "",
+                    lv_label_get_text( objects.clock_zones )
                 );
                 defects.push_back(newDefect);
                 ++newDefectsCount;
@@ -699,7 +701,8 @@ public:
                 selected_component_name,
                 selected_defect ? *selected_defect : String(""),
                 severity,
-                notes
+                notes,
+                lv_label_get_text( objects.clock_zones )
             );
 
             // is there a sibling already there - delete it
@@ -1114,12 +1117,13 @@ public:
 
         makeKeyboard();
         addKeyboard( objects.defect_dialog_notes );
+        
     }
 
     void start() override {
 
         domainManagerClass* domain = domainManagerClass::getInstance();
-
+        
         // Clear existing items
         lv_obj_clean(objects.zone_asset_list);
         lv_obj_clean(objects.zone_list);
@@ -1409,9 +1413,7 @@ public:
             } 
 
             // for the record                        
-            domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));       
-            domain->currentInspection.company = domain->company;
-
+            domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));               
             Serial.println( domain->currentInspection.toString() );                                      
 
             String result = "<<TEST NO SUBMIT>>";                

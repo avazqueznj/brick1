@@ -107,6 +107,7 @@ typedef struct _objects_t {
     lv_obj_t *dst;
     lv_obj_t *obj11;
     lv_obj_t *clock_settings;
+    lv_obj_t *clock_settings_1;
 } objects_t;
 
 extern objects_t objects;

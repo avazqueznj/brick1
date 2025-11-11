@@ -96,6 +96,7 @@ public:
     String defectType;
     int severity;
     String notes;
+    String time;
 
     defectClass(
         assetClass assetParam,
@@ -103,13 +104,15 @@ public:
         const String& componentName,
         const String& defectType,
         int severity,
-        const String& notes)
+        const String& notes,
+        const String& time)
     : asset(assetParam),
       zoneName(zoneName),
       componentName(componentName),
       defectType(defectType),
       severity(severity),
-      notes(notes)
+      notes(notes),
+      time(time)
     {}
 
     bool isSameComponent(const defectClass& other) const {
@@ -132,7 +135,12 @@ public:
     std::vector<assetClass> assets;    
     std::vector<defectClass> defects;
     std::vector<  String  > inspectionFormFieldValues; 
+
     String submitTime;
+    String startTime;
+    String offset;
+    String dst;
+
 
     String driver_username;    
     String driver_name;
@@ -153,7 +161,7 @@ public:
         driver_name = "";
     }
 
-    String toString() const {
+    String toStringX() const {
         String result = "INSPECTION\n";
 
         result += "ID: " + id + "\n";
@@ -252,7 +260,125 @@ public:
         }
 
         return result;
-    }        
+    }   
+    
+    //====================================
+    //============
+    //====================================
+
+    String toString() const {
+        String result;
+        
+        result += "BRICKINSPECTION*1\n";
+
+        // display header 
+        result += 
+            "DISPLAYHEADER*" + id.substring(id.length() - 5) 
+            + "*" + submitTime 
+            + "*" + driver_username 
+            + "*" + assets[0].buttonName
+            + "\n";
+
+        result += "INSPHEADER\n";
+
+        result += "INSPID*" + id + "\n";
+        result += "COMPANYID*" + company + "\n";
+
+        result += "DRIVER*";
+        result += driver_name;
+        result += "*";       
+        result += driver_username;
+        result += "\n";
+            
+        result += "INSPSTARTTIME*";
+        result += startTime;
+        result += "\n";           
+
+        result += "INSPSUBTIME*";
+        result += submitTime;
+        result += "\n";           
+
+        result += "INSPTIMEOFFSET*";
+        result += offset;
+        result += "\n";           
+
+        result += "INSPTIMEDST*";
+        result += dst;
+        result += "\n";                 
+
+        // --- Assets ---
+        result += "ASSETS\n";
+        for (const auto& asset : assets) {
+            result  += "ASSET*" + asset.ID             
+            + "*" + asset.layoutName           
+            + "*" + asset.tag
+            + "\n";
+        }
+
+        // --- Inspection Type ---
+        result += "INSPTYPE\n";
+
+        result += "INSPTYPENAME*" + type->name +"\n";
+
+        result += "FORMFIELDS\n";
+
+        size_t rowIndex = 0;
+        for (const auto& row : type->formFields) {
+
+            // name
+            result += "FF*" + row[0];
+        
+            // value
+            if (rowIndex < inspectionFormFieldValues.size()) {
+                result += "*";
+                result += inspectionFormFieldValues[rowIndex];
+            } else {
+                result += "*NULL";
+            }
+
+            result += "\n";
+            ++rowIndex;
+        }
+
+        // --- Defects: severity == 0 first ---
+        result += "CHECKS\n";
+        for (const auto& defect : defects) {
+            if (defect.severity == 0) {
+                result += "CHECK*";
+                result += defect.asset.ID;
+                result += "*" + defect.zoneName;
+                result += "*" + defect.componentName;
+                result += "*" + defect.defectType;
+                result += "*" + String(defect.severity);
+                result += "*" + defect.time;
+                result += "*" + defect.notes;
+                result += "\n";
+            }
+        }
+
+        // --- Defects: severity > 0 after ---
+        result += "DEFECTS\n";
+        for (const auto& defect : defects) {
+            if (defect.severity > 0) {
+                result += "DEFECT*";                
+                result += defect.asset.ID;
+                result += "*" + defect.zoneName;
+                result += "*" + defect.componentName;
+                result += "*" + defect.defectType;
+                result += "*" + String(defect.severity);
+                result += "*" + defect.time;
+                result += "*" + defect.notes;
+                result += "\n";
+            }
+        }
+
+        result += "END***\n";
+
+        return result;
+    }   
+
+
+
 };
 
 

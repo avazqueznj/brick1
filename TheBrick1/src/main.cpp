@@ -386,11 +386,17 @@ void loop() {
             
 
             else if (cmd == "show settings") {
+              
               Serial.println("===== SHOW SETTINGS =====");
+              Serial.println("===== in file");
               for (const auto& kv : stateManager->settings ) {
                   Serial.print(kv.first); Serial.print(" = "); Serial.println(kv.second);
               }
+
+              Serial.println("===== loaded");              
+              stateManager->printLoadedSettings();
               Serial.println("=================");
+
             }              
             else if (cmd == "reset settings") {
               Serial.println("===== RESET SETTINGS  =====");
@@ -410,8 +416,8 @@ void loop() {
               Serial.println("show config");
               Serial.println("delete config");
 
-              Serial.println("reset settings");
-              Serial.println("show config");
+              Serial.println("show settings");
+              Serial.println("reset settings");              
               
               Serial.println("show inspection");
             }             
