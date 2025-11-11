@@ -1,1 +1,8 @@
 POST /api/device/inspections
+
+curl -X POST http://localhost:5000/api/device/inspections \
+  -H "Content-Type: text/plain" \
+  --data-binary @sample_inspection.txt
+
+
+https://69010266-8dfc-4111-888d-c65be831ff37-00-263ynwendhuan.picard.replit.dev/api/device/inspections

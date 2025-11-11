@@ -124,9 +124,9 @@ public:
         settings.defaultKey( "timeOffsetFromUTC" , "-420" );
         settings.defaultKey( "DST" , "0" );                        
 
-        settings.defaultKey( "serverURL" , "10.0.0.32" );        
+        settings.defaultKey( "serverURL" , "inspection-brick.replit.app" );        
         settings.defaultKey( "getConfigPath" , "/brickServer1/config" );        
-        settings.defaultKey( "postInspectionsPath" , "/brickServer1/inspections" );                        
+        settings.defaultKey( "postInspectionsPath" , "/api/device/inspections" );                        
 
         // commos        
         settings.defaultKey( "wifi_ssid" , "irazu2G" );

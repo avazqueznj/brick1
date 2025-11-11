@@ -433,6 +433,8 @@ public:
 
         domainManagerClass* domain = domainManagerClass::getInstance();         
         
+        domain->currentInspection.clear();
+
         // prepare new inspection
         domain->currentInspection.driver_name = domain->loggedUser.name;
         domain->currentInspection.driver_username = domain->loggedUser.username;

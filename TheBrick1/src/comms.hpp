@@ -12,7 +12,7 @@
 
 #include <Arduino.h>
 #include <exception>
-#include <WiFi.h>
+#include <WiFiSSLClient.h>
 
 #include <NTPClient.h>
 #include "RTClib.h"
@@ -22,7 +22,7 @@ extern RTC_DS3231* rtc;
 class commsClass{
 public:
 
-    WiFiClient client;
+    WiFiSSLClient  client;
 
     // from the config
     String ssid = "irazu2G";
@@ -90,7 +90,7 @@ public:
     }
 
 
-    WiFiClient& connectToServer( String serverURL ){
+    WiFiSSLClient& connectToServer( String serverURL ){
 
         connectToWifi();
 
@@ -98,7 +98,7 @@ public:
         Serial.print("Connecting to server... ");        
         Serial.println(serverURL);        
         for( int i = 0 ; i < 3; i++){
-            if( !client.connect( serverURL.c_str(), 8080 ) ){
+            if( !client.connect( serverURL.c_str(), 443 ) ){
                 Serial.println("Cannto connect, retrying...");                
                 delay( 3000 );  
                 delayBlink();
@@ -217,9 +217,11 @@ public:
             Serial.println( "Sending ..." );
 
             client.print(request); // send - 
+
+            // wait reply
             unsigned long timeout = millis();
             while (client.available() == 0) {
-                if (millis() - timeout > 5000) {                    
+                if (millis() - timeout > 20000) {                    
                     client.stop();
                     throw std::runtime_error("Server did not respond!"); 
                 }
@@ -232,18 +234,23 @@ public:
                 response += line + "\n";
             }
 
+            Serial.println( "read reply done!:" );                        
+            Serial.println( response );            
             Serial.println( "Wifi shut down ***" );            
             client.stop();
             WiFi.end();                     
 
-            // Extract only body , ie remove headers
+            //Extract only body , ie remove headers
             int bodyIndex = response.indexOf("\r\n\r\n");
             if (bodyIndex != -1) {
                 response = response.substring(bodyIndex + 4);
             }
 
-            Serial.println( "Success response ->" );
-            Serial.println( response );
+            if (response.indexOf("\"success\":true") != -1) {
+                Serial.println( "Success !!!" );            
+            } else {
+                throw std::runtime_error("ERROR. Could not read reply. inspection might not be submitted."); 
+            }
 
             return response;
 

@@ -5761,7 +5761,7 @@
               "type": "LVGLLabelWidget",
               "left": -20,
               "top": 215,
-              "width": 43,
+              "width": 50,
               "height": 16,
               "customInputs": [],
               "customOutputs": [],
@@ -5804,7 +5804,7 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "v 0.9.5",
+              "text": "v 0.962",
               "textType": "literal",
               "longMode": "WRAP",
               "recolor": false

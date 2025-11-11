@@ -141,9 +141,11 @@ public:
     String offset;
     String dst;
 
-
     String driver_username;    
     String driver_name;
+
+    bool submitted =  false;
+    String serverReply = "";
 
     inspectionClass(){
         id = newUUID();
@@ -152,13 +154,22 @@ public:
     void clear() {
         id = newUUID();
         company = "";
+
         type = NULL;
         assets.clear();
         defects.clear();
         inspectionFormFieldValues.clear();
+
         submitTime = "";
+        startTime = "";
+        offset = "";
+        dst = "";
+
         driver_username = "";        
         driver_name = "";
+
+        submitted = false;
+        serverReply = "";
     }
 
     String toStringX() const {
@@ -376,8 +387,6 @@ public:
 
         return result;
     }   
-
-
 
 };
 

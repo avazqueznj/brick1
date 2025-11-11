@@ -1419,7 +1419,9 @@ public:
             String result = "<<TEST NO SUBMIT>>";                
             result =  domain->comms->POST( domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toString() );
 
-            domainManagerClass::getInstance()->currentInspection.clear();                        
+            domainManagerClass::getInstance()->currentInspection.submitted = true;
+            domainManagerClass::getInstance()->currentInspection.serverReply = result;
+
             Serial.println("Submit ... done!");
             spinnerEnd();      
 
