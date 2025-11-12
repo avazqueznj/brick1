@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US" class="windows desktop landscape" style="--vh: 7.6px; --header-height: 100px;"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <!-- v26613 -->
+
+
+  <title>Update Wi-Fi firmware on GIGA R1 WiFi – Arduino Help Center</title>
+
+  
+
+  <meta name="description" content="In this article, we will go through a step-by-step process on how to get the latest Wi-Fi firmware on your GIGA R1 WiFi board. Before you..."><meta property="og:image" content="https://support.arduino.cc/hc/theming_assets/01HZPC7TM3NKJB5F60A3WJRHG4">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Arduino Help Center">
+<meta property="og:title" content="Update Wi-Fi firmware on GIGA R1 WiFi">
+<meta property="og:description" content="In this article, we will go through a step-by-step process on how to get the latest Wi-Fi firmware on your GIGA R1 WiFi board.
+Before you begin
+
+Add the Arduino Mbed OS Giga Boards to Arduino IDE u...">
+<meta property="og:url" content="https://support.arduino.cc/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi">
+<link rel="canonical" href="https://support.arduino.cc/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi">
+<link rel="alternate" hreflang="en-us" href="https://support.arduino.cc/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi">
+<link rel="alternate" hreflang="x-default" href="https://support.arduino.cc/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi">
+
+  <link rel="stylesheet" href="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/application-43dc745333a4019d79cea53328730603.css" media="all" id="stylesheet">
+  <link rel="stylesheet" type="text/css" href="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/style.css">
+
+  
+
+    
+    
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link rel="stylesheet" type="text/css" href="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/index.v2.css">
+<link rel="stylesheet" type="text/css" href="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/hljs-default.css">
+<script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/identify_974b9887.js"></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/main.MTQwMDFhOTU1MQ.js" data-id="CO1UDRRC77UEH42ABQ4G"></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/events.js"></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/pixel.js"></script><script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/163462445226050.js" async=""></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/fbevents.js"></script><script async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/clarity.js"></script><script async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/187036717_002.js"></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/v8.js"></script><script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/bat.js" async=""></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/uwt.js"></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/insight.min.js"></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/q4hyr6qg14.js"></script><script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/core-en.js" charset="UTF-8"></script><script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/9a0b3c88-6db6-11ee-8bfc-5ad8d8c564c0.js" async=""></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/js"></script><script async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/gtm.js"></script><script type="text/javascript" async="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/qUh2Pce5EsyeGTFGda1mDz.min.js"></script><script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/index.v2.js"></script><style type="text/css">img[onload^="SVGInject("]{visibility:hidden;}</style>
+<!-- Segment -->
+<script>
+!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://evs.aayinltcs.arduino.cc/5yy37B6M2UBwaTzKNi37Ls/qUh2Pce5EsyeGTFGda1mDz.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics._writeKey="Mjvf0GrvmQYNDH0GfIhND5e8aGFynScR";analytics._cdn = "https://evs.aayinltcs.arduino.cc";analytics.SNIPPET_VERSION="4.15.3";
+analytics.load("Mjvf0GrvmQYNDH0GfIhND5e8aGFynScR");
+}}();
+</script>
+<!-- End Segment -->
+<!-- Google Tag Manager -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+      event: 'pageMetaData',
+      page: {
+        type: 'home',
+        title:  'Arduino Help Center',
+        path: window.location.pathname,
+        environment: 'prod',
+        region: 'global',
+        brand: 'arduino',
+        language: 'EN',
+      },
+    });
+</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NK2TW8L');</script>
+<!-- End Google Tag Manager -->
+  
+<style>/*!
+ * Copyright Zendesk, Inc.
+ *
+ * Use of this source code is governed under the Apache License, Version 2.0
+ * found at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+.hjkkBUi48PQ20mlsqeQtBQzu9Uioa_BY{
+  position:relative;
+  border:1px solid #d8dcde;
+  border-radius:4px;
+  background-color:#fff;
+  padding:20px 40px;
+  line-height:1.42857;
+  color:#68737d;
+  font-size:14px;
+}
+
+.oPikK3G2Tkv7yYgW_phm8QoqS9GeopSy{
+  display:block;
+  margin:0;
+  color:#2f3941;
+  font-weight:600;
+}
+
+.j4PjRpHW7lSNqzFUVkdiwquA5yhyJevI{
+  margin:10px 0 0;
+}
+
+.hjkkBUi48PQ20mlsqeQtBQzu9Uioa_BY.j_jUk6npo7qBPZXKDV16gVpuK7l9oIHS{
+  direction:rtl;
+}
+
+.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL{
+  display:block;
+  position:absolute;
+  top:4px;
+  right:4px;
+  transition:background-color .1s ease-in-out;
+  border:none;
+  border-radius:50%;
+  background-color:transparent;
+  cursor:pointer;
+  width:28px;
+  height:28px;
+  overflow:hidden;
+  text-decoration:none;
+  font-size:0;
+  -webkit-user-select:none;
+     -moz-user-select:none;
+          user-select:none;
+}
+
+.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:after,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:before{
+  display:block;
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  transition:opacity .25s ease-in-out;
+  background-repeat:no-repeat;
+  background-position:50%;
+  background-size:12px;
+  content:"";
+}
+
+.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:before{
+  opacity:1;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%2368737d%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:after{
+  opacity:0;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%232f3941%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Gm7fuq8AqgoCjbkP6i5Vgq0LBz5aQUta:before,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Qt6yLNXIu6VkEq6Q8Cb7w8fVqEvVWQzq:before,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:focus:before,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:hover:before{
+  opacity:0;
+}
+
+.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Gm7fuq8AqgoCjbkP6i5Vgq0LBz5aQUta:after,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Qt6yLNXIu6VkEq6Q8Cb7w8fVqEvVWQzq:after,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:focus:after,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:hover:after{
+  opacity:1;
+}
+
+.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Gm7fuq8AqgoCjbkP6i5Vgq0LBz5aQUta,.RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:focus{
+  outline:none;
+  background-color:color-mod(#68737d alpha(15%));
+}
+
+.hjkkBUi48PQ20mlsqeQtBQzu9Uioa_BY.j_jUk6npo7qBPZXKDV16gVpuK7l9oIHS .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL{
+  right:auto;
+  left:4px;
+}
+
+.FhX7nbqWv2hn1LUryjQwcA562pfet9cN:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:before{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%23d93f4c%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.FhX7nbqWv2hn1LUryjQwcA562pfet9cN:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:after{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%23681219%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.X7J83wFig6JDZULO8MWowIxp6uStzirj:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:before{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%23228f67%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.X7J83wFig6JDZULO8MWowIxp6uStzirj:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:after{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%230b3b29%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:before{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%23ad5918%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:after{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 color=%27%23703815%27%3E%3Cpath stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27m3 9 6-6m0 6L3 3%27/%3E%3C/svg%3E");
+}
+
+.FhX7nbqWv2hn1LUryjQwcA562pfet9cN:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Gm7fuq8AqgoCjbkP6i5Vgq0LBz5aQUta,.FhX7nbqWv2hn1LUryjQwcA562pfet9cN:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:focus{
+  background-color:color-mod(#cc3340 alpha(15%));
+}
+
+.X7J83wFig6JDZULO8MWowIxp6uStzirj:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Gm7fuq8AqgoCjbkP6i5Vgq0LBz5aQUta,.X7J83wFig6JDZULO8MWowIxp6uStzirj:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:focus{
+  background-color:color-mod(#038153 alpha(15%));
+}
+
+.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Gm7fuq8AqgoCjbkP6i5Vgq0LBz5aQUta,.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm:not(.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq) .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:focus{
+  background-color:color-mod(#ad5918 alpha(15%));
+}
+
+.hjkkBUi48PQ20mlsqeQtBQzu9Uioa_BY .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL.Gm7fuq8AqgoCjbkP6i5Vgq0LBz5aQUta:active,.hjkkBUi48PQ20mlsqeQtBQzu9Uioa_BY .RcaEiGX0A3kyCVPSSydgAyOGGRc5MylL:focus:active{
+  background-color:transparent;
+}
+
+.zuqb1_E1eW6vR2QIOcifg43IL35dkVtW{
+  background-color:#f8f9f9;
+}
+
+.A7206VdtAqwtFIm3sAvVw_FSKzfgZ6no{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 color=%27%2368737d%27%3E%3Cg stroke=%27currentColor%27%3E%3Ccircle cx=%277.5%27 cy=%278.5%27 r=%277%27 fill=%27none%27/%3E%3Cpath stroke-linecap=%27round%27 d=%27M7.5 12.5V8%27/%3E%3C/g%3E%3Ccircle cx=%277.5%27 cy=%275%27 r=%271%27 fill=%27currentColor%27/%3E%3C/svg%3E");
+}
+
+.FhX7nbqWv2hn1LUryjQwcA562pfet9cN{
+  border-color:#f5b5ba;
+  background-color:#fff0f1;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 color=%27%23cc3340%27%3E%3Cg fill=%27none%27 stroke=%27currentColor%27%3E%3Ccircle cx=%277.5%27 cy=%278.5%27 r=%277%27/%3E%3Cpath stroke-linecap=%27round%27 d=%27M7.5 4.5V9%27/%3E%3C/g%3E%3Ccircle cx=%277.5%27 cy=%2712%27 r=%271%27 fill=%27currentColor%27/%3E%3C/svg%3E");
+  color:#8c232c;
+}
+
+.X7J83wFig6JDZULO8MWowIxp6uStzirj{
+  border-color:#aecfc2;
+  background-color:#edf8f4;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 color=%27%23038153%27%3E%3Cg fill=%27none%27 stroke=%27currentColor%27%3E%3Cpath stroke-linecap=%27round%27 stroke-linejoin=%27round%27 d=%27m4 9 2.5 2.5 5-5%27/%3E%3Ccircle cx=%277.5%27 cy=%278.5%27 r=%277%27/%3E%3C/g%3E%3C/svg%3E");
+  color:#186146;
+}
+
+.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm{
+  border-color:#fed6a8;
+  background-color:#fff7ed;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 color=%27%23ad5918%27%3E%3Cpath fill=%27none%27 stroke=%27currentColor%27 stroke-linecap=%27round%27 d=%27M.88 13.77 7.06 1.86c.19-.36.7-.36.89 0l6.18 11.91c.17.33-.07.73-.44.73H1.32c-.37 0-.61-.4-.44-.73zM7.5 6v3.5%27/%3E%3Ccircle cx=%277.5%27 cy=%2712%27 r=%271%27 fill=%27currentColor%27/%3E%3C/svg%3E");
+  color:#ad5918;
+}
+
+.FhX7nbqWv2hn1LUryjQwcA562pfet9cN,.A7206VdtAqwtFIm3sAvVw_FSKzfgZ6no,.X7J83wFig6JDZULO8MWowIxp6uStzirj,.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm{
+  background-repeat:no-repeat;
+  background-position:24px 22px;
+  padding-left:50px;
+}
+
+.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq{
+  box-shadow:0 20px 28px 0 color-mod(#17494d alpha(15%));
+}
+
+.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq.FhX7nbqWv2hn1LUryjQwcA562pfet9cN,.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq.X7J83wFig6JDZULO8MWowIxp6uStzirj,.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm{
+  border-color:#d8dcde;
+  background-color:#fff;
+  color:#49545c;
+}
+
+.FhX7nbqWv2hn1LUryjQwcA562pfet9cN .oPikK3G2Tkv7yYgW_phm8QoqS9GeopSy{
+  color:#681219;
+}
+
+.X7J83wFig6JDZULO8MWowIxp6uStzirj .oPikK3G2Tkv7yYgW_phm8QoqS9GeopSy{
+  color:#0b3b29;
+}
+
+.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm .oPikK3G2Tkv7yYgW_phm8QoqS9GeopSy{
+  color:#703815;
+}
+
+.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq.FhX7nbqWv2hn1LUryjQwcA562pfet9cN .oPikK3G2Tkv7yYgW_phm8QoqS9GeopSy{
+  color:#cc3340;
+}
+
+.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq.X7J83wFig6JDZULO8MWowIxp6uStzirj .oPikK3G2Tkv7yYgW_phm8QoqS9GeopSy{
+  color:#038153;
+}
+
+.FMYCmvXtsS6N5SRs_pF88gAhOnLqIHYq.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm .oPikK3G2Tkv7yYgW_phm8QoqS9GeopSy{
+  color:#ad5918;
+}
+
+.FhX7nbqWv2hn1LUryjQwcA562pfet9cN.j_jUk6npo7qBPZXKDV16gVpuK7l9oIHS,.A7206VdtAqwtFIm3sAvVw_FSKzfgZ6no.j_jUk6npo7qBPZXKDV16gVpuK7l9oIHS,.X7J83wFig6JDZULO8MWowIxp6uStzirj.j_jUk6npo7qBPZXKDV16gVpuK7l9oIHS,.XnWwn1n9xSK69XEGcYZlQltSvmMvsbCm.j_jUk6npo7qBPZXKDV16gVpuK7l9oIHS{
+  background-position:calc(100% - 24px) 22px;
+  padding-right:50px;
+  padding-left:40px;
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL25vZGVfbW9kdWxlcy9AemVuZGVza2dhcmRlbi9jc3MtY2FsbG91dHMvZGlzdC9pbmRleC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7O0VBS0U7O0FBRUY7RUFDRSxpQkFBaUI7RUFDakIsd0JBQXdCO0VBQ3hCLGlCQUFpQjtFQUNqQixxQkFBcUI7RUFDckIsaUJBQWlCO0VBQ2pCLG1CQUFtQjtFQUNuQixhQUFhO0VBQ2IsY0FBYztBQUNoQjs7QUFFQTtFQUNFLGFBQWE7RUFDYixRQUFRO0VBQ1IsYUFBYTtFQUNiLGVBQWU7QUFDakI7O0FBRUE7RUFDRSxlQUFlO0FBQ2pCOztBQUVBO0VBQ0UsYUFBYTtBQUNmOztBQUVBO0VBQ0UsYUFBYTtFQUNiLGlCQUFpQjtFQUNqQixPQUFPO0VBQ1AsU0FBUztFQUNULDJDQUEyQztFQUMzQyxXQUFXO0VBQ1gsaUJBQWlCO0VBQ2pCLDRCQUE0QjtFQUM1QixjQUFjO0VBQ2QsVUFBVTtFQUNWLFdBQVc7RUFDWCxlQUFlO0VBQ2Ysb0JBQW9CO0VBQ3BCLFdBQVc7RUFDWCx3QkFBd0I7S0FDckIscUJBQXFCO1VBQ2hCLGdCQUFnQjtBQUMxQjs7QUFFQTtFQUNFLGFBQWE7RUFDYixpQkFBaUI7RUFDakIsS0FBSztFQUNMLE9BQU87RUFDUCxRQUFRO0VBQ1IsTUFBTTtFQUNOLG1DQUFtQztFQUNuQywyQkFBMkI7RUFDM0IsdUJBQXVCO0VBQ3ZCLG9CQUFvQjtFQUNwQixVQUFVO0FBQ1o7O0FBRUE7RUFDRSxTQUFTO0VBQ1Qsd0RBQXFPO0FBQ3ZPOztBQUVBO0VBQ0UsU0FBUztFQUNULHdEQUFxTztBQUN2Tzs7QUFFQTtFQUNFLFNBQVM7QUFDWDs7QUFFQTtFQUNFLFNBQVM7QUFDWDs7QUFFQTtFQUNFLFlBQVk7RUFDWiw4Q0FBOEM7QUFDaEQ7O0FBRUE7RUFDRSxVQUFVO0VBQ1YsUUFBUTtBQUNWOztBQUVBO0VBQ0Usd0RBQXFPO0FBQ3ZPOztBQUVBO0VBQ0Usd0RBQXFPO0FBQ3ZPOztBQUVBO0VBQ0Usd0RBQXFPO0FBQ3ZPOztBQUVBO0VBQ0Usd0RBQXFPO0FBQ3ZPOztBQUVBO0VBQ0Usd0RBQXFPO0FBQ3ZPOztBQUVBO0VBQ0Usd0RBQXFPO0FBQ3ZPOztBQUVBO0VBQ0UsOENBQThDO0FBQ2hEOztBQUVBO0VBQ0UsOENBQThDO0FBQ2hEOztBQUVBO0VBQ0UsOENBQThDO0FBQ2hEOztBQUVBO0VBQ0UsNEJBQTRCO0FBQzlCOztBQUVBO0VBQ0Usd0JBQXdCO0FBQzFCOztBQUVBO0VBQ0Usd0RBQXVWO0FBQ3pWOztBQUVBO0VBQ0Usb0JBQW9CO0VBQ3BCLHdCQUF3QjtFQUN4Qix3REFBdVY7RUFDdlYsYUFBYTtBQUNmOztBQUVBO0VBQ0Usb0JBQW9CO0VBQ3BCLHdCQUF3QjtFQUN4Qix5REFBNlQ7RUFDN1QsYUFBYTtBQUNmOztBQUVBO0VBQ0Usb0JBQW9CO0VBQ3BCLHdCQUF3QjtFQUN4Qix5REFBc1k7RUFDdFksYUFBYTtBQUNmOztBQUVBO0VBQ0UsMkJBQTJCO0VBQzNCLDZCQUE2QjtFQUM3QixpQkFBaUI7QUFDbkI7O0FBRUE7RUFDRSxzREFBc0Q7QUFDeEQ7O0FBRUE7RUFDRSxvQkFBb0I7RUFDcEIscUJBQXFCO0VBQ3JCLGFBQWE7QUFDZjs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLDBDQUEwQztFQUMxQyxrQkFBa0I7RUFDbEIsaUJBQWlCO0FBQ25CIiwic291cmNlc0NvbnRlbnQiOlsiLyohXG4gKiBDb3B5cmlnaHQgWmVuZGVzaywgSW5jLlxuICpcbiAqIFVzZSBvZiB0aGlzIHNvdXJjZSBjb2RlIGlzIGdvdmVybmVkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjBcbiAqIGZvdW5kIGF0IGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMC5cbiAqL1xuXG4uYy1jYWxsb3V0e1xuICBwb3NpdGlvbjpyZWxhdGl2ZTtcbiAgYm9yZGVyOjFweCBzb2xpZCAjZDhkY2RlO1xuICBib3JkZXItcmFkaXVzOjRweDtcbiAgYmFja2dyb3VuZC1jb2xvcjojZmZmO1xuICBwYWRkaW5nOjIwcHggNDBweDtcbiAgbGluZS1oZWlnaHQ6MS40Mjg1NztcbiAgY29sb3I6IzY4NzM3ZDtcbiAgZm9udC1zaXplOjE0cHg7XG59XG5cbi5jLWNhbGxvdXRfX3RpdGxle1xuICBkaXNwbGF5OmJsb2NrO1xuICBtYXJnaW46MDtcbiAgY29sb3I6IzJmMzk0MTtcbiAgZm9udC13ZWlnaHQ6NjAwO1xufVxuXG4uYy1jYWxsb3V0X19wYXJhZ3JhcGh7XG4gIG1hcmdpbjoxMHB4IDAgMDtcbn1cblxuLmMtY2FsbG91dC5pcy1ydGx7XG4gIGRpcmVjdGlvbjpydGw7XG59XG5cbi5jLWNhbGxvdXRfX2Nsb3Nle1xuICBkaXNwbGF5OmJsb2NrO1xuICBwb3NpdGlvbjphYnNvbHV0ZTtcbiAgdG9wOjRweDtcbiAgcmlnaHQ6NHB4O1xuICB0cmFuc2l0aW9uOmJhY2tncm91bmQtY29sb3IgLjFzIGVhc2UtaW4tb3V0O1xuICBib3JkZXI6bm9uZTtcbiAgYm9yZGVyLXJhZGl1czo1MCU7XG4gIGJhY2tncm91bmQtY29sb3I6dHJhbnNwYXJlbnQ7XG4gIGN1cnNvcjpwb2ludGVyO1xuICB3aWR0aDoyOHB4O1xuICBoZWlnaHQ6MjhweDtcbiAgb3ZlcmZsb3c6aGlkZGVuO1xuICB0ZXh0LWRlY29yYXRpb246bm9uZTtcbiAgZm9udC1zaXplOjA7XG4gIC13ZWJraXQtdXNlci1zZWxlY3Q6bm9uZTtcbiAgICAgLW1vei11c2VyLXNlbGVjdDpub25lO1xuICAgICAgICAgIHVzZXItc2VsZWN0Om5vbmU7XG59XG5cbi5jLWNhbGxvdXRfX2Nsb3NlOmFmdGVyLC5jLWNhbGxvdXRfX2Nsb3NlOmJlZm9yZXtcbiAgZGlzcGxheTpibG9jaztcbiAgcG9zaXRpb246YWJzb2x1dGU7XG4gIHRvcDowO1xuICByaWdodDowO1xuICBib3R0b206MDtcbiAgbGVmdDowO1xuICB0cmFuc2l0aW9uOm9wYWNpdHkgLjI1cyBlYXNlLWluLW91dDtcbiAgYmFja2dyb3VuZC1yZXBlYXQ6bm8tcmVwZWF0O1xuICBiYWNrZ3JvdW5kLXBvc2l0aW9uOjUwJTtcbiAgYmFja2dyb3VuZC1zaXplOjEycHg7XG4gIGNvbnRlbnQ6XCJcIjtcbn1cblxuLmMtY2FsbG91dF9fY2xvc2U6YmVmb3Jle1xuICBvcGFjaXR5OjE7XG4gIGJhY2tncm91bmQtaW1hZ2U6dXJsKFwiZGF0YTppbWFnZS9zdmcreG1sO2NoYXJzZXQ9dXRmLTgsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBjb2xvcj0nJTIzNjg3MzdkJyUzRSUzQ3BhdGggc3Ryb2tlPSdjdXJyZW50Q29sb3InIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgZD0nbTMgOSA2LTZtMCA2TDMgMycvJTNFJTNDL3N2ZyUzRVwiKTtcbn1cblxuLmMtY2FsbG91dF9fY2xvc2U6YWZ0ZXJ7XG4gIG9wYWNpdHk6MDtcbiAgYmFja2dyb3VuZC1pbWFnZTp1cmwoXCJkYXRhOmltYWdlL3N2Zyt4bWw7Y2hhcnNldD11dGYtOCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGNvbG9yPSclMjMyZjM5NDEnJTNFJTNDcGF0aCBzdHJva2U9J2N1cnJlbnRDb2xvcicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJyBkPSdtMyA5IDYtNm0wIDZMMyAzJy8lM0UlM0Mvc3ZnJTNFXCIpO1xufVxuXG4uYy1jYWxsb3V0X19jbG9zZS5pcy1mb2N1c2VkOmJlZm9yZSwuYy1jYWxsb3V0X19jbG9zZS5pcy1ob3ZlcmVkOmJlZm9yZSwuYy1jYWxsb3V0X19jbG9zZTpmb2N1czpiZWZvcmUsLmMtY2FsbG91dF9fY2xvc2U6aG92ZXI6YmVmb3Jle1xuICBvcGFjaXR5OjA7XG59XG5cbi5jLWNhbGxvdXRfX2Nsb3NlLmlzLWZvY3VzZWQ6YWZ0ZXIsLmMtY2FsbG91dF9fY2xvc2UuaXMtaG92ZXJlZDphZnRlciwuYy1jYWxsb3V0X19jbG9zZTpmb2N1czphZnRlciwuYy1jYWxsb3V0X19jbG9zZTpob3ZlcjphZnRlcntcbiAgb3BhY2l0eToxO1xufVxuXG4uYy1jYWxsb3V0X19jbG9zZS5pcy1mb2N1c2VkLC5jLWNhbGxvdXRfX2Nsb3NlOmZvY3Vze1xuICBvdXRsaW5lOm5vbmU7XG4gIGJhY2tncm91bmQtY29sb3I6Y29sb3ItbW9kKCM2ODczN2QgYWxwaGEoMTUlKSk7XG59XG5cbi5jLWNhbGxvdXQuaXMtcnRsIC5jLWNhbGxvdXRfX2Nsb3Nle1xuICByaWdodDphdXRvO1xuICBsZWZ0OjRweDtcbn1cblxuLmMtY2FsbG91dC0tZXJyb3I6bm90KC5jLWNhbGxvdXQtLWRpYWxvZykgLmMtY2FsbG91dF9fY2xvc2U6YmVmb3Jle1xuICBiYWNrZ3JvdW5kLWltYWdlOnVybChcImRhdGE6aW1hZ2Uvc3ZnK3htbDtjaGFyc2V0PXV0Zi04LCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgY29sb3I9JyUyM2Q5M2Y0YyclM0UlM0NwYXRoIHN0cm9rZT0nY3VycmVudENvbG9yJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIGQ9J20zIDkgNi02bTAgNkwzIDMnLyUzRSUzQy9zdmclM0VcIik7XG59XG5cbi5jLWNhbGxvdXQtLWVycm9yOm5vdCguYy1jYWxsb3V0LS1kaWFsb2cpIC5jLWNhbGxvdXRfX2Nsb3NlOmFmdGVye1xuICBiYWNrZ3JvdW5kLWltYWdlOnVybChcImRhdGE6aW1hZ2Uvc3ZnK3htbDtjaGFyc2V0PXV0Zi04LCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgY29sb3I9JyUyMzY4MTIxOSclM0UlM0NwYXRoIHN0cm9rZT0nY3VycmVudENvbG9yJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIGQ9J20zIDkgNi02bTAgNkwzIDMnLyUzRSUzQy9zdmclM0VcIik7XG59XG5cbi5jLWNhbGxvdXQtLXN1Y2Nlc3M6bm90KC5jLWNhbGxvdXQtLWRpYWxvZykgLmMtY2FsbG91dF9fY2xvc2U6YmVmb3Jle1xuICBiYWNrZ3JvdW5kLWltYWdlOnVybChcImRhdGE6aW1hZ2Uvc3ZnK3htbDtjaGFyc2V0PXV0Zi04LCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgY29sb3I9JyUyMzIyOGY2NyclM0UlM0NwYXRoIHN0cm9rZT0nY3VycmVudENvbG9yJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIGQ9J20zIDkgNi02bTAgNkwzIDMnLyUzRSUzQy9zdmclM0VcIik7XG59XG5cbi5jLWNhbGxvdXQtLXN1Y2Nlc3M6bm90KC5jLWNhbGxvdXQtLWRpYWxvZykgLmMtY2FsbG91dF9fY2xvc2U6YWZ0ZXJ7XG4gIGJhY2tncm91bmQtaW1hZ2U6dXJsKFwiZGF0YTppbWFnZS9zdmcreG1sO2NoYXJzZXQ9dXRmLTgsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBjb2xvcj0nJTIzMGIzYjI5JyUzRSUzQ3BhdGggc3Ryb2tlPSdjdXJyZW50Q29sb3InIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgZD0nbTMgOSA2LTZtMCA2TDMgMycvJTNFJTNDL3N2ZyUzRVwiKTtcbn1cblxuLmMtY2FsbG91dC0td2FybmluZzpub3QoLmMtY2FsbG91dC0tZGlhbG9nKSAuYy1jYWxsb3V0X19jbG9zZTpiZWZvcmV7XG4gIGJhY2tncm91bmQtaW1hZ2U6dXJsKFwiZGF0YTppbWFnZS9zdmcreG1sO2NoYXJzZXQ9dXRmLTgsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBjb2xvcj0nJTIzYWQ1OTE4JyUzRSUzQ3BhdGggc3Ryb2tlPSdjdXJyZW50Q29sb3InIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgZD0nbTMgOSA2LTZtMCA2TDMgMycvJTNFJTNDL3N2ZyUzRVwiKTtcbn1cblxuLmMtY2FsbG91dC0td2FybmluZzpub3QoLmMtY2FsbG91dC0tZGlhbG9nKSAuYy1jYWxsb3V0X19jbG9zZTphZnRlcntcbiAgYmFja2dyb3VuZC1pbWFnZTp1cmwoXCJkYXRhOmltYWdlL3N2Zyt4bWw7Y2hhcnNldD11dGYtOCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGNvbG9yPSclMjM3MDM4MTUnJTNFJTNDcGF0aCBzdHJva2U9J2N1cnJlbnRDb2xvcicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJyBkPSdtMyA5IDYtNm0wIDZMMyAzJy8lM0UlM0Mvc3ZnJTNFXCIpO1xufVxuXG4uYy1jYWxsb3V0LS1lcnJvcjpub3QoLmMtY2FsbG91dC0tZGlhbG9nKSAuYy1jYWxsb3V0X19jbG9zZS5pcy1mb2N1c2VkLC5jLWNhbGxvdXQtLWVycm9yOm5vdCguYy1jYWxsb3V0LS1kaWFsb2cpIC5jLWNhbGxvdXRfX2Nsb3NlOmZvY3Vze1xuICBiYWNrZ3JvdW5kLWNvbG9yOmNvbG9yLW1vZCgjY2MzMzQwIGFscGhhKDE1JSkpO1xufVxuXG4uYy1jYWxsb3V0LS1zdWNjZXNzOm5vdCguYy1jYWxsb3V0LS1kaWFsb2cpIC5jLWNhbGxvdXRfX2Nsb3NlLmlzLWZvY3VzZWQsLmMtY2FsbG91dC0tc3VjY2Vzczpub3QoLmMtY2FsbG91dC0tZGlhbG9nKSAuYy1jYWxsb3V0X19jbG9zZTpmb2N1c3tcbiAgYmFja2dyb3VuZC1jb2xvcjpjb2xvci1tb2QoIzAzODE1MyBhbHBoYSgxNSUpKTtcbn1cblxuLmMtY2FsbG91dC0td2FybmluZzpub3QoLmMtY2FsbG91dC0tZGlhbG9nKSAuYy1jYWxsb3V0X19jbG9zZS5pcy1mb2N1c2VkLC5jLWNhbGxvdXQtLXdhcm5pbmc6bm90KC5jLWNhbGxvdXQtLWRpYWxvZykgLmMtY2FsbG91dF9fY2xvc2U6Zm9jdXN7XG4gIGJhY2tncm91bmQtY29sb3I6Y29sb3ItbW9kKCNhZDU5MTggYWxwaGEoMTUlKSk7XG59XG5cbi5jLWNhbGxvdXQgLmMtY2FsbG91dF9fY2xvc2UuaXMtZm9jdXNlZDphY3RpdmUsLmMtY2FsbG91dCAuYy1jYWxsb3V0X19jbG9zZTpmb2N1czphY3RpdmV7XG4gIGJhY2tncm91bmQtY29sb3I6dHJhbnNwYXJlbnQ7XG59XG5cbi5jLWNhbGxvdXQtLXJlY2Vzc2Vke1xuICBiYWNrZ3JvdW5kLWNvbG9yOiNmOGY5Zjk7XG59XG5cbi5jLWNhbGxvdXQtLWluZm97XG4gIGJhY2tncm91bmQtaW1hZ2U6dXJsKFwiZGF0YTppbWFnZS9zdmcreG1sO2NoYXJzZXQ9dXRmLTgsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzE2JyBoZWlnaHQ9JzE2JyBjb2xvcj0nJTIzNjg3MzdkJyUzRSUzQ2cgc3Ryb2tlPSdjdXJyZW50Q29sb3InJTNFJTNDY2lyY2xlIGN4PSc3LjUnIGN5PSc4LjUnIHI9JzcnIGZpbGw9J25vbmUnLyUzRSUzQ3BhdGggc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJyBkPSdNNy41IDEyLjVWOCcvJTNFJTNDL2clM0UlM0NjaXJjbGUgY3g9JzcuNScgY3k9JzUnIHI9JzEnIGZpbGw9J2N1cnJlbnRDb2xvcicvJTNFJTNDL3N2ZyUzRVwiKTtcbn1cblxuLmMtY2FsbG91dC0tZXJyb3J7XG4gIGJvcmRlci1jb2xvcjojZjViNWJhO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiNmZmYwZjE7XG4gIGJhY2tncm91bmQtaW1hZ2U6dXJsKFwiZGF0YTppbWFnZS9zdmcreG1sO2NoYXJzZXQ9dXRmLTgsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzE2JyBoZWlnaHQ9JzE2JyBjb2xvcj0nJTIzY2MzMzQwJyUzRSUzQ2cgZmlsbD0nbm9uZScgc3Ryb2tlPSdjdXJyZW50Q29sb3InJTNFJTNDY2lyY2xlIGN4PSc3LjUnIGN5PSc4LjUnIHI9JzcnLyUzRSUzQ3BhdGggc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJyBkPSdNNy41IDQuNVY5Jy8lM0UlM0MvZyUzRSUzQ2NpcmNsZSBjeD0nNy41JyBjeT0nMTInIHI9JzEnIGZpbGw9J2N1cnJlbnRDb2xvcicvJTNFJTNDL3N2ZyUzRVwiKTtcbiAgY29sb3I6IzhjMjMyYztcbn1cblxuLmMtY2FsbG91dC0tc3VjY2Vzc3tcbiAgYm9yZGVyLWNvbG9yOiNhZWNmYzI7XG4gIGJhY2tncm91bmQtY29sb3I6I2VkZjhmNDtcbiAgYmFja2dyb3VuZC1pbWFnZTp1cmwoXCJkYXRhOmltYWdlL3N2Zyt4bWw7Y2hhcnNldD11dGYtOCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB3aWR0aD0nMTYnIGhlaWdodD0nMTYnIGNvbG9yPSclMjMwMzgxNTMnJTNFJTNDZyBmaWxsPSdub25lJyBzdHJva2U9J2N1cnJlbnRDb2xvciclM0UlM0NwYXRoIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgc3Ryb2tlLWxpbmVqb2luPSdyb3VuZCcgZD0nbTQgOSAyLjUgMi41IDUtNScvJTNFJTNDY2lyY2xlIGN4PSc3LjUnIGN5PSc4LjUnIHI9JzcnLyUzRSUzQy9nJTNFJTNDL3N2ZyUzRVwiKTtcbiAgY29sb3I6IzE4NjE0Njtcbn1cblxuLmMtY2FsbG91dC0td2FybmluZ3tcbiAgYm9yZGVyLWNvbG9yOiNmZWQ2YTg7XG4gIGJhY2tncm91bmQtY29sb3I6I2ZmZjdlZDtcbiAgYmFja2dyb3VuZC1pbWFnZTp1cmwoXCJkYXRhOmltYWdlL3N2Zyt4bWw7Y2hhcnNldD11dGYtOCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB3aWR0aD0nMTYnIGhlaWdodD0nMTYnIGNvbG9yPSclMjNhZDU5MTgnJTNFJTNDcGF0aCBmaWxsPSdub25lJyBzdHJva2U9J2N1cnJlbnRDb2xvcicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJyBkPSdNLjg4IDEzLjc3IDcuMDYgMS44NmMuMTktLjM2LjctLjM2Ljg5IDBsNi4xOCAxMS45MWMuMTcuMzMtLjA3LjczLS40NC43M0gxLjMyYy0uMzcgMC0uNjEtLjQtLjQ0LS43M3pNNy41IDZ2My41Jy8lM0UlM0NjaXJjbGUgY3g9JzcuNScgY3k9JzEyJyByPScxJyBmaWxsPSdjdXJyZW50Q29sb3InLyUzRSUzQy9zdmclM0VcIik7XG4gIGNvbG9yOiNhZDU5MTg7XG59XG5cbi5jLWNhbGxvdXQtLWVycm9yLC5jLWNhbGxvdXQtLWluZm8sLmMtY2FsbG91dC0tc3VjY2VzcywuYy1jYWxsb3V0LS13YXJuaW5ne1xuICBiYWNrZ3JvdW5kLXJlcGVhdDpuby1yZXBlYXQ7XG4gIGJhY2tncm91bmQtcG9zaXRpb246MjRweCAyMnB4O1xuICBwYWRkaW5nLWxlZnQ6NTBweDtcbn1cblxuLmMtY2FsbG91dC0tZGlhbG9ne1xuICBib3gtc2hhZG93OjAgMjBweCAyOHB4IDAgY29sb3ItbW9kKCMxNzQ5NGQgYWxwaGEoMTUlKSk7XG59XG5cbi5jLWNhbGxvdXQtLWRpYWxvZy5jLWNhbGxvdXQtLWVycm9yLC5jLWNhbGxvdXQtLWRpYWxvZy5jLWNhbGxvdXQtLXN1Y2Nlc3MsLmMtY2FsbG91dC0tZGlhbG9nLmMtY2FsbG91dC0td2FybmluZ3tcbiAgYm9yZGVyLWNvbG9yOiNkOGRjZGU7XG4gIGJhY2tncm91bmQtY29sb3I6I2ZmZjtcbiAgY29sb3I6IzQ5NTQ1Yztcbn1cblxuLmMtY2FsbG91dC0tZXJyb3IgLmMtY2FsbG91dF9fdGl0bGV7XG4gIGNvbG9yOiM2ODEyMTk7XG59XG5cbi5jLWNhbGxvdXQtLXN1Y2Nlc3MgLmMtY2FsbG91dF9fdGl0bGV7XG4gIGNvbG9yOiMwYjNiMjk7XG59XG5cbi5jLWNhbGxvdXQtLXdhcm5pbmcgLmMtY2FsbG91dF9fdGl0bGV7XG4gIGNvbG9yOiM3MDM4MTU7XG59XG5cbi5jLWNhbGxvdXQtLWRpYWxvZy5jLWNhbGxvdXQtLWVycm9yIC5jLWNhbGxvdXRfX3RpdGxle1xuICBjb2xvcjojY2MzMzQwO1xufVxuXG4uYy1jYWxsb3V0LS1kaWFsb2cuYy1jYWxsb3V0LS1zdWNjZXNzIC5jLWNhbGxvdXRfX3RpdGxle1xuICBjb2xvcjojMDM4MTUzO1xufVxuXG4uYy1jYWxsb3V0LS1kaWFsb2cuYy1jYWxsb3V0LS13YXJuaW5nIC5jLWNhbGxvdXRfX3RpdGxle1xuICBjb2xvcjojYWQ1OTE4O1xufVxuXG4uYy1jYWxsb3V0LS1lcnJvci5pcy1ydGwsLmMtY2FsbG91dC0taW5mby5pcy1ydGwsLmMtY2FsbG91dC0tc3VjY2Vzcy5pcy1ydGwsLmMtY2FsbG91dC0td2FybmluZy5pcy1ydGx7XG4gIGJhY2tncm91bmQtcG9zaXRpb246Y2FsYygxMDAlIC0gMjRweCkgMjJweDtcbiAgcGFkZGluZy1yaWdodDo1MHB4O1xuICBwYWRkaW5nLWxlZnQ6NDBweDtcbn1cbiJdLCJzb3VyY2VSb290IjoiIn0= */</style><style>/**
+ * Copyright Zendesk, Inc.
+ *
+ * Use of this source code is governed under the Apache License, Version 2.0
+ * found at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+:root {
+  --zd-color-black: #000;
+  --zd-color-green-100: #edf8f4;
+  --zd-color-green-200: #d1e8df;
+  --zd-color-green-300: #aecfc2;
+  --zd-color-green-400: #5eae91;
+  --zd-color-green-500: #228f67;
+  --zd-color-green-600: #038153;
+  --zd-color-green-700: #186146;
+  --zd-color-green-800: #0b3b29;
+  --zd-color-grey-100: #f8f9f9;
+  --zd-color-grey-200: #e9ebed;
+  --zd-color-grey-300: #d8dcde;
+  --zd-color-grey-400: #c2c8cc;
+  --zd-color-grey-500: #87929d;
+  --zd-color-grey-600: #68737d;
+  --zd-color-grey-700: #49545c;
+  --zd-color-grey-800: #2f3941;
+  --zd-color-blue-100: #edf7ff;
+  --zd-color-blue-200: #cee2f2;
+  --zd-color-blue-300: #adcce4;
+  --zd-color-blue-400: #5293c7;
+  --zd-color-blue-500: #337fbd;
+  --zd-color-blue-600: #1f73b7;
+  --zd-color-blue-700: #144a75;
+  --zd-color-blue-800: #0f3554;
+  --zd-color-kale-100: #f5fcfc;
+  --zd-color-kale-200: #daeded;
+  --zd-color-kale-300: #bdd9d7;
+  --zd-color-kale-400: #90bbbb;
+  --zd-color-kale-500: #498283;
+  --zd-color-kale-600: #17494d;
+  --zd-color-kale-700: #03363d;
+  --zd-color-kale-800: #012b30;
+  --zd-color-red-100: #fff0f1;
+  --zd-color-red-200: #f5d5d8;
+  --zd-color-red-300: #f5b5ba;
+  --zd-color-red-400: #e35b66;
+  --zd-color-red-500: #d93f4c;
+  --zd-color-red-600: #cc3340;
+  --zd-color-red-700: #8c232c;
+  --zd-color-red-800: #681219;
+  --zd-color-yellow-100: #fff7ed;
+  --zd-color-yellow-200: #ffeedb;
+  --zd-color-yellow-300: #fed6a8;
+  --zd-color-yellow-400: #ffb057;
+  --zd-color-yellow-500: #f79a3e;
+  --zd-color-yellow-600: #ed8f1c;
+  --zd-color-yellow-700: #ad5918;
+  --zd-color-yellow-800: #703815;
+  --zd-color-white: #fff;
+  --zd-color-secondary-azure-400: #3091ec;
+  --zd-color-secondary-azure-600: #1371d6;
+  --zd-color-secondary-crimson-400: #e34f32;
+  --zd-color-secondary-crimson-600: #c72a1c;
+  --zd-color-secondary-fuschia-400: #d653c2;
+  --zd-color-secondary-fuschia-600: #a81897;
+  --zd-color-secondary-lemon-400: #ffd424;
+  --zd-color-secondary-lemon-600: #ffbb10;
+  --zd-color-secondary-lime-400: #43b324;
+  --zd-color-secondary-lime-600: #2e8200;
+  --zd-color-secondary-mint-400: #00a656;
+  --zd-color-secondary-mint-600: #058541;
+  --zd-color-secondary-orange-400: #de701d;
+  --zd-color-secondary-orange-600: #bf5000;
+  --zd-color-secondary-pink-400: #ec4d63;
+  --zd-color-secondary-pink-600: #d42054;
+  --zd-color-secondary-purple-400: #b552e2;
+  --zd-color-secondary-purple-600: #6a27b8;
+  --zd-color-secondary-royal-400: #5d7df5;
+  --zd-color-secondary-royal-600: #3353e2;
+  --zd-color-secondary-teal-400: #02a191;
+  --zd-color-secondary-teal-600: #028079;
+  --zd-color-secondary-azure-M400: #5f8dcf;
+  --zd-color-secondary-azure-M600: #3a70b2;
+  --zd-color-secondary-crimson-M400: #cc6c5b;
+  --zd-color-secondary-crimson-M600: #b24a3c;
+  --zd-color-secondary-fuschia-M400: #cf62a8;
+  --zd-color-secondary-fuschia-M600: #a8458c;
+  --zd-color-secondary-lemon-M400: #e7a500;
+  --zd-color-secondary-lemon-M600: #c38f00;
+  --zd-color-secondary-lime-M400: #519e2d;
+  --zd-color-secondary-lime-M600: #47782c;
+  --zd-color-secondary-mint-M400: #299c66;
+  --zd-color-secondary-mint-M600: #2e8057;
+  --zd-color-secondary-orange-M400: #d4772c;
+  --zd-color-secondary-orange-M600: #b35827;
+  --zd-color-secondary-pink-M400: #d57287;
+  --zd-color-secondary-pink-M600: #b23a5d;
+  --zd-color-secondary-purple-M400: #b072cc;
+  --zd-color-secondary-purple-M600: #9358b0;
+  --zd-color-secondary-royal-M400: #7986d8;
+  --zd-color-secondary-royal-M600: #4b61c3;
+  --zd-color-secondary-teal-M400: #2d9e8f;
+  --zd-color-secondary-teal-M600: #3c7873;
+  --zd-color-chat-orange: #f79a3e;
+  --zd-color-connect-red: #ff6224;
+  --zd-color-explore-blue: #30aabc;
+  --zd-color-gather-pink: #f6c8be;
+  --zd-color-guide-pink: #eb4962;
+  --zd-color-message-green: #37b8af;
+  --zd-color-sell-gold: #c38f00;
+  --zd-color-support-green: #00a656;
+  --zd-color-talk-yellow: #efc93d;
+  --zd-font-family-monospace: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  --zd-font-family-system: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
+  --zd-font-size-xs: 10px;
+  --zd-font-size-sm: 12px;
+  --zd-font-size-md: 14px;
+  --zd-font-size-lg: 18px;
+  --zd-font-size-xl: 22px;
+  --zd-font-size-xxl: 26px;
+  --zd-font-size-xxxl: 36px;
+  --zd-font-size-sm-monospace: 11px;
+  --zd-font-size-md-monospace: 13px;
+  --zd-font-size-lg-monospace: 17px;
+  --zd-font-weight-thin: 100;
+  --zd-font-weight-extralight: 200;
+  --zd-font-weight-light: 300;
+  --zd-font-weight-regular: 400;
+  --zd-font-weight-medium: 500;
+  --zd-font-weight-semibold: 600;
+  --zd-font-weight-bold: 700;
+  --zd-font-weight-extrabold: 800;
+  --zd-font-weight-black: 900;
+  --zd-font-weight-ultralight: 200;
+  --zd-font-weight-ultrabold: 800;
+  --zd-font-weight-heavy: 900;
+  --zd-line-height-sm: 16px;
+  --zd-line-height-md: 20px;
+  --zd-line-height-lg: 24px;
+  --zd-line-height-xl: 28px;
+  --zd-line-height-xxl: 32px;
+  --zd-line-height-xxxl: 44px;
+  --zd-spacing-xxs: 4px;
+  --zd-spacing-xs: 8px;
+  --zd-spacing-sm: 12px;
+  --zd-spacing: 20px;
+  --zd-spacing-lg: 32px;
+  --zd-spacing-xl: 40px;
+  --zd-spacing-xxl: 48px;
+}
+
+.f9BqAlsIZvx7sACM4xRFqwHmcyIhbjt6 {
+}
+
+.kzYITkxJWL_02DpPXe0gWyN2swJRVitJ {
+}
+
+.wINJoVYRvGy8raLsj56fUQ_Rtxf8SXNp {
+}
+
+.QNIPdWgxsnPIjnQQzFMoMgcPDAOOsPrm {
+}
+
+._HdHwJNOTFG9Mij4WmL1AlvKwno7GrCd {
+  background-color: #f8f9f9;
+}
+
+.yXw8lmZs7Tg0Y73sa9aaAZs1ahSKzGnp {
+  background-color: transparent !important;
+  padding: 0;
+}
+
+.yXw8lmZs7Tg0Y73sa9aaAZs1ahSKzGnp.h4cMXsHyKKZf7DHHkpaaFwuvtZd3B4HJ {
+  outline: 1px solid #2f3941;
+  outline: 1px solid var(--zd-color-grey-800);
+}
+
+.yXw8lmZs7Tg0Y73sa9aaAZs1ahSKzGnp:focus-visible {
+  outline: 1px solid #2f3941;
+  outline: 1px solid var(--zd-color-grey-800);
+}
+
+.QN1ves1hk0MUeUx70asdhg7VPFdkXeNa {
+}
+
+.XJXUPzr7Dx0szbQn8wH5AZY581GZ1SmI {
+}
+
+.sPA0enxuGX2pj2jkRfN0ZArNVD80pacY {
+}
+
+/* Reset styles for links within notifications */
+
+.qQF1ABBg7opWaOeLFI1g1Ax8igXoLRdR a {
+  -webkit-animation: none 0s ease 0s 1 normal none running;
+          animation: none 0s ease 0s 1 normal none running;
+  -webkit-backface-visibility: visible;
+          backface-visibility: visible;
+  background: transparent none repeat 0 0 / auto auto padding-box border-box scroll;
+  border: medium none currentColor;
+  border-collapse: separate;
+  -o-border-image: none;
+     border-image: none;
+  border-radius: 0;
+  border-spacing: 0;
+  bottom: auto;
+  box-shadow: none;
+  box-sizing: content-box;
+  caption-side: top;
+  clear: none;
+  clip: auto;
+  color: #000;
+  -webkit-columns: auto;
+     -moz-columns: auto;
+          columns: auto;
+  -webkit-column-count: auto;
+     -moz-column-count: auto;
+          column-count: auto;
+  -webkit-column-fill: balance;
+     -moz-column-fill: balance;
+          column-fill: balance;
+  grid-column-gap: normal;
+  -webkit-column-gap: normal;
+     -moz-column-gap: normal;
+          column-gap: normal;
+  -webkit-column-rule: medium none currentColor;
+     -moz-column-rule: medium none currentColor;
+          column-rule: medium none currentColor;
+  -webkit-column-span: 1;
+     -moz-column-span: 1;
+          column-span: 1;
+  -webkit-column-width: auto;
+     -moz-column-width: auto;
+          column-width: auto;
+  content: normal;
+  counter-increment: none;
+  counter-reset: none;
+  cursor: auto;
+  direction: ltr;
+  display: inline;
+  empty-cells: show;
+  float: none;
+  font-family: serif;
+  font-size: medium;
+  font-style: normal;
+  -webkit-font-feature-settings: normal;
+          font-feature-settings: normal;
+  font-variant: normal;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: normal;
+  height: auto;
+  -webkit-hyphens: none;
+          hyphens: none;
+  left: auto;
+  letter-spacing: normal;
+  list-style: disc outside none;
+  margin: 0;
+  max-height: none;
+  max-width: none;
+  min-height: 0;
+  min-width: 0;
+  opacity: 1;
+  orphans: 2;
+  outline: medium none invert;
+  overflow: visible;
+  overflow-x: visible;
+  overflow-y: visible;
+  padding: 0;
+  page-break-after: auto;
+  page-break-before: auto;
+  page-break-inside: auto;
+  -webkit-perspective: none;
+          perspective: none;
+  -webkit-perspective-origin: 50% 50%;
+          perspective-origin: 50% 50%;
+  position: static;
+  right: auto;
+  -moz-tab-size: 8;
+    -o-tab-size: 8;
+       tab-size: 8;
+  table-layout: auto;
+  text-align: left;
+  -moz-text-align-last: auto;
+       text-align-last: auto;
+  text-decoration: none;
+  text-indent: 0;
+  text-shadow: none;
+  text-transform: none;
+  top: auto;
+  -webkit-transform: none;
+          transform: none;
+  -webkit-transform-origin: 50% 50% 0;
+          transform-origin: 50% 50% 0;
+  -webkit-transform-style: flat;
+          transform-style: flat;
+  transition: none 0s ease 0s;
+  unicode-bidi: normal;
+  vertical-align: baseline;
+  visibility: visible;
+  white-space: normal;
+  widows: 2;
+  width: auto;
+  word-spacing: normal;
+  z-index: auto;
+  all: initial;
+  font-size: inherit;
+  font-family: inherit;
+  color: #0072ef;
+  cursor: pointer;
+}
+
+.qQF1ABBg7opWaOeLFI1g1Ax8igXoLRdR a:hover,
+.qQF1ABBg7opWaOeLFI1g1Ax8igXoLRdR a:focus {
+  text-decoration: underline;
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL25vZGVfbW9kdWxlcy9AemVuZGVza2dhcmRlbi9jc3MtdmFyaWFibGVzL2Rpc3QvaW5kZXguY3NzIiwid2VicGFjazovLy4vdWkvY29tcG9uZW50cy9Ob3RpZmljYXRpb24vaW5kZXguY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7OztFQUtFOztBQUVGO0VBQ0Usc0JBQXNCO0VBQ3RCLDZCQUE2QjtFQUM3Qiw2QkFBNkI7RUFDN0IsNkJBQTZCO0VBQzdCLDZCQUE2QjtFQUM3Qiw2QkFBNkI7RUFDN0IsNkJBQTZCO0VBQzdCLDZCQUE2QjtFQUM3Qiw2QkFBNkI7RUFDN0IsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsMkJBQTJCO0VBQzNCLDJCQUEyQjtFQUMzQiwyQkFBMkI7RUFDM0IsMkJBQTJCO0VBQzNCLDJCQUEyQjtFQUMzQiwyQkFBMkI7RUFDM0IsMkJBQTJCO0VBQzNCLDJCQUEyQjtFQUMzQiw4QkFBOEI7RUFDOUIsOEJBQThCO0VBQzlCLDhCQUE4QjtFQUM5Qiw4QkFBOEI7RUFDOUIsOEJBQThCO0VBQzlCLDhCQUE4QjtFQUM5Qiw4QkFBOEI7RUFDOUIsOEJBQThCO0VBQzlCLHNCQUFzQjtFQUN0Qix1Q0FBdUM7RUFDdkMsdUNBQXVDO0VBQ3ZDLHlDQUF5QztFQUN6Qyx5Q0FBeUM7RUFDekMseUNBQXlDO0VBQ3pDLHlDQUF5QztFQUN6Qyx1Q0FBdUM7RUFDdkMsdUNBQXVDO0VBQ3ZDLHNDQUFzQztFQUN0QyxzQ0FBc0M7RUFDdEMsc0NBQXNDO0VBQ3RDLHNDQUFzQztFQUN0Qyx3Q0FBd0M7RUFDeEMsd0NBQXdDO0VBQ3hDLHNDQUFzQztFQUN0QyxzQ0FBc0M7RUFDdEMsd0NBQXdDO0VBQ3hDLHdDQUF3QztFQUN4Qyx1Q0FBdUM7RUFDdkMsdUNBQXVDO0VBQ3ZDLHNDQUFzQztFQUN0QyxzQ0FBc0M7RUFDdEMsd0NBQXdDO0VBQ3hDLHdDQUF3QztFQUN4QywwQ0FBMEM7RUFDMUMsMENBQTBDO0VBQzFDLDBDQUEwQztFQUMxQywwQ0FBMEM7RUFDMUMsd0NBQXdDO0VBQ3hDLHdDQUF3QztFQUN4Qyx1Q0FBdUM7RUFDdkMsdUNBQXVDO0VBQ3ZDLHVDQUF1QztFQUN2Qyx1Q0FBdUM7RUFDdkMseUNBQXlDO0VBQ3pDLHlDQUF5QztFQUN6Qyx1Q0FBdUM7RUFDdkMsdUNBQXVDO0VBQ3ZDLHlDQUF5QztFQUN6Qyx5Q0FBeUM7RUFDekMsd0NBQXdDO0VBQ3hDLHdDQUF3QztFQUN4Qyx1Q0FBdUM7RUFDdkMsdUNBQXVDO0VBQ3ZDLCtCQUErQjtFQUMvQiwrQkFBK0I7RUFDL0IsZ0NBQWdDO0VBQ2hDLCtCQUErQjtFQUMvQiw4QkFBOEI7RUFDOUIsaUNBQWlDO0VBQ2pDLDZCQUE2QjtFQUM3QixpQ0FBaUM7RUFDakMsK0JBQStCO0VBQy9CLGtHQUFrRztFQUNsRywwTkFBOEo7RUFDOUosdUJBQXVCO0VBQ3ZCLHVCQUF1QjtFQUN2Qix1QkFBdUI7RUFDdkIsdUJBQXVCO0VBQ3ZCLHVCQUF1QjtFQUN2Qix3QkFBd0I7RUFDeEIseUJBQXlCO0VBQ3pCLGlDQUFpQztFQUNqQyxpQ0FBaUM7RUFDakMsaUNBQWlDO0VBQ2pDLDBCQUEwQjtFQUMxQixnQ0FBZ0M7RUFDaEMsMkJBQTJCO0VBQzNCLDZCQUE2QjtFQUM3Qiw0QkFBNEI7RUFDNUIsOEJBQThCO0VBQzlCLDBCQUEwQjtFQUMxQiwrQkFBK0I7RUFDL0IsMkJBQTJCO0VBQzNCLGdDQUFnQztFQUNoQywrQkFBK0I7RUFDL0IsMkJBQTJCO0VBQzNCLHlCQUF5QjtFQUN6Qix5QkFBeUI7RUFDekIseUJBQXlCO0VBQ3pCLHlCQUF5QjtFQUN6QiwwQkFBMEI7RUFDMUIsMkJBQTJCO0VBQzNCLHFCQUFxQjtFQUNyQixvQkFBb0I7RUFDcEIscUJBQXFCO0VBQ3JCLGtCQUFrQjtFQUNsQixxQkFBcUI7RUFDckIscUJBQXFCO0VBQ3JCLHNCQUFzQjtBQUN4Qjs7QUNsSkE7QUFFQTs7QUFFQTtBQUVBOztBQUVBO0FBRUE7O0FBRUE7QUFFQTs7QUFFQTtFQUVFLHlCQUF5QjtBQUMzQjs7QUFFQTtFQUNFLHdDQUF3QztFQUV4QyxVQUFVO0FBQ1o7O0FBRUE7RUFDRSwwQkFBMkM7RUFBM0MsMkNBQTJDO0FBQzdDOztBQUZBO0VBQ0UsMEJBQTJDO0VBQTNDLDJDQUEyQztBQUM3Qzs7QUFFQTtBQUVBOztBQUVBO0FBRUE7O0FBRUE7QUFFQTs7QUFFQSxnREFBZ0Q7O0FBQ2hEO0VBQ0Usd0RBQVk7VUFBWixnREFBWTtFQUFaLG9DQUFZO1VBQVosNEJBQVk7RUFBWixpRkFBWTtFQUFaLGdDQUFZO0VBQVoseUJBQVk7RUFBWixxQkFBWTtLQUFaLGtCQUFZO0VBQVosZ0JBQVk7RUFBWixpQkFBWTtFQUFaLFlBQVk7RUFBWixnQkFBWTtFQUFaLHVCQUFZO0VBQVosaUJBQVk7RUFBWixXQUFZO0VBQVosVUFBWTtFQUFaLFdBQVk7RUFBWixxQkFBWTtLQUFaLGtCQUFZO1VBQVosYUFBWTtFQUFaLDBCQUFZO0tBQVosdUJBQVk7VUFBWixrQkFBWTtFQUFaLDRCQUFZO0tBQVoseUJBQVk7VUFBWixvQkFBWTtFQUFaLHVCQUFZO0VBQVosMEJBQVk7S0FBWix1QkFBWTtVQUFaLGtCQUFZO0VBQVosNkNBQVk7S0FBWiwwQ0FBWTtVQUFaLHFDQUFZO0VBQVosc0JBQVk7S0FBWixtQkFBWTtVQUFaLGNBQVk7RUFBWiwwQkFBWTtLQUFaLHVCQUFZO1VBQVosa0JBQVk7RUFBWixlQUFZO0VBQVosdUJBQVk7RUFBWixtQkFBWTtFQUFaLFlBQVk7RUFBWixjQUFZO0VBQVosZUFBWTtFQUFaLGlCQUFZO0VBQVosV0FBWTtFQUFaLGtCQUFZO0VBQVosaUJBQVk7RUFBWixrQkFBWTtFQUFaLHFDQUFZO1VBQVosNkJBQVk7RUFBWixvQkFBWTtFQUFaLG1CQUFZO0VBQVosb0JBQVk7RUFBWixtQkFBWTtFQUFaLFlBQVk7RUFBWixxQkFBWTtVQUFaLGFBQVk7RUFBWixVQUFZO0VBQVosc0JBQVk7RUFBWiw2QkFBWTtFQUFaLFNBQVk7RUFBWixnQkFBWTtFQUFaLGVBQVk7RUFBWixhQUFZO0VBQVosWUFBWTtFQUFaLFVBQVk7RUFBWixVQUFZO0VBQVosMkJBQVk7RUFBWixpQkFBWTtFQUFaLG1CQUFZO0VBQVosbUJBQVk7RUFBWixVQUFZO0VBQVosc0JBQVk7RUFBWix1QkFBWTtFQUFaLHVCQUFZO0VBQVoseUJBQVk7VUFBWixpQkFBWTtFQUFaLG1DQUFZO1VBQVosMkJBQVk7RUFBWixnQkFBWTtFQUFaLFdBQVk7RUFBWixnQkFBWTtJQUFaLGNBQVk7T0FBWixXQUFZO0VBQVosa0JBQVk7RUFBWixnQkFBWTtFQUFaLDBCQUFZO09BQVoscUJBQVk7RUFBWixxQkFBWTtFQUFaLGNBQVk7RUFBWixpQkFBWTtFQUFaLG9CQUFZO0VBQVosU0FBWTtFQUFaLHVCQUFZO1VBQVosZUFBWTtFQUFaLG1DQUFZO1VBQVosMkJBQVk7RUFBWiw2QkFBWTtVQUFaLHFCQUFZO0VBQVosMkJBQVk7RUFBWixvQkFBWTtFQUFaLHdCQUFZO0VBQVosbUJBQVk7RUFBWixtQkFBWTtFQUFaLFNBQVk7RUFBWixXQUFZO0VBQVosb0JBQVk7RUFBWixhQUFZO0VBQVosWUFBWTtFQUNaLGtCQUFrQjtFQUNsQixvQkFBb0I7RUFDcEIsY0FBYztFQUNkLGVBQWU7QUFDakI7O0FBQ0E7O0VBRUUsMEJBQTBCO0FBQzVCIiwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBDb3B5cmlnaHQgWmVuZGVzaywgSW5jLlxuICpcbiAqIFVzZSBvZiB0aGlzIHNvdXJjZSBjb2RlIGlzIGdvdmVybmVkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjBcbiAqIGZvdW5kIGF0IGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMC5cbiAqL1xuXG46cm9vdCB7XG4gIC0temQtY29sb3ItYmxhY2s6ICMwMDA7XG4gIC0temQtY29sb3ItZ3JlZW4tMTAwOiAjZWRmOGY0O1xuICAtLXpkLWNvbG9yLWdyZWVuLTIwMDogI2QxZThkZjtcbiAgLS16ZC1jb2xvci1ncmVlbi0zMDA6ICNhZWNmYzI7XG4gIC0temQtY29sb3ItZ3JlZW4tNDAwOiAjNWVhZTkxO1xuICAtLXpkLWNvbG9yLWdyZWVuLTUwMDogIzIyOGY2NztcbiAgLS16ZC1jb2xvci1ncmVlbi02MDA6ICMwMzgxNTM7XG4gIC0temQtY29sb3ItZ3JlZW4tNzAwOiAjMTg2MTQ2O1xuICAtLXpkLWNvbG9yLWdyZWVuLTgwMDogIzBiM2IyOTtcbiAgLS16ZC1jb2xvci1ncmV5LTEwMDogI2Y4ZjlmOTtcbiAgLS16ZC1jb2xvci1ncmV5LTIwMDogI2U5ZWJlZDtcbiAgLS16ZC1jb2xvci1ncmV5LTMwMDogI2Q4ZGNkZTtcbiAgLS16ZC1jb2xvci1ncmV5LTQwMDogI2MyYzhjYztcbiAgLS16ZC1jb2xvci1ncmV5LTUwMDogIzg3OTI5ZDtcbiAgLS16ZC1jb2xvci1ncmV5LTYwMDogIzY4NzM3ZDtcbiAgLS16ZC1jb2xvci1ncmV5LTcwMDogIzQ5NTQ1YztcbiAgLS16ZC1jb2xvci1ncmV5LTgwMDogIzJmMzk0MTtcbiAgLS16ZC1jb2xvci1ibHVlLTEwMDogI2VkZjdmZjtcbiAgLS16ZC1jb2xvci1ibHVlLTIwMDogI2NlZTJmMjtcbiAgLS16ZC1jb2xvci1ibHVlLTMwMDogI2FkY2NlNDtcbiAgLS16ZC1jb2xvci1ibHVlLTQwMDogIzUyOTNjNztcbiAgLS16ZC1jb2xvci1ibHVlLTUwMDogIzMzN2ZiZDtcbiAgLS16ZC1jb2xvci1ibHVlLTYwMDogIzFmNzNiNztcbiAgLS16ZC1jb2xvci1ibHVlLTcwMDogIzE0NGE3NTtcbiAgLS16ZC1jb2xvci1ibHVlLTgwMDogIzBmMzU1NDtcbiAgLS16ZC1jb2xvci1rYWxlLTEwMDogI2Y1ZmNmYztcbiAgLS16ZC1jb2xvci1rYWxlLTIwMDogI2RhZWRlZDtcbiAgLS16ZC1jb2xvci1rYWxlLTMwMDogI2JkZDlkNztcbiAgLS16ZC1jb2xvci1rYWxlLTQwMDogIzkwYmJiYjtcbiAgLS16ZC1jb2xvci1rYWxlLTUwMDogIzQ5ODI4MztcbiAgLS16ZC1jb2xvci1rYWxlLTYwMDogIzE3NDk0ZDtcbiAgLS16ZC1jb2xvci1rYWxlLTcwMDogIzAzMzYzZDtcbiAgLS16ZC1jb2xvci1rYWxlLTgwMDogIzAxMmIzMDtcbiAgLS16ZC1jb2xvci1yZWQtMTAwOiAjZmZmMGYxO1xuICAtLXpkLWNvbG9yLXJlZC0yMDA6ICNmNWQ1ZDg7XG4gIC0temQtY29sb3ItcmVkLTMwMDogI2Y1YjViYTtcbiAgLS16ZC1jb2xvci1yZWQtNDAwOiAjZTM1YjY2O1xuICAtLXpkLWNvbG9yLXJlZC01MDA6ICNkOTNmNGM7XG4gIC0temQtY29sb3ItcmVkLTYwMDogI2NjMzM0MDtcbiAgLS16ZC1jb2xvci1yZWQtNzAwOiAjOGMyMzJjO1xuICAtLXpkLWNvbG9yLXJlZC04MDA6ICM2ODEyMTk7XG4gIC0temQtY29sb3IteWVsbG93LTEwMDogI2ZmZjdlZDtcbiAgLS16ZC1jb2xvci15ZWxsb3ctMjAwOiAjZmZlZWRiO1xuICAtLXpkLWNvbG9yLXllbGxvdy0zMDA6ICNmZWQ2YTg7XG4gIC0temQtY29sb3IteWVsbG93LTQwMDogI2ZmYjA1NztcbiAgLS16ZC1jb2xvci15ZWxsb3ctNTAwOiAjZjc5YTNlO1xuICAtLXpkLWNvbG9yLXllbGxvdy02MDA6ICNlZDhmMWM7XG4gIC0temQtY29sb3IteWVsbG93LTcwMDogI2FkNTkxODtcbiAgLS16ZC1jb2xvci15ZWxsb3ctODAwOiAjNzAzODE1O1xuICAtLXpkLWNvbG9yLXdoaXRlOiAjZmZmO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1henVyZS00MDA6ICMzMDkxZWM7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWF6dXJlLTYwMDogIzEzNzFkNjtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktY3JpbXNvbi00MDA6ICNlMzRmMzI7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWNyaW1zb24tNjAwOiAjYzcyYTFjO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1mdXNjaGlhLTQwMDogI2Q2NTNjMjtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktZnVzY2hpYS02MDA6ICNhODE4OTc7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWxlbW9uLTQwMDogI2ZmZDQyNDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbGVtb24tNjAwOiAjZmZiYjEwO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1saW1lLTQwMDogIzQzYjMyNDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbGltZS02MDA6ICMyZTgyMDA7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LW1pbnQtNDAwOiAjMDBhNjU2O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1taW50LTYwMDogIzA1ODU0MTtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktb3JhbmdlLTQwMDogI2RlNzAxZDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktb3JhbmdlLTYwMDogI2JmNTAwMDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktcGluay00MDA6ICNlYzRkNjM7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXBpbmstNjAwOiAjZDQyMDU0O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1wdXJwbGUtNDAwOiAjYjU1MmUyO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1wdXJwbGUtNjAwOiAjNmEyN2I4O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1yb3lhbC00MDA6ICM1ZDdkZjU7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXJveWFsLTYwMDogIzMzNTNlMjtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktdGVhbC00MDA6ICMwMmExOTE7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXRlYWwtNjAwOiAjMDI4MDc5O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1henVyZS1NNDAwOiAjNWY4ZGNmO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1henVyZS1NNjAwOiAjM2E3MGIyO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1jcmltc29uLU00MDA6ICNjYzZjNWI7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWNyaW1zb24tTTYwMDogI2IyNGEzYztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktZnVzY2hpYS1NNDAwOiAjY2Y2MmE4O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1mdXNjaGlhLU02MDA6ICNhODQ1OGM7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWxlbW9uLU00MDA6ICNlN2E1MDA7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWxlbW9uLU02MDA6ICNjMzhmMDA7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWxpbWUtTTQwMDogIzUxOWUyZDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbGltZS1NNjAwOiAjNDc3ODJjO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1taW50LU00MDA6ICMyOTljNjY7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LW1pbnQtTTYwMDogIzJlODA1NztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktb3JhbmdlLU00MDA6ICNkNDc3MmM7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LW9yYW5nZS1NNjAwOiAjYjM1ODI3O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1waW5rLU00MDA6ICNkNTcyODc7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXBpbmstTTYwMDogI2IyM2E1ZDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktcHVycGxlLU00MDA6ICNiMDcyY2M7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXB1cnBsZS1NNjAwOiAjOTM1OGIwO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1yb3lhbC1NNDAwOiAjNzk4NmQ4O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1yb3lhbC1NNjAwOiAjNGI2MWMzO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS10ZWFsLU00MDA6ICMyZDllOGY7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXRlYWwtTTYwMDogIzNjNzg3MztcbiAgLS16ZC1jb2xvci1jaGF0LW9yYW5nZTogI2Y3OWEzZTtcbiAgLS16ZC1jb2xvci1jb25uZWN0LXJlZDogI2ZmNjIyNDtcbiAgLS16ZC1jb2xvci1leHBsb3JlLWJsdWU6ICMzMGFhYmM7XG4gIC0temQtY29sb3ItZ2F0aGVyLXBpbms6ICNmNmM4YmU7XG4gIC0temQtY29sb3ItZ3VpZGUtcGluazogI2ViNDk2MjtcbiAgLS16ZC1jb2xvci1tZXNzYWdlLWdyZWVuOiAjMzdiOGFmO1xuICAtLXpkLWNvbG9yLXNlbGwtZ29sZDogI2MzOGYwMDtcbiAgLS16ZC1jb2xvci1zdXBwb3J0LWdyZWVuOiAjMDBhNjU2O1xuICAtLXpkLWNvbG9yLXRhbGsteWVsbG93OiAjZWZjOTNkO1xuICAtLXpkLWZvbnQtZmFtaWx5LW1vbm9zcGFjZTogU0ZNb25vLVJlZ3VsYXIsIENvbnNvbGFzLCAnTGliZXJhdGlvbiBNb25vJywgTWVubG8sIENvdXJpZXIsIG1vbm9zcGFjZTtcbiAgLS16ZC1mb250LWZhbWlseS1zeXN0ZW06IHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIE94eWdlbi1TYW5zLCBVYnVudHUsIENhbnRhcmVsbCwgJ0hlbHZldGljYSBOZXVlJywgQXJpYWwsIHNhbnMtc2VyaWY7XG4gIC0temQtZm9udC1zaXplLXhzOiAxMHB4O1xuICAtLXpkLWZvbnQtc2l6ZS1zbTogMTJweDtcbiAgLS16ZC1mb250LXNpemUtbWQ6IDE0cHg7XG4gIC0temQtZm9udC1zaXplLWxnOiAxOHB4O1xuICAtLXpkLWZvbnQtc2l6ZS14bDogMjJweDtcbiAgLS16ZC1mb250LXNpemUteHhsOiAyNnB4O1xuICAtLXpkLWZvbnQtc2l6ZS14eHhsOiAzNnB4O1xuICAtLXpkLWZvbnQtc2l6ZS1zbS1tb25vc3BhY2U6IDExcHg7XG4gIC0temQtZm9udC1zaXplLW1kLW1vbm9zcGFjZTogMTNweDtcbiAgLS16ZC1mb250LXNpemUtbGctbW9ub3NwYWNlOiAxN3B4O1xuICAtLXpkLWZvbnQtd2VpZ2h0LXRoaW46IDEwMDtcbiAgLS16ZC1mb250LXdlaWdodC1leHRyYWxpZ2h0OiAyMDA7XG4gIC0temQtZm9udC13ZWlnaHQtbGlnaHQ6IDMwMDtcbiAgLS16ZC1mb250LXdlaWdodC1yZWd1bGFyOiA0MDA7XG4gIC0temQtZm9udC13ZWlnaHQtbWVkaXVtOiA1MDA7XG4gIC0temQtZm9udC13ZWlnaHQtc2VtaWJvbGQ6IDYwMDtcbiAgLS16ZC1mb250LXdlaWdodC1ib2xkOiA3MDA7XG4gIC0temQtZm9udC13ZWlnaHQtZXh0cmFib2xkOiA4MDA7XG4gIC0temQtZm9udC13ZWlnaHQtYmxhY2s6IDkwMDtcbiAgLS16ZC1mb250LXdlaWdodC11bHRyYWxpZ2h0OiAyMDA7XG4gIC0temQtZm9udC13ZWlnaHQtdWx0cmFib2xkOiA4MDA7XG4gIC0temQtZm9udC13ZWlnaHQtaGVhdnk6IDkwMDtcbiAgLS16ZC1saW5lLWhlaWdodC1zbTogMTZweDtcbiAgLS16ZC1saW5lLWhlaWdodC1tZDogMjBweDtcbiAgLS16ZC1saW5lLWhlaWdodC1sZzogMjRweDtcbiAgLS16ZC1saW5lLWhlaWdodC14bDogMjhweDtcbiAgLS16ZC1saW5lLWhlaWdodC14eGw6IDMycHg7XG4gIC0temQtbGluZS1oZWlnaHQteHh4bDogNDRweDtcbiAgLS16ZC1zcGFjaW5nLXh4czogNHB4O1xuICAtLXpkLXNwYWNpbmcteHM6IDhweDtcbiAgLS16ZC1zcGFjaW5nLXNtOiAxMnB4O1xuICAtLXpkLXNwYWNpbmc6IDIwcHg7XG4gIC0temQtc3BhY2luZy1sZzogMzJweDtcbiAgLS16ZC1zcGFjaW5nLXhsOiA0MHB4O1xuICAtLXpkLXNwYWNpbmcteHhsOiA0OHB4O1xufVxuIiwiQGltcG9ydCBcIkB6ZW5kZXNrZ2FyZGVuL2Nzcy12YXJpYWJsZXNcIjtcblxuLmRlZmF1bHQge1xuICBjb21wb3NlczogYy1jYWxsb3V0IGZyb20gXCJ+QHplbmRlc2tnYXJkZW4vY3NzLWNhbGxvdXRzL2Rpc3QvaW5kZXguY3NzXCI7XG59XG5cbi5zdWNjZXNzIHtcbiAgY29tcG9zZXM6IGMtY2FsbG91dCBjLWNhbGxvdXQtLXN1Y2Nlc3MgZnJvbSBcIn5AemVuZGVza2dhcmRlbi9jc3MtY2FsbG91dHMvZGlzdC9pbmRleC5jc3NcIjtcbn1cblxuLndhcm5pbmcge1xuICBjb21wb3NlczogYy1jYWxsb3V0IGMtY2FsbG91dC0td2FybmluZyBmcm9tIFwifkB6ZW5kZXNrZ2FyZGVuL2Nzcy1jYWxsb3V0cy9kaXN0L2luZGV4LmNzc1wiO1xufVxuXG4uZXJyb3Ige1xuICBjb21wb3NlczogYy1jYWxsb3V0IGMtY2FsbG91dC0tZXJyb3IgZnJvbSBcIn5AemVuZGVza2dhcmRlbi9jc3MtY2FsbG91dHMvZGlzdC9pbmRleC5jc3NcIjtcbn1cblxuLmluZm8ge1xuICBjb21wb3NlczogYy1jYWxsb3V0IGMtY2FsbG91dC0taW5mbyBmcm9tIFwifkB6ZW5kZXNrZ2FyZGVuL2Nzcy1jYWxsb3V0cy9kaXN0L2luZGV4LmNzc1wiO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjZjhmOWY5O1xufVxuXG4ucmVtb3ZlIHtcbiAgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQgIWltcG9ydGFudDtcbiAgY29tcG9zZXM6IGMtY2FsbG91dF9fY2xvc2UgZnJvbSBcIn5AemVuZGVza2dhcmRlbi9jc3MtY2FsbG91dHMvZGlzdC9pbmRleC5jc3NcIjtcbiAgcGFkZGluZzogMDtcbn1cblxuLnJlbW92ZTpmb2N1cy12aXNpYmxlIHtcbiAgb3V0bGluZTogMXB4IHNvbGlkIHZhcigtLXpkLWNvbG9yLWdyZXktODAwKTtcbn1cblxuLnRpdGxlIHtcbiAgY29tcG9zZXM6IGMtY2FsbG91dF9fdGl0bGUgZnJvbSBcIn5AemVuZGVza2dhcmRlbi9jc3MtY2FsbG91dHMvZGlzdC9pbmRleC5jc3NcIjtcbn1cblxuLnJ0bCB7XG4gIGNvbXBvc2VzOiBpcy1ydGwgZnJvbSBcIn5AemVuZGVza2dhcmRlbi9jc3MtY2FsbG91dHMvZGlzdC9pbmRleC5jc3NcIjtcbn1cblxuLmZsb2F0aW5nIHtcbiAgY29tcG9zZXM6IGMtY2FsbG91dC0tZGlhbG9nIGZyb20gXCJ+QHplbmRlc2tnYXJkZW4vY3NzLWNhbGxvdXRzL2Rpc3QvaW5kZXguY3NzXCI7XG59XG5cbi8qIFJlc2V0IHN0eWxlcyBmb3IgbGlua3Mgd2l0aGluIG5vdGlmaWNhdGlvbnMgKi9cbi5ub3RpZmljYXRpb24gYSB7XG4gIGFsbDogaW5pdGlhbDtcbiAgZm9udC1zaXplOiBpbmhlcml0O1xuICBmb250LWZhbWlseTogaW5oZXJpdDtcbiAgY29sb3I6ICMwMDcyZWY7XG4gIGN1cnNvcjogcG9pbnRlcjtcbn1cbi5ub3RpZmljYXRpb24gYTpob3Zlcixcbi5ub3RpZmljYXRpb24gYTpmb2N1cyB7XG4gIHRleHQtZGVjb3JhdGlvbjogdW5kZXJsaW5lO1xufVxuIl0sInNvdXJjZVJvb3QiOiIifQ== */</style><style>.gG1SKx_8sRWXWUqBql1Ygd7tnyV_z43E {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 360px;
+  z-index: 2147483647; /* needs to be higher than the z-index of the navbar and modal backdrop */
+}
+
+[dir="rtl"] .gG1SKx_8sRWXWUqBql1Ygd7tnyV_z43E {
+  right: 0;
+  left: 16px;
+}
+
+.gG1SKx_8sRWXWUqBql1Ygd7tnyV_z43E > * {
+  margin-bottom: 10px;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3VpL2NvbXBvbmVudHMvTm90aWZpY2F0aW9ucy9zdHlsZXMuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsZUFBZTtFQUNmLFNBQVM7RUFDVCxXQUFXO0VBQ1gsWUFBWTtFQUNaLG1CQUFtQixFQUFFLHlFQUF5RTtBQUNoRzs7QUFFQTtFQUNFLFFBQVE7RUFDUixVQUFVO0FBQ1o7O0FBRUE7RUFDRSxtQkFBbUI7QUFDckIiLCJzb3VyY2VzQ29udGVudCI6WyIubm90aWZpY2F0aW9ucyB7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgdG9wOiAxNnB4O1xuICByaWdodDogMTZweDtcbiAgd2lkdGg6IDM2MHB4O1xuICB6LWluZGV4OiAyMTQ3NDgzNjQ3OyAvKiBuZWVkcyB0byBiZSBoaWdoZXIgdGhhbiB0aGUgei1pbmRleCBvZiB0aGUgbmF2YmFyIGFuZCBtb2RhbCBiYWNrZHJvcCAqL1xufVxuXG5bZGlyPVwicnRsXCJdIC5ub3RpZmljYXRpb25zIHtcbiAgcmlnaHQ6IDA7XG4gIGxlZnQ6IDE2cHg7XG59XG5cbi5ub3RpZmljYXRpb25zID4gKiB7XG4gIG1hcmdpbi1ib3R0b206IDEwcHg7XG59Il0sInNvdXJjZVJvb3QiOiIifQ== */</style><style>.NjHrlmSUIMtSlY7gtg7w7dtpuhz62MEa {
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3VpL2phdmFzY3JpcHRzL2VuZHVzZXIvbW9kdWxlcy9zZXR1cE5vdGlmaWNhdGlvbnMvaW5kZXguY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0FBRUEiLCJzb3VyY2VzQ29udGVudCI6WyIubm90aWZpY2F0aW9uQm9keSB7XG4gIGNvbXBvc2VzOiBjLWNhbGxvdXRfX3BhcmFncmFwaCBmcm9tIFwifkB6ZW5kZXNrZ2FyZGVuL2Nzcy1jYWxsb3V0cy9kaXN0L2luZGV4LmNzc1wiO1xufVxuIl0sInNvdXJjZVJvb3QiOiIifQ== */</style><style>/**
+ * Copyright Zendesk, Inc.
+ *
+ * Use of this source code is governed under the Apache License, Version 2.0
+ * found at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+:root {
+  --zd-color-black: #000;
+  --zd-color-green-100: #edf8f4;
+  --zd-color-green-200: #d1e8df;
+  --zd-color-green-300: #aecfc2;
+  --zd-color-green-400: #5eae91;
+  --zd-color-green-500: #228f67;
+  --zd-color-green-600: #038153;
+  --zd-color-green-700: #186146;
+  --zd-color-green-800: #0b3b29;
+  --zd-color-grey-100: #f8f9f9;
+  --zd-color-grey-200: #e9ebed;
+  --zd-color-grey-300: #d8dcde;
+  --zd-color-grey-400: #c2c8cc;
+  --zd-color-grey-500: #87929d;
+  --zd-color-grey-600: #68737d;
+  --zd-color-grey-700: #49545c;
+  --zd-color-grey-800: #2f3941;
+  --zd-color-blue-100: #edf7ff;
+  --zd-color-blue-200: #cee2f2;
+  --zd-color-blue-300: #adcce4;
+  --zd-color-blue-400: #5293c7;
+  --zd-color-blue-500: #337fbd;
+  --zd-color-blue-600: #1f73b7;
+  --zd-color-blue-700: #144a75;
+  --zd-color-blue-800: #0f3554;
+  --zd-color-kale-100: #f5fcfc;
+  --zd-color-kale-200: #daeded;
+  --zd-color-kale-300: #bdd9d7;
+  --zd-color-kale-400: #90bbbb;
+  --zd-color-kale-500: #498283;
+  --zd-color-kale-600: #17494d;
+  --zd-color-kale-700: #03363d;
+  --zd-color-kale-800: #012b30;
+  --zd-color-red-100: #fff0f1;
+  --zd-color-red-200: #f5d5d8;
+  --zd-color-red-300: #f5b5ba;
+  --zd-color-red-400: #e35b66;
+  --zd-color-red-500: #d93f4c;
+  --zd-color-red-600: #cc3340;
+  --zd-color-red-700: #8c232c;
+  --zd-color-red-800: #681219;
+  --zd-color-yellow-100: #fff7ed;
+  --zd-color-yellow-200: #ffeedb;
+  --zd-color-yellow-300: #fed6a8;
+  --zd-color-yellow-400: #ffb057;
+  --zd-color-yellow-500: #f79a3e;
+  --zd-color-yellow-600: #ed8f1c;
+  --zd-color-yellow-700: #ad5918;
+  --zd-color-yellow-800: #703815;
+  --zd-color-white: #fff;
+  --zd-color-secondary-azure-400: #3091ec;
+  --zd-color-secondary-azure-600: #1371d6;
+  --zd-color-secondary-crimson-400: #e34f32;
+  --zd-color-secondary-crimson-600: #c72a1c;
+  --zd-color-secondary-fuschia-400: #d653c2;
+  --zd-color-secondary-fuschia-600: #a81897;
+  --zd-color-secondary-lemon-400: #ffd424;
+  --zd-color-secondary-lemon-600: #ffbb10;
+  --zd-color-secondary-lime-400: #43b324;
+  --zd-color-secondary-lime-600: #2e8200;
+  --zd-color-secondary-mint-400: #00a656;
+  --zd-color-secondary-mint-600: #058541;
+  --zd-color-secondary-orange-400: #de701d;
+  --zd-color-secondary-orange-600: #bf5000;
+  --zd-color-secondary-pink-400: #ec4d63;
+  --zd-color-secondary-pink-600: #d42054;
+  --zd-color-secondary-purple-400: #b552e2;
+  --zd-color-secondary-purple-600: #6a27b8;
+  --zd-color-secondary-royal-400: #5d7df5;
+  --zd-color-secondary-royal-600: #3353e2;
+  --zd-color-secondary-teal-400: #02a191;
+  --zd-color-secondary-teal-600: #028079;
+  --zd-color-secondary-azure-M400: #5f8dcf;
+  --zd-color-secondary-azure-M600: #3a70b2;
+  --zd-color-secondary-crimson-M400: #cc6c5b;
+  --zd-color-secondary-crimson-M600: #b24a3c;
+  --zd-color-secondary-fuschia-M400: #cf62a8;
+  --zd-color-secondary-fuschia-M600: #a8458c;
+  --zd-color-secondary-lemon-M400: #e7a500;
+  --zd-color-secondary-lemon-M600: #c38f00;
+  --zd-color-secondary-lime-M400: #519e2d;
+  --zd-color-secondary-lime-M600: #47782c;
+  --zd-color-secondary-mint-M400: #299c66;
+  --zd-color-secondary-mint-M600: #2e8057;
+  --zd-color-secondary-orange-M400: #d4772c;
+  --zd-color-secondary-orange-M600: #b35827;
+  --zd-color-secondary-pink-M400: #d57287;
+  --zd-color-secondary-pink-M600: #b23a5d;
+  --zd-color-secondary-purple-M400: #b072cc;
+  --zd-color-secondary-purple-M600: #9358b0;
+  --zd-color-secondary-royal-M400: #7986d8;
+  --zd-color-secondary-royal-M600: #4b61c3;
+  --zd-color-secondary-teal-M400: #2d9e8f;
+  --zd-color-secondary-teal-M600: #3c7873;
+  --zd-color-chat-orange: #f79a3e;
+  --zd-color-connect-red: #ff6224;
+  --zd-color-explore-blue: #30aabc;
+  --zd-color-gather-pink: #f6c8be;
+  --zd-color-guide-pink: #eb4962;
+  --zd-color-message-green: #37b8af;
+  --zd-color-sell-gold: #c38f00;
+  --zd-color-support-green: #00a656;
+  --zd-color-talk-yellow: #efc93d;
+  --zd-font-family-monospace: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  --zd-font-family-system: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
+  --zd-font-size-xs: 10px;
+  --zd-font-size-sm: 12px;
+  --zd-font-size-md: 14px;
+  --zd-font-size-lg: 18px;
+  --zd-font-size-xl: 22px;
+  --zd-font-size-xxl: 26px;
+  --zd-font-size-xxxl: 36px;
+  --zd-font-size-sm-monospace: 11px;
+  --zd-font-size-md-monospace: 13px;
+  --zd-font-size-lg-monospace: 17px;
+  --zd-font-weight-thin: 100;
+  --zd-font-weight-extralight: 200;
+  --zd-font-weight-light: 300;
+  --zd-font-weight-regular: 400;
+  --zd-font-weight-medium: 500;
+  --zd-font-weight-semibold: 600;
+  --zd-font-weight-bold: 700;
+  --zd-font-weight-extrabold: 800;
+  --zd-font-weight-black: 900;
+  --zd-font-weight-ultralight: 200;
+  --zd-font-weight-ultrabold: 800;
+  --zd-font-weight-heavy: 900;
+  --zd-line-height-sm: 16px;
+  --zd-line-height-md: 20px;
+  --zd-line-height-lg: 24px;
+  --zd-line-height-xl: 28px;
+  --zd-line-height-xxl: 32px;
+  --zd-line-height-xxxl: 44px;
+  --zd-spacing-xxs: 4px;
+  --zd-spacing-xs: 8px;
+  --zd-spacing-sm: 12px;
+  --zd-spacing: 20px;
+  --zd-spacing-lg: 32px;
+  --zd-spacing-xl: 40px;
+  --zd-spacing-xxl: 48px;
+}
+
+:root {
+  --reach-menu-button: 1;
+}
+
+._8RHFYPTt0CxuUudzL8wxA9oZq1ynL1u {
+  background: #fff;
+  border: 1px solid #d8d8d8;
+  border-radius: 3px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  left: 0;
+  min-width: 170px;
+  outline: none;
+  padding: 10px 0;
+  position: relative;
+  z-index: 1000;
+}
+
+._s7IdTkp038IFCdlKs8vwOcioOy4uK5h {
+  color: #333;
+  cursor: pointer;
+  display: block;
+  padding: 7px 40px 7px 20px;
+  outline: none;
+  white-space: nowrap;
+}
+
+[data-reach-menu-item][data-selected] {
+  background-color: rgba(92, 105, 112, 0.08);
+  box-shadow: #49545c 3px 0px inset;
+  box-shadow: var(--zd-color-grey-700) 3px 0px inset;
+}
+
+.XmCiWBUhr_QflETEQRaOWgLkfbAj8oS7 {
+  border-bottom: 1px solid #d8d8d8;
+  color: #969696;
+  display: block;
+  font-weight: normal;
+  font-size: 11px;
+  padding: 5px 0;
+  margin: 5px 20px 10px 20px;
+}
+
+.NFPgFc0gI0HvonfLdOrjAWlpe6fhsgu2 {
+  display: inline-block;
+  width: 10px;
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL25vZGVfbW9kdWxlcy9AemVuZGVza2dhcmRlbi9jc3MtdmFyaWFibGVzL2Rpc3QvaW5kZXguY3NzIiwid2VicGFjazovLy4vdWkvY29tcG9uZW50cy9NZW51QnV0dG9uL2luZGV4LmNzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7Ozs7RUFLRTs7QUFFRjtFQUNFLHNCQUFzQjtFQUN0Qiw2QkFBNkI7RUFDN0IsNkJBQTZCO0VBQzdCLDZCQUE2QjtFQUM3Qiw2QkFBNkI7RUFDN0IsNkJBQTZCO0VBQzdCLDZCQUE2QjtFQUM3Qiw2QkFBNkI7RUFDN0IsNkJBQTZCO0VBQzdCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDRCQUE0QjtFQUM1Qiw0QkFBNEI7RUFDNUIsNEJBQTRCO0VBQzVCLDJCQUEyQjtFQUMzQiwyQkFBMkI7RUFDM0IsMkJBQTJCO0VBQzNCLDJCQUEyQjtFQUMzQiwyQkFBMkI7RUFDM0IsMkJBQTJCO0VBQzNCLDJCQUEyQjtFQUMzQiwyQkFBMkI7RUFDM0IsOEJBQThCO0VBQzlCLDhCQUE4QjtFQUM5Qiw4QkFBOEI7RUFDOUIsOEJBQThCO0VBQzlCLDhCQUE4QjtFQUM5Qiw4QkFBOEI7RUFDOUIsOEJBQThCO0VBQzlCLDhCQUE4QjtFQUM5QixzQkFBc0I7RUFDdEIsdUNBQXVDO0VBQ3ZDLHVDQUF1QztFQUN2Qyx5Q0FBeUM7RUFDekMseUNBQXlDO0VBQ3pDLHlDQUF5QztFQUN6Qyx5Q0FBeUM7RUFDekMsdUNBQXVDO0VBQ3ZDLHVDQUF1QztFQUN2QyxzQ0FBc0M7RUFDdEMsc0NBQXNDO0VBQ3RDLHNDQUFzQztFQUN0QyxzQ0FBc0M7RUFDdEMsd0NBQXdDO0VBQ3hDLHdDQUF3QztFQUN4QyxzQ0FBc0M7RUFDdEMsc0NBQXNDO0VBQ3RDLHdDQUF3QztFQUN4Qyx3Q0FBd0M7RUFDeEMsdUNBQXVDO0VBQ3ZDLHVDQUF1QztFQUN2QyxzQ0FBc0M7RUFDdEMsc0NBQXNDO0VBQ3RDLHdDQUF3QztFQUN4Qyx3Q0FBd0M7RUFDeEMsMENBQTBDO0VBQzFDLDBDQUEwQztFQUMxQywwQ0FBMEM7RUFDMUMsMENBQTBDO0VBQzFDLHdDQUF3QztFQUN4Qyx3Q0FBd0M7RUFDeEMsdUNBQXVDO0VBQ3ZDLHVDQUF1QztFQUN2Qyx1Q0FBdUM7RUFDdkMsdUNBQXVDO0VBQ3ZDLHlDQUF5QztFQUN6Qyx5Q0FBeUM7RUFDekMsdUNBQXVDO0VBQ3ZDLHVDQUF1QztFQUN2Qyx5Q0FBeUM7RUFDekMseUNBQXlDO0VBQ3pDLHdDQUF3QztFQUN4Qyx3Q0FBd0M7RUFDeEMsdUNBQXVDO0VBQ3ZDLHVDQUF1QztFQUN2QywrQkFBK0I7RUFDL0IsK0JBQStCO0VBQy9CLGdDQUFnQztFQUNoQywrQkFBK0I7RUFDL0IsOEJBQThCO0VBQzlCLGlDQUFpQztFQUNqQyw2QkFBNkI7RUFDN0IsaUNBQWlDO0VBQ2pDLCtCQUErQjtFQUMvQixrR0FBa0c7RUFDbEcsME5BQThKO0VBQzlKLHVCQUF1QjtFQUN2Qix1QkFBdUI7RUFDdkIsdUJBQXVCO0VBQ3ZCLHVCQUF1QjtFQUN2Qix1QkFBdUI7RUFDdkIsd0JBQXdCO0VBQ3hCLHlCQUF5QjtFQUN6QixpQ0FBaUM7RUFDakMsaUNBQWlDO0VBQ2pDLGlDQUFpQztFQUNqQywwQkFBMEI7RUFDMUIsZ0NBQWdDO0VBQ2hDLDJCQUEyQjtFQUMzQiw2QkFBNkI7RUFDN0IsNEJBQTRCO0VBQzVCLDhCQUE4QjtFQUM5QiwwQkFBMEI7RUFDMUIsK0JBQStCO0VBQy9CLDJCQUEyQjtFQUMzQixnQ0FBZ0M7RUFDaEMsK0JBQStCO0VBQy9CLDJCQUEyQjtFQUMzQix5QkFBeUI7RUFDekIseUJBQXlCO0VBQ3pCLHlCQUF5QjtFQUN6Qix5QkFBeUI7RUFDekIsMEJBQTBCO0VBQzFCLDJCQUEyQjtFQUMzQixxQkFBcUI7RUFDckIsb0JBQW9CO0VBQ3BCLHFCQUFxQjtFQUNyQixrQkFBa0I7RUFDbEIscUJBQXFCO0VBQ3JCLHFCQUFxQjtFQUNyQixzQkFBc0I7QUFDeEI7O0FDbEpBO0VBQ0Usc0JBQXNCO0FBQ3hCOztBQUVBO0VBQ0UsZ0JBQWdCO0VBQ2hCLHlCQUF5QjtFQUN6QixrQkFBa0I7RUFDbEIsd0NBQXdDO0VBQ3hDLGVBQWU7RUFDZixrQkFBa0I7RUFDbEIsbUJBQW1CO0VBQ25CLE9BQU87RUFDUCxnQkFBZ0I7RUFDaEIsYUFBYTtFQUNiLGVBQWU7RUFDZixrQkFBa0I7RUFDbEIsYUFBYTtBQUNmOztBQUVBO0VBQ0UsV0FBVztFQUNYLGVBQWU7RUFDZixjQUFjO0VBQ2QsMEJBQTBCO0VBQzFCLGFBQWE7RUFDYixtQkFBbUI7QUFDckI7O0FBRUE7RUFDRSwwQ0FBMEM7RUFDMUMsaUNBQWtEO0VBQWxELGtEQUFrRDtBQUNwRDs7QUFFQTtFQUNFLGdDQUFnQztFQUNoQyxjQUFjO0VBQ2QsY0FBYztFQUNkLG1CQUFtQjtFQUNuQixlQUFlO0VBQ2YsY0FBYztFQUNkLDBCQUEwQjtBQUM1Qjs7QUFFQTtFQUNFLHFCQUFxQjtFQUNyQixXQUFXO0FBQ2IiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIENvcHlyaWdodCBaZW5kZXNrLCBJbmMuXG4gKlxuICogVXNlIG9mIHRoaXMgc291cmNlIGNvZGUgaXMgZ292ZXJuZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMFxuICogZm91bmQgYXQgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wLlxuICovXG5cbjpyb290IHtcbiAgLS16ZC1jb2xvci1ibGFjazogIzAwMDtcbiAgLS16ZC1jb2xvci1ncmVlbi0xMDA6ICNlZGY4ZjQ7XG4gIC0temQtY29sb3ItZ3JlZW4tMjAwOiAjZDFlOGRmO1xuICAtLXpkLWNvbG9yLWdyZWVuLTMwMDogI2FlY2ZjMjtcbiAgLS16ZC1jb2xvci1ncmVlbi00MDA6ICM1ZWFlOTE7XG4gIC0temQtY29sb3ItZ3JlZW4tNTAwOiAjMjI4ZjY3O1xuICAtLXpkLWNvbG9yLWdyZWVuLTYwMDogIzAzODE1MztcbiAgLS16ZC1jb2xvci1ncmVlbi03MDA6ICMxODYxNDY7XG4gIC0temQtY29sb3ItZ3JlZW4tODAwOiAjMGIzYjI5O1xuICAtLXpkLWNvbG9yLWdyZXktMTAwOiAjZjhmOWY5O1xuICAtLXpkLWNvbG9yLWdyZXktMjAwOiAjZTllYmVkO1xuICAtLXpkLWNvbG9yLWdyZXktMzAwOiAjZDhkY2RlO1xuICAtLXpkLWNvbG9yLWdyZXktNDAwOiAjYzJjOGNjO1xuICAtLXpkLWNvbG9yLWdyZXktNTAwOiAjODc5MjlkO1xuICAtLXpkLWNvbG9yLWdyZXktNjAwOiAjNjg3MzdkO1xuICAtLXpkLWNvbG9yLWdyZXktNzAwOiAjNDk1NDVjO1xuICAtLXpkLWNvbG9yLWdyZXktODAwOiAjMmYzOTQxO1xuICAtLXpkLWNvbG9yLWJsdWUtMTAwOiAjZWRmN2ZmO1xuICAtLXpkLWNvbG9yLWJsdWUtMjAwOiAjY2VlMmYyO1xuICAtLXpkLWNvbG9yLWJsdWUtMzAwOiAjYWRjY2U0O1xuICAtLXpkLWNvbG9yLWJsdWUtNDAwOiAjNTI5M2M3O1xuICAtLXpkLWNvbG9yLWJsdWUtNTAwOiAjMzM3ZmJkO1xuICAtLXpkLWNvbG9yLWJsdWUtNjAwOiAjMWY3M2I3O1xuICAtLXpkLWNvbG9yLWJsdWUtNzAwOiAjMTQ0YTc1O1xuICAtLXpkLWNvbG9yLWJsdWUtODAwOiAjMGYzNTU0O1xuICAtLXpkLWNvbG9yLWthbGUtMTAwOiAjZjVmY2ZjO1xuICAtLXpkLWNvbG9yLWthbGUtMjAwOiAjZGFlZGVkO1xuICAtLXpkLWNvbG9yLWthbGUtMzAwOiAjYmRkOWQ3O1xuICAtLXpkLWNvbG9yLWthbGUtNDAwOiAjOTBiYmJiO1xuICAtLXpkLWNvbG9yLWthbGUtNTAwOiAjNDk4MjgzO1xuICAtLXpkLWNvbG9yLWthbGUtNjAwOiAjMTc0OTRkO1xuICAtLXpkLWNvbG9yLWthbGUtNzAwOiAjMDMzNjNkO1xuICAtLXpkLWNvbG9yLWthbGUtODAwOiAjMDEyYjMwO1xuICAtLXpkLWNvbG9yLXJlZC0xMDA6ICNmZmYwZjE7XG4gIC0temQtY29sb3ItcmVkLTIwMDogI2Y1ZDVkODtcbiAgLS16ZC1jb2xvci1yZWQtMzAwOiAjZjViNWJhO1xuICAtLXpkLWNvbG9yLXJlZC00MDA6ICNlMzViNjY7XG4gIC0temQtY29sb3ItcmVkLTUwMDogI2Q5M2Y0YztcbiAgLS16ZC1jb2xvci1yZWQtNjAwOiAjY2MzMzQwO1xuICAtLXpkLWNvbG9yLXJlZC03MDA6ICM4YzIzMmM7XG4gIC0temQtY29sb3ItcmVkLTgwMDogIzY4MTIxOTtcbiAgLS16ZC1jb2xvci15ZWxsb3ctMTAwOiAjZmZmN2VkO1xuICAtLXpkLWNvbG9yLXllbGxvdy0yMDA6ICNmZmVlZGI7XG4gIC0temQtY29sb3IteWVsbG93LTMwMDogI2ZlZDZhODtcbiAgLS16ZC1jb2xvci15ZWxsb3ctNDAwOiAjZmZiMDU3O1xuICAtLXpkLWNvbG9yLXllbGxvdy01MDA6ICNmNzlhM2U7XG4gIC0temQtY29sb3IteWVsbG93LTYwMDogI2VkOGYxYztcbiAgLS16ZC1jb2xvci15ZWxsb3ctNzAwOiAjYWQ1OTE4O1xuICAtLXpkLWNvbG9yLXllbGxvdy04MDA6ICM3MDM4MTU7XG4gIC0temQtY29sb3Itd2hpdGU6ICNmZmY7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWF6dXJlLTQwMDogIzMwOTFlYztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktYXp1cmUtNjAwOiAjMTM3MWQ2O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1jcmltc29uLTQwMDogI2UzNGYzMjtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktY3JpbXNvbi02MDA6ICNjNzJhMWM7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWZ1c2NoaWEtNDAwOiAjZDY1M2MyO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1mdXNjaGlhLTYwMDogI2E4MTg5NztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbGVtb24tNDAwOiAjZmZkNDI0O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1sZW1vbi02MDA6ICNmZmJiMTA7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWxpbWUtNDAwOiAjNDNiMzI0O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1saW1lLTYwMDogIzJlODIwMDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbWludC00MDA6ICMwMGE2NTY7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LW1pbnQtNjAwOiAjMDU4NTQxO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1vcmFuZ2UtNDAwOiAjZGU3MDFkO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1vcmFuZ2UtNjAwOiAjYmY1MDAwO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1waW5rLTQwMDogI2VjNGQ2MztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktcGluay02MDA6ICNkNDIwNTQ7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXB1cnBsZS00MDA6ICNiNTUyZTI7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXB1cnBsZS02MDA6ICM2YTI3Yjg7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXJveWFsLTQwMDogIzVkN2RmNTtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktcm95YWwtNjAwOiAjMzM1M2UyO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS10ZWFsLTQwMDogIzAyYTE5MTtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktdGVhbC02MDA6ICMwMjgwNzk7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWF6dXJlLU00MDA6ICM1ZjhkY2Y7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWF6dXJlLU02MDA6ICMzYTcwYjI7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWNyaW1zb24tTTQwMDogI2NjNmM1YjtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktY3JpbXNvbi1NNjAwOiAjYjI0YTNjO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1mdXNjaGlhLU00MDA6ICNjZjYyYTg7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LWZ1c2NoaWEtTTYwMDogI2E4NDU4YztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbGVtb24tTTQwMDogI2U3YTUwMDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbGVtb24tTTYwMDogI2MzOGYwMDtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbGltZS1NNDAwOiAjNTE5ZTJkO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1saW1lLU02MDA6ICM0Nzc4MmM7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LW1pbnQtTTQwMDogIzI5OWM2NjtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktbWludC1NNjAwOiAjMmU4MDU3O1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1vcmFuZ2UtTTQwMDogI2Q0NzcyYztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktb3JhbmdlLU02MDA6ICNiMzU4Mjc7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXBpbmstTTQwMDogI2Q1NzI4NztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktcGluay1NNjAwOiAjYjIzYTVkO1xuICAtLXpkLWNvbG9yLXNlY29uZGFyeS1wdXJwbGUtTTQwMDogI2IwNzJjYztcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktcHVycGxlLU02MDA6ICM5MzU4YjA7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXJveWFsLU00MDA6ICM3OTg2ZDg7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXJveWFsLU02MDA6ICM0YjYxYzM7XG4gIC0temQtY29sb3Itc2Vjb25kYXJ5LXRlYWwtTTQwMDogIzJkOWU4ZjtcbiAgLS16ZC1jb2xvci1zZWNvbmRhcnktdGVhbC1NNjAwOiAjM2M3ODczO1xuICAtLXpkLWNvbG9yLWNoYXQtb3JhbmdlOiAjZjc5YTNlO1xuICAtLXpkLWNvbG9yLWNvbm5lY3QtcmVkOiAjZmY2MjI0O1xuICAtLXpkLWNvbG9yLWV4cGxvcmUtYmx1ZTogIzMwYWFiYztcbiAgLS16ZC1jb2xvci1nYXRoZXItcGluazogI2Y2YzhiZTtcbiAgLS16ZC1jb2xvci1ndWlkZS1waW5rOiAjZWI0OTYyO1xuICAtLXpkLWNvbG9yLW1lc3NhZ2UtZ3JlZW46ICMzN2I4YWY7XG4gIC0temQtY29sb3Itc2VsbC1nb2xkOiAjYzM4ZjAwO1xuICAtLXpkLWNvbG9yLXN1cHBvcnQtZ3JlZW46ICMwMGE2NTY7XG4gIC0temQtY29sb3ItdGFsay15ZWxsb3c6ICNlZmM5M2Q7XG4gIC0temQtZm9udC1mYW1pbHktbW9ub3NwYWNlOiBTRk1vbm8tUmVndWxhciwgQ29uc29sYXMsICdMaWJlcmF0aW9uIE1vbm8nLCBNZW5sbywgQ291cmllciwgbW9ub3NwYWNlO1xuICAtLXpkLWZvbnQtZmFtaWx5LXN5c3RlbTogc3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFJvYm90bywgT3h5Z2VuLVNhbnMsIFVidW50dSwgQ2FudGFyZWxsLCAnSGVsdmV0aWNhIE5ldWUnLCBBcmlhbCwgc2Fucy1zZXJpZjtcbiAgLS16ZC1mb250LXNpemUteHM6IDEwcHg7XG4gIC0temQtZm9udC1zaXplLXNtOiAxMnB4O1xuICAtLXpkLWZvbnQtc2l6ZS1tZDogMTRweDtcbiAgLS16ZC1mb250LXNpemUtbGc6IDE4cHg7XG4gIC0temQtZm9udC1zaXplLXhsOiAyMnB4O1xuICAtLXpkLWZvbnQtc2l6ZS14eGw6IDI2cHg7XG4gIC0temQtZm9udC1zaXplLXh4eGw6IDM2cHg7XG4gIC0temQtZm9udC1zaXplLXNtLW1vbm9zcGFjZTogMTFweDtcbiAgLS16ZC1mb250LXNpemUtbWQtbW9ub3NwYWNlOiAxM3B4O1xuICAtLXpkLWZvbnQtc2l6ZS1sZy1tb25vc3BhY2U6IDE3cHg7XG4gIC0temQtZm9udC13ZWlnaHQtdGhpbjogMTAwO1xuICAtLXpkLWZvbnQtd2VpZ2h0LWV4dHJhbGlnaHQ6IDIwMDtcbiAgLS16ZC1mb250LXdlaWdodC1saWdodDogMzAwO1xuICAtLXpkLWZvbnQtd2VpZ2h0LXJlZ3VsYXI6IDQwMDtcbiAgLS16ZC1mb250LXdlaWdodC1tZWRpdW06IDUwMDtcbiAgLS16ZC1mb250LXdlaWdodC1zZW1pYm9sZDogNjAwO1xuICAtLXpkLWZvbnQtd2VpZ2h0LWJvbGQ6IDcwMDtcbiAgLS16ZC1mb250LXdlaWdodC1leHRyYWJvbGQ6IDgwMDtcbiAgLS16ZC1mb250LXdlaWdodC1ibGFjazogOTAwO1xuICAtLXpkLWZvbnQtd2VpZ2h0LXVsdHJhbGlnaHQ6IDIwMDtcbiAgLS16ZC1mb250LXdlaWdodC11bHRyYWJvbGQ6IDgwMDtcbiAgLS16ZC1mb250LXdlaWdodC1oZWF2eTogOTAwO1xuICAtLXpkLWxpbmUtaGVpZ2h0LXNtOiAxNnB4O1xuICAtLXpkLWxpbmUtaGVpZ2h0LW1kOiAyMHB4O1xuICAtLXpkLWxpbmUtaGVpZ2h0LWxnOiAyNHB4O1xuICAtLXpkLWxpbmUtaGVpZ2h0LXhsOiAyOHB4O1xuICAtLXpkLWxpbmUtaGVpZ2h0LXh4bDogMzJweDtcbiAgLS16ZC1saW5lLWhlaWdodC14eHhsOiA0NHB4O1xuICAtLXpkLXNwYWNpbmcteHhzOiA0cHg7XG4gIC0temQtc3BhY2luZy14czogOHB4O1xuICAtLXpkLXNwYWNpbmctc206IDEycHg7XG4gIC0temQtc3BhY2luZzogMjBweDtcbiAgLS16ZC1zcGFjaW5nLWxnOiAzMnB4O1xuICAtLXpkLXNwYWNpbmcteGw6IDQwcHg7XG4gIC0temQtc3BhY2luZy14eGw6IDQ4cHg7XG59XG4iLCJAaW1wb3J0IFwiQHplbmRlc2tnYXJkZW4vY3NzLXZhcmlhYmxlc1wiO1xuXG46cm9vdCB7XG4gIC0tcmVhY2gtbWVudS1idXR0b246IDE7XG59XG5cbi5saXN0IHtcbiAgYmFja2dyb3VuZDogI2ZmZjtcbiAgYm9yZGVyOiAxcHggc29saWQgI2Q4ZDhkODtcbiAgYm9yZGVyLXJhZGl1czogM3B4O1xuICBib3gtc2hhZG93OiAwIDFweCA1cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICBmb250LXNpemU6IDE0cHg7XG4gIGZvbnQtc3R5bGU6IG5vcm1hbDtcbiAgZm9udC13ZWlnaHQ6IG5vcm1hbDtcbiAgbGVmdDogMDtcbiAgbWluLXdpZHRoOiAxNzBweDtcbiAgb3V0bGluZTogbm9uZTtcbiAgcGFkZGluZzogMTBweCAwO1xuICBwb3NpdGlvbjogcmVsYXRpdmU7XG4gIHotaW5kZXg6IDEwMDA7XG59XG5cbi5pdGVtIHtcbiAgY29sb3I6ICMzMzM7XG4gIGN1cnNvcjogcG9pbnRlcjtcbiAgZGlzcGxheTogYmxvY2s7XG4gIHBhZGRpbmc6IDdweCA0MHB4IDdweCAyMHB4O1xuICBvdXRsaW5lOiBub25lO1xuICB3aGl0ZS1zcGFjZTogbm93cmFwO1xufVxuXG5bZGF0YS1yZWFjaC1tZW51LWl0ZW1dW2RhdGEtc2VsZWN0ZWRdIHtcbiAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSg5MiwgMTA1LCAxMTIsIDAuMDgpO1xuICBib3gtc2hhZG93OiB2YXIoLS16ZC1jb2xvci1ncmV5LTcwMCkgM3B4IDBweCBpbnNldDtcbn1cblxuLnNlcGFyYXRvciB7XG4gIGJvcmRlci1ib3R0b206IDFweCBzb2xpZCAjZDhkOGQ4O1xuICBjb2xvcjogIzk2OTY5NjtcbiAgZGlzcGxheTogYmxvY2s7XG4gIGZvbnQtd2VpZ2h0OiBub3JtYWw7XG4gIGZvbnQtc2l6ZTogMTFweDtcbiAgcGFkZGluZzogNXB4IDA7XG4gIG1hcmdpbjogNXB4IDIwcHggMTBweCAyMHB4O1xufVxuXG4uc3BhY2VyIHtcbiAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB3aWR0aDogMTBweDtcbn1cbiJdLCJzb3VyY2VSb290IjoiIn0= */</style><style>:root {
+  --reach-menu-button: 1;
+}
+
+.vb0q01gYhxX6xjoZDd0O4Qb7TxhiDaKD {
+  background: #fff;
+  border: 1px solid rgb(216, 216, 216);
+  border-radius: 3px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  left: 0;
+  min-width: 170px;
+  outline: none;
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+.OZgYUTQTaNinWRRb5SyjeQ8WEtA09RuF {
+  color: #333;
+  cursor: pointer;
+  display: block;
+  padding: 7px 40px 7px 20px;
+  white-space: nowrap;
+}
+
+.p1JvbEyYxbSfz1_7MmGKUQzT0SOap8Vu {
+  display: inline-block;
+  width: 10px;
+}
+
+.IJDXXdfgVXcY6MRd9u66HghwrbdhBtJv {
+  position: absolute;
+  top: auto;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  width: 1px;
+  height: 1px;
+  white-space: nowrap;
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3VpL2NvbXBvbmVudHMvU3Vic2NyaWJlL2luZGV4LmNzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLHNCQUFzQjtBQUN4Qjs7QUFFQTtFQUNFLGdCQUFnQjtFQUNoQixvQ0FBb0M7RUFDcEMsa0JBQWtCO0VBQ2xCLHdDQUF3QztFQUN4QyxlQUFlO0VBQ2Ysa0JBQWtCO0VBQ2xCLG1CQUFtQjtFQUNuQixPQUFPO0VBQ1AsZ0JBQWdCO0VBQ2hCLGFBQWE7RUFDYixlQUFlO0VBQ2YsYUFBYTtBQUNmOztBQUVBO0VBQ0UsV0FBVztFQUNYLGVBQWU7RUFDZixjQUFjO0VBQ2QsMEJBQTBCO0VBQzFCLG1CQUFtQjtBQUNyQjs7QUFFQTtFQUNFLHFCQUFxQjtFQUNyQixXQUFXO0FBQ2I7O0FBRUE7RUFDRSxrQkFBa0I7RUFDbEIsU0FBUztFQUNULGdCQUFnQjtFQUNoQiw4QkFBOEI7RUFDOUIsVUFBVTtFQUNWLFdBQVc7RUFDWCxtQkFBbUI7QUFDckIiLCJzb3VyY2VzQ29udGVudCI6WyI6cm9vdCB7XG4gIC0tcmVhY2gtbWVudS1idXR0b246IDE7XG59XG5cbi5saXN0IHtcbiAgYmFja2dyb3VuZDogI2ZmZjtcbiAgYm9yZGVyOiAxcHggc29saWQgcmdiKDIxNiwgMjE2LCAyMTYpO1xuICBib3JkZXItcmFkaXVzOiAzcHg7XG4gIGJveC1zaGFkb3c6IDAgMXB4IDVweCByZ2JhKDAsIDAsIDAsIDAuMSk7XG4gIGZvbnQtc2l6ZTogMTRweDtcbiAgZm9udC1zdHlsZTogbm9ybWFsO1xuICBmb250LXdlaWdodDogbm9ybWFsO1xuICBsZWZ0OiAwO1xuICBtaW4td2lkdGg6IDE3MHB4O1xuICBvdXRsaW5lOiBub25lO1xuICBwYWRkaW5nOiAxMHB4IDA7XG4gIHotaW5kZXg6IDEwMDA7XG59XG5cbi5pdGVtIHtcbiAgY29sb3I6ICMzMzM7XG4gIGN1cnNvcjogcG9pbnRlcjtcbiAgZGlzcGxheTogYmxvY2s7XG4gIHBhZGRpbmc6IDdweCA0MHB4IDdweCAyMHB4O1xuICB3aGl0ZS1zcGFjZTogbm93cmFwO1xufVxuXG4uc3BhY2VyIHtcbiAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB3aWR0aDogMTBweDtcbn1cblxuLmludmlzaWJsZSB7XG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgdG9wOiBhdXRvO1xuICBvdmVyZmxvdzogaGlkZGVuO1xuICBjbGlwOiByZWN0KDFweCwgMXB4LCAxcHgsIDFweCk7XG4gIHdpZHRoOiAxcHg7XG4gIGhlaWdodDogMXB4O1xuICB3aGl0ZS1zcGFjZTogbm93cmFwO1xufVxuIl0sInNvdXJjZVJvb3QiOiIifQ== */</style>
+  <link rel="shortcut icon" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/favicon-48x48.png">
+  <link rel="manifest" id="ino-manifest-placeholder" href="blob:https://support.arduino.cc/5febe68d-0002-4912-a445-e9b009127807">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#fff">
+  <meta name="application-name">
+  <link rel="apple-touch-icon" sizes="57x57" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="1024x1024" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-icon-1024x1024.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title">
+  <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-640x1136.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-750x1334.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-828x1792.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1125x2436.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1242x2208.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1242x2688.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1536x2048.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1668x2224.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1668x2388.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2048x2732.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1620x2160.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1136x640.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1334x750.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-1792x828.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2436x1125.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2208x1242.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2688x1242.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2048x1536.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2224x1668.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2388x1668.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2732x2048.png">
+  <link rel="apple-touch-startup-image" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/apple-touch-startup-image-2160x1620.png">
+  <link rel="icon" type="image/png" sizes="228x228" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/coast-228x228.png">
+  <meta name="msapplication-TileColor" content="#fff">
+  <meta name="msapplication-TileImage" content="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/mstile-144x144.png">
+  <meta name="msapplication-config" content="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/browserconfig.xml">
+  <link rel="yandex-tableau-widget" href="https://cdn.arduino.cc/header-footer/prod/assets/favicon-arduino/yandex-browser-manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, shrink-to-fit=no"><style type="text/css">.iubenda-alert{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:100%!important;z-index:2147483647!important;background-color:rgba(0,0,0,.5)!important;font-family:"Helvetica Neue",-apple-system,sans-serif!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:16px!important}.iubenda-alert *{font-size:100%!important;width:auto!important;-webkit-appearance:none!important;-moz-appearance:none!important;appearance:none!important;background:0 0!important;box-sizing:border-box!important;-webkit-tap-highlight-color:transparent!important;backface-visibility:hidden!important;font-family:-apple-system,sans-serif!important;text-decoration:none!important;color:currentColor!important;background-attachment:scroll!important;background-color:transparent!important;background-image:none!important;background-position:0 0!important;background-repeat:repeat!important;border:0!important;border-color:#000!important;border-color:currentColor!important;border-radius:0!important;border-style:none!important;border-width:medium!important;bottom:auto!important;clear:none!important;clip:auto!important;counter-increment:none!important;counter-reset:none!important;direction:inherit!important;float:none!important;font-style:inherit!important;font-variant:normal!important;font-weight:inherit!important;height:auto!important;left:auto!important;letter-spacing:normal;line-height:inherit;list-style-type:inherit!important;list-style-position:outside!important;list-style-image:none!important;margin:0;max-height:none!important;max-width:none!important;min-height:0!important;min-width:0!important;opacity:1;overflow:visible!important;padding:0!important;position:static!important;quotes:"" ""!important;right:auto!important;table-layout:auto!important;text-align:left!important;text-indent:0!important;text-transform:none!important;top:auto!important;unicode-bidi:normal!important;vertical-align:baseline!important;visibility:inherit!important;white-space:normal!important;width:auto!important;word-spacing:normal;z-index:auto!important;background-origin:padding-box!important;background-origin:padding-box!important;background-clip:border-box!important;background-size:auto!important;-o-border-image:none!important;border-image:none!important;border-radius:0!important;border-radius:0!important;box-shadow:none!important;-moz-column-count:auto!important;column-count:auto!important;-moz-column-gap:normal!important;column-gap:normal!important;-moz-column-rule:medium none #000!important;column-rule:medium none #000!important;-moz-column-span:none!important;column-span:none!important;-moz-column-width:auto!important;column-width:auto!important;font-feature-settings:normal!important;overflow-x:visible!important;overflow-y:visible!important;-webkit-hyphens:manual!important;hyphens:manual!important;perspective:none!important;perspective-origin:50% 50%!important;text-shadow:none!important;transition:all 0s ease 0s!important;transform:none!important;transform-origin:50% 50%!important;transform-style:flat!important;word-break:normal!important}.iubenda-alert .iubenda-alert-dialog{margin:16px!important;width:100%!important;border-radius:6px!important;background-color:#111!important;color:#f4f4f4!important}@media (min-width:320px){.iubenda-alert .iubenda-alert-dialog{width:320px!important}}.iubenda-alert .iubenda-alert-dialog .iubenda-alert-dialog-content{padding:24px 24px 0!important}.iubenda-alert .iubenda-alert-dialog .iubenda-alert-dialog-buttons{padding:24px!important;display:flex!important}.iubenda-alert .iubenda-alert-dialog .iubenda-alert-dialog-buttons button{flex:1!important}.iubenda-alert button{flex:1!important;-webkit-appearance:none!important;-moz-appearance:none!important;appearance:none!important;margin:4px!important;padding:8px 16px!important;border-radius:64px!important;cursor:pointer!important;font-weight:700!important;font-size:100%!important;border:1px solid transparent!important;color:#fff;text-align:center!important}.iubenda-alert button:hover{border-color:currentColor!important}.iubenda-alert button.iubenda-button-confirm{background-color:#0073ce!important}.iubenda-alert button.iubenda-button-cancel{background-color:rgba(255,255,255,.1)!important}</style><script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/187036717.js" type="text/javascript" async="" data-ueto="ueto_29a3f11fc8"></script></head>
+<body class="header-arduino ccpaApplies"><div style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/sprites.svg" style="display: none;">
+  <symbol id="footerLang-icon" viewBox="0 0 14 14">
+    <path d="M13.813 6.733a6.422 6.422 0 00-.286-1.669 6.563 6.563 0 00-2.56-3.46.267.267 0 00-.06-.037A6.43 6.43 0 007.783.48 4.49 4.49 0 007.25.438 6.563 6.563 0 1013.813 7a2.533 2.533 0 000-.268zM3.969 11.57a5.625 5.625 0 01-2.096-6.23l.807.577L3.969 8.07v3.501zm6.675-5.976a.469.469 0 00-.324.037l-.937.469a.469.469 0 00-.235.567l.47 1.406a.469.469 0 00.294.296l1.144.38.366 2.001a5.597 5.597 0 01-4.172 1.875 5.48 5.48 0 01-2.142-.427l2.076-3.557a.469.469 0 00-.07-.568l-.469-.468a.469.469 0 00-.332-.136H4.728l-.342-.68a.127.127 0 00-.028-.047l-.455-.68h1.003a.469.469 0 00.469-.468v-.746l.802-.796a.469.469 0 00.056-.591l-.9-1.355-.117-.351a5.56 5.56 0 012.034-.38v.469a.469.469 0 00.938 0v-.385a5.466 5.466 0 011.959.722L9.71 3.72l-.066.225-.384.38a.469.469 0 00.152.768.469.469 0 00.514-.103l.262-.262.469.15 2.044.68c.055.193.097.39.126.59l-2.184-.553z" fill="currentColor"></path>
+  </symbol>
+  <symbol id="footerTriangle-icon" viewBox="0 0 9 6">
+    <path d="M.332 4.332l3.2-3.2a.8.8 0 011.136 0l3.2 3.2a.8.8 0 01.168.872.8.8 0 01-.736.496H.9a.8.8 0 01-.736-.496.8.8 0 01.168-.872z" fill="currentColor"></path>
+  </symbol>
+  <symbol id="headerIcon-menu-triangle" viewBox="0 0 11 7">
+    <path d="M10.21 2.21l-4 4a1 1 0 01-1.42 0l-4-4a1 1 0 01-.21-1.09A1 1 0 011.5.5h8a1 1 0 01.92.62 1 1 0 01-.21 1.09z" fill="currentColor"></path>
+  </symbol>
+  <symbol id="headerIcon-extend-menu" viewBox="0 0 7 12">
+    <path d="M1.5 11.25a.75.75 0 01-.533-1.283L4.942 6 .967 2.032A.753.753 0 112.032.967l4.5 4.5a.75.75 0 010 1.065l-4.5 4.5a.75.75 0 01-.532.218z" fill="currentColor"></path>
+  </symbol>
+  <symbol id="headerIcon-extend-next" viewBox="0 0 10 9">
+    <path d="M8.891 4.766L5.516 8.141a.375.375 0 01-.614-.122.375.375 0 01.082-.41L7.72 4.875H.375a.375.375 0 010-.75h7.346L4.984 1.391A.377.377 0 015.516.86l3.375 3.375a.375.375 0 010 .532z" fill="currentColor"></path>
+  </symbol>
+  <symbol id="headerLangWorld-icon" viewBox="0 0 17 16">
+    <path d="M8.246.125a7.875 7.875 0 100 15.75 7.875 7.875 0 000-15.75zm-2.863 1.76a8.938 8.938 0 00-1.35 3.303H2.109a6.817 6.817 0 013.274-3.302zM1.496 8c0-.57.071-1.136.214-1.688h2.137a14.113 14.113 0 000 3.375H1.71A6.705 6.705 0 011.496 8zm.613 2.813h1.924a8.938 8.938 0 001.35 3.301 6.818 6.818 0 01-3.274-3.302zm5.575 3.836c-1.092-.383-2.025-1.868-2.487-3.836h2.487v3.836zm0-4.961H4.989a12.111 12.111 0 010-3.376h2.695v3.375zm0-4.5H5.197c.462-1.97 1.395-3.454 2.487-3.837v3.837zm6.699 0h-1.924a8.937 8.937 0 00-1.35-3.302 6.817 6.817 0 013.274 3.301zM8.809 1.35c1.09.383 2.025 1.868 2.492 3.837H8.808V1.35zm0 4.962h2.694c.158 1.119.158 2.255 0 3.375H8.809V6.312zm0 8.336v-3.836H11.3c-.467 1.968-1.401 3.453-2.492 3.836zm2.3-.535a8.937 8.937 0 001.35-3.302h1.924a6.818 6.818 0 01-3.274 3.302zm1.536-4.427c.068-.56.102-1.123.101-1.687a13.656 13.656 0 00-.101-1.688h2.137a6.75 6.75 0 010 3.375h-2.137z" fill="currentColor"></path>
+  </symbol>
+</svg></div><div></div>
+  
+  
+  
+
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NK2TW8L"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- <a class="skip-navigation" tabindex="1" href="#main-content">Skip to main content</a> -->
+
+<header id="header" data-ref="0.4062705643513871" class="ino-header-base"><header id="ino-header-new">
+  <nav class="arduino-nav teal collapsed">
+    <!-- First level of header -->
+    <div class="first-level">
+
+      <div class="first-level-left app-menu-apps" id="main-menu">
+        <!-- Component MenuAppsCmp -->
+      <div class="app-menu-apps-link"><a href="https://www.arduino.cc/pro"><span class="link-full">Professional</span><span class="link-short">Pro</span></a></div><div class="app-menu-apps-link"><a href="https://www.arduino.cc/edu"><span class="link-full">Education</span><span class="link-short">Edu</span></a></div><div class="app-menu-apps-link"><a href="https://store.arduino.cc/"><span>Store</span></a></div></div>
+
+      <!-- Right part of control -->
+      <div class="first-level-right">
+        <!-- Search bar -->
+        <div class="app-controls search-control app-desktop-search-control"><form class="search-form" role="search" method="GET" action="//search.arduino.cc/search">
+  <div class="search-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" id="search" viewBox="0 0 20 20" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/headerIcon-search.svg">
+  <path d="M19.5325 18.4675L14.2825 13.2175C15.4994 11.7274 16.0972 9.82667 15.9522 7.90828C15.8072 5.9899 14.9306 4.20059 13.5035 2.91032C12.0765 1.62005 10.2082 0.927502 8.28495 0.975872C6.3617 1.02424 4.53058 1.80983 3.17021 3.1702C1.80984 4.53057 1.02425 6.36169 0.975884 8.28493C0.927514 10.2082 1.62006 12.0765 2.91033 13.5035C4.2006 14.9305 5.98991 15.8072 7.90829 15.9522C9.82668 16.0972 11.7274 15.4994 13.2175 14.2825L18.4675 19.5325C18.5372 19.6028 18.6202 19.6586 18.7116 19.6967C18.803 19.7347 18.901 19.7543 19 19.7543C19.099 19.7543 19.197 19.7347 19.2884 19.6967C19.3798 19.6586 19.4628 19.6028 19.5325 19.5325C19.6028 19.4628 19.6586 19.3798 19.6967 19.2884C19.7348 19.197 19.7544 19.099 19.7544 19C19.7544 18.901 19.7348 18.803 19.6967 18.7116C19.6586 18.6202 19.6028 18.5372 19.5325 18.4675ZM8.50001 14.5C7.31332 14.5 6.15329 14.1481 5.16659 13.4888C4.1799 12.8295 3.41086 11.8925 2.95674 10.7961C2.50261 9.69974 2.38379 8.49334 2.6153 7.32946C2.84681 6.16557 3.41826 5.09647 4.25737 4.25736C5.09649 3.41824 6.16558 2.8468 7.32947 2.61529C8.49336 2.38378 9.69976 2.5026 10.7961 2.95672C11.8925 3.41085 12.8295 4.17988 13.4888 5.16658C14.1481 6.15327 14.5 7.31331 14.5 8.5C14.5 10.0913 13.8679 11.6174 12.7427 12.7426C11.6174 13.8679 10.0913 14.5 8.50001 14.5Z" fill="currentColor"></path>
+</svg>
+  </div>
+  <input type="hidden" name="tab" value="" class="search-tab">
+  <input type="text" placeholder="Search on Arduino.cc" name="q" title="" class="search-typing" autocomplete="off">
+</form></div>
+
+        <!-- Store container -->
+        <div class="app-controls store-controls hide">
+          <!-- Store buttons -->
+        </div>
+
+        <!-- Application list -->
+        <div class="app-controls application-list app-applications-container style-arduino"><div class="app-applications popup-dropdown">
+  <a aria-label="Applications" id="application-list-control" href="https://app.arduino.cc/" target="_blank" role="button">
+    <div class="app-applications-icon">
+      <svg id="app-list" viewBox="0 0 42 31" fill="none" xmlns="http://www.w3.org/2000/svg" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/headerApp-arduino-cloud.svg"><path d="M31.885 28.361c-4.732 0-8.71-2.478-11.202-6.977l-1.99-3.592c-1.967-3.553-4.934-5.43-8.578-5.43-3.647 0-6.615 2.915-6.615 6.5 0 3.583 2.968 6.5 6.615 6.5H18.5a1.5 1.5 0 1 1 0 3h-8.385c-5.302 0-9.615-4.263-9.615-9.5 0-5.24 4.313-9.5 9.615-9.5 4.732 0 8.71 2.477 11.202 6.977l1.99 3.591c1.967 3.553 4.934 5.431 8.578 5.431 3.647 0 6.615-2.916 6.615-6.5s-2.968-6.5-6.615-6.5c-.866 0-1.71.11-2.507.327a1.497 1.497 0 0 1-1.89-1.333C27.232 7.994 24.382 5.361 21 5.361c-1.432 0-2.79.456-3.926 1.32a1.5 1.5 0 0 1-1.814-2.39A9.42 9.42 0 0 1 21 2.36c4.37 0 8.132 3.012 9.203 7.11.552-.073 1.114-.11 1.682-.11 5.302 0 9.615 4.262 9.615 9.5s-4.313 9.5-9.615 9.5Z" fill="currentColor"></path></svg>
+    </div>
+  </a>
+</div>
+
+<!-- <div class="app-applications popup-dropdown">
+  <a aria-label="Applications" id="application-list-control" href="#" role="button">
+    <div class="app-applications-icon">
+      <img src="https://cdn.arduino.cc/header-footer/prod/assets/headerIcon-app-list.svg" onload="SVGInject(this)"></img>
+    </div>
+  </a>
+  <div class="popup-container">
+    <div class="popup-container__box">
+      <div id='app-apps-container-box'></div>
+    </div>
+  </div>
+</div> --></div>
+
+        <!-- Auth/Profile container -->
+        <div class="app-controls profile-desktop-container app-desktop-profile-container style-arduino min-width"><!-- Sign In -->
+<div class="login-button">
+  <a href="#">
+    <span>Sign In</span>
+  </a>
+</div>
+
+<!-- Profile view -->
+<div class="profile-dropdown popup-dropdown hide" tabindex="0">
+  <a data-hj-suppress="" class="submenu-toggle profile-avatar" aria-label="user profile">
+    <svg viewBox="0 0 22 22" class="avatar default-avatar">
+      <path d="M11 11.7498H10.88C9.99585 11.7184 9.1594 11.341 8.55072 10.6989C7.94204 10.0569 7.6098 9.20152 7.62553 8.31694C7.64126 7.43237 8.0037 6.58934 8.63483 5.96934C9.26595 5.34934 10.1153 5.00195 11 5.00195C11.8847 5.00195 12.7341 5.34934 13.3652 5.96934C13.9963 6.58934 14.3587 7.43237 14.3745 8.31694C14.3902 9.20152 14.058 10.0569 13.4493 10.6989C12.8406 11.341 12.0042 11.7184 11.12 11.7498H11Z" fill="currentColor"></path>
+      <path d="M17.9752 18.65C17.9857 18.7012 18.0007 18.7514 18.0202 18.8C16.0921 20.535 13.5902 21.495 10.9964 21.495C8.40264 21.495 5.90067 20.535 3.97266 18.8C3.99462 18.7516 4.01219 18.7014 4.02516 18.65C4.38847 17.1001 5.26936 15.7205 6.52245 14.7387C7.77553 13.757 9.3259 13.2318 10.9177 13.25H11.0827C12.6744 13.2318 14.2248 13.757 15.4779 14.7387C16.7309 15.7205 17.6118 17.1001 17.9752 18.65Z" fill="currentColor"></path>
+      <path d="M21.5004 10.9998C21.5108 13.3645 20.7174 15.6626 19.2504 17.5173C18.8356 16.2987 18.1466 15.1916 17.2363 14.2814C16.3261 13.3712 15.219 12.6821 14.0004 12.2673C14.8135 11.6501 15.4123 10.7933 15.7124 9.81765C16.0126 8.842 15.9989 7.79676 15.6733 6.82931C15.3477 5.86186 14.7266 5.02102 13.8977 4.42536C13.0687 3.8297 12.0737 3.50928 11.0529 3.50928C10.0321 3.50928 9.03713 3.8297 8.20818 4.42536C7.37922 5.02102 6.75816 5.86186 6.43256 6.82931C6.10697 7.79676 6.09327 8.842 6.39341 9.81765C6.69354 10.7933 7.29236 11.6501 8.10542 12.2673C6.88682 12.6821 5.77973 13.3712 4.8695 14.2814C3.95927 15.1916 3.2702 16.2987 2.85542 17.5173C1.79166 16.2095 1.05841 14.6648 0.717686 13.0138C0.376957 11.3629 0.438759 9.65409 0.897868 8.03203C1.35698 6.40996 2.19989 4.92228 3.35535 3.69477C4.51081 2.46726 5.94484 1.536 7.5362 0.979724C9.12757 0.423451 10.8295 0.25852 12.498 0.498875C14.1666 0.73923 15.7528 1.3778 17.1224 2.36061C18.4921 3.34341 19.605 4.64156 20.367 6.14528C21.129 7.64901 21.5178 9.31411 21.5004 10.9998Z" fill="currentColor"></path>
+    </svg>      
+    <img class="avatar user-avatar" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/global_user_profile.svg" alt="User Profile">
+    <span class="badge">0</span>
+  </a>
+  <div class="popup-container">
+    <div class="popup-container__box">
+      <ul class="profile-menu-desktop">
+        <li>
+          <a href="https://id.arduino.cc/"><span>Profile</span></a>
+        </li>
+        
+        <li>
+          <a href="https://cloud.arduino.cc/home/courses"><span>My Courses</span></a>
+        </li>
+        
+        <li>
+          <a href="https://digital-store.arduino.cc/subscriptions"><span>My Plans</span></a>
+        </li>
+        <li class="logout"><a role="button" tabindex="0"><span>Sign Out</span></a></li></ul>
+    </div>
+  </div>
+</div></div>
+      </div>
+
+    </div>
+
+    <!-- Second level of header -->
+    <div class="second-level">
+      <!-- Brand logo -->
+      <a class="brand-logo app-brand-logo style-arduino logo-arduino" href="https://www.arduino.cc/" aria-label="arduino-logo"><svg viewBox="0 0 52 25" fill="none" xmlns="http://www.w3.org/2000/svg" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/headerLogo-arduino.svg">
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M51.25 12.5C51.25 5.60219 45.5773 0 38.6242 0C37.984 0 37.3261 0.0364964 36.6859 0.145985C31.2799 0.930657 27.6522 4.92701 25.625 7.9927C23.5978 4.92701 19.9701 0.930657 14.5641 0.145985C13.9239 0.0547445 13.266 0 12.6258 0C5.65493 0 0 5.60219 0 12.5C0 19.3978 5.67271 25 12.6258 25C13.266 25 13.9239 24.9635 14.5819 24.854C19.9879 24.0511 23.6155 20.0547 25.6428 16.9891C27.67 20.0547 31.2977 24.0511 36.7037 24.854C37.3439 24.9453 38.0018 25 38.6598 25C45.5773 25 51.25 19.3978 51.25 12.5ZM13.9416 20.4744C13.4971 20.5474 13.0525 20.5657 12.6079 20.5657C8.01996 20.5657 4.30336 16.9343 4.30336 12.5C4.30336 8.04744 8.03774 4.4343 12.6257 4.4343C13.0703 4.4343 13.5148 4.4708 13.9594 4.52554C19.0631 5.27372 22.1751 10.4379 23.242 12.5C22.1573 14.5803 19.0275 19.7263 13.9416 20.4744ZM37.2905 4.52554C32.1868 5.27372 29.057 10.4379 28.0079 12.5C29.057 14.562 32.1868 19.7263 37.2905 20.4744C37.735 20.5292 38.1796 20.5657 38.6242 20.5657C43.1944 20.5657 46.9287 16.9525 46.9287 12.5C46.9287 8.06569 43.2121 4.4343 38.6242 4.4343C38.1796 4.4343 37.735 4.4708 37.2905 4.52554ZM9.06449 11.161H16.7004V13.5642H9.06449V11.161ZM42.1479 13.5817H39.5728V16.1077H37.1049V13.5817H34.5298V11.161H37.1049V8.63499H39.5728V11.161H42.1479V13.5817Z" fill="currentColor"></path>
+</svg></a>
+
+      <!-- Main application menu -->
+      <div class="menu-container">
+        <!-- Search bar -->
+        <div class="mobile-search-control app-mobile-search-control"><form class="search-form" role="search" method="GET" action="//search.arduino.cc/search">
+  <div class="search-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" id="search" viewBox="0 0 20 20" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/headerIcon-search.svg">
+  <path d="M19.5325 18.4675L14.2825 13.2175C15.4994 11.7274 16.0972 9.82667 15.9522 7.90828C15.8072 5.9899 14.9306 4.20059 13.5035 2.91032C12.0765 1.62005 10.2082 0.927502 8.28495 0.975872C6.3617 1.02424 4.53058 1.80983 3.17021 3.1702C1.80984 4.53057 1.02425 6.36169 0.975884 8.28493C0.927514 10.2082 1.62006 12.0765 2.91033 13.5035C4.2006 14.9305 5.98991 15.8072 7.90829 15.9522C9.82668 16.0972 11.7274 15.4994 13.2175 14.2825L18.4675 19.5325C18.5372 19.6028 18.6202 19.6586 18.7116 19.6967C18.803 19.7347 18.901 19.7543 19 19.7543C19.099 19.7543 19.197 19.7347 19.2884 19.6967C19.3798 19.6586 19.4628 19.6028 19.5325 19.5325C19.6028 19.4628 19.6586 19.3798 19.6967 19.2884C19.7348 19.197 19.7544 19.099 19.7544 19C19.7544 18.901 19.7348 18.803 19.6967 18.7116C19.6586 18.6202 19.6028 18.5372 19.5325 18.4675ZM8.50001 14.5C7.31332 14.5 6.15329 14.1481 5.16659 13.4888C4.1799 12.8295 3.41086 11.8925 2.95674 10.7961C2.50261 9.69974 2.38379 8.49334 2.6153 7.32946C2.84681 6.16557 3.41826 5.09647 4.25737 4.25736C5.09649 3.41824 6.16558 2.8468 7.32947 2.61529C8.49336 2.38378 9.69976 2.5026 10.7961 2.95672C11.8925 3.41085 12.8295 4.17988 13.4888 5.16658C14.1481 6.15327 14.5 7.31331 14.5 8.5C14.5 10.0913 13.8679 11.6174 12.7427 12.7426C11.6174 13.8679 10.0913 14.5 8.50001 14.5Z" fill="currentColor"></path>
+</svg>
+  </div>
+  <input type="hidden" name="tab" value="" class="search-tab">
+  <input type="text" placeholder="Search on Arduino.cc" name="q" title="" class="search-typing" autocomplete="off">
+</form></div>
+
+        <!-- App menu -->
+        <div class="menu-list app-menu-main style-arduino" id="app-menu-list"><div class="app-menu-item" tabindex="0"><a class="app-menu-text main-text" href="https://www.arduino.cc/en/Main/Products" tabindex="-1"><span title="Hardware">Hardware</span></a></div><div class="app-menu-item" tabindex="0"><a class="app-menu-text main-text" href="https://www.arduino.cc/en/software" tabindex="-1"><span title="Software">Software</span></a></div><div class="app-menu-item" tabindex="0"><a class="app-menu-text main-text" href="https://cloud.arduino.cc/" tabindex="-1"><span title="Cloud">Cloud</span></a></div><div class="app-menu-item" tabindex="0"><a class="app-menu-text main-text" href="https://docs.arduino.cc/" tabindex="-1"><span title="Documentation">Documentation</span></a></div><div class="app-menu-item app-has-sub-menu" tabindex="0"><a class="app-menu-text main-text" role="button" tabindex="-1"><span title="Community">Community</span><div class="app-menu-triangle"><svg>
+        <use xlink:href="/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi#headerIcon-menu-triangle" href="#headerIcon-menu-triangle"></use>
+      </svg></div></a><div class="app-sub-menu"><a class="app-menu-text sub-menu-text" href="https://forum.arduino.cc/"><span title="Forum">Forum</span></a><a class="app-menu-text sub-menu-text" href="https://discord.gg/jQJFwW7" target="_blank" rel="noopener noreferrer"><span title="Discord">Discord</span></a><a class="app-menu-text sub-menu-text" href="https://create.arduino.cc/projecthub" target="_blank" rel="noopener noreferrer"><span title="Project Hub">Project Hub</span></a><a class="app-menu-text sub-menu-text" href="https://day.arduino.cc/" target="_blank" rel="noopener noreferrer"><span title="Arduino Day">Arduino Day</span></a><a class="app-menu-text sub-menu-text" href="https://sites.arduino.cc/user-groups" target="_blank" rel="noopener noreferrer"><span title="User Groups">User Groups</span></a></div></div><div class="app-menu-item" tabindex="0"><a class="app-menu-text main-text" href="https://blog.arduino.cc/" tabindex="-1"><span title="Blog">Blog</span></a></div><div class="app-menu-item" tabindex="0"><a class="app-menu-text main-text" href="https://www.arduino.cc/en/about" tabindex="-1"><span title="About">About</span></a></div></div>
+
+        <!-- App buttons -->
+        <div class="menu-buttons app-menu-buttons" id="app-menu-buttons"></div>
+
+        <div class="profile-mobile-container app-mobile-profile-container style-arduino"><!-- Sign In -->
+<div class="login-button">
+  <a href="#">
+    <span>Sign In</span>
+  </a>
+</div>
+<!-- User profile -->
+<div class="profile-dropdown hide">
+  <div class="profile-menu-mobile">
+    <div class="toggle-mobile-profile close-profile-menu-mobile"><div class="profile-menu-mobile__item"><div class="close-profile-menu-mobile__wrapper"><svg><use xlink:href="/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi#headerIcon-extend-next" href="#headerIcon-extend-next"></use></svg><span>Back</span></div></div></div>
+    <div class="profile-menu-mobile-content">
+        <div class="profile-menu-mobile__item">
+          <a href="https://id.arduino.cc/">Profile</a>
+        </div>
+        
+        <div class="profile-menu-mobile__item">
+          <a href="https://cloud.arduino.cc/home/courses">My Courses</a>
+        </div>
+        
+        <div class="profile-menu-mobile__item">
+          <a href="https://digital-store.arduino.cc/subscriptions">My Plans</a>
+        </div>
+        </div>
+    <div class="logout profile-menu-mobile__item">
+      <a role="button" tabindex="0">Sign Out</a>
+    </div>
+  </div>
+  <div class="profile-info">
+    <div class="profile-avatar" aria-label="user profile">
+      <svg viewBox="0 0 22 22" class="avatar default-avatar">
+        <path d="M11 11.7498H10.88C9.99585 11.7184 9.1594 11.341 8.55072 10.6989C7.94204 10.0569 7.6098 9.20152 7.62553 8.31694C7.64126 7.43237 8.0037 6.58934 8.63483 5.96934C9.26595 5.34934 10.1153 5.00195 11 5.00195C11.8847 5.00195 12.7341 5.34934 13.3652 5.96934C13.9963 6.58934 14.3587 7.43237 14.3745 8.31694C14.3902 9.20152 14.058 10.0569 13.4493 10.6989C12.8406 11.341 12.0042 11.7184 11.12 11.7498H11Z" fill="currentColor"></path>
+        <path d="M17.9752 18.65C17.9857 18.7012 18.0007 18.7514 18.0202 18.8C16.0921 20.535 13.5902 21.495 10.9964 21.495C8.40264 21.495 5.90067 20.535 3.97266 18.8C3.99462 18.7516 4.01219 18.7014 4.02516 18.65C4.38847 17.1001 5.26936 15.7205 6.52245 14.7387C7.77553 13.757 9.3259 13.2318 10.9177 13.25H11.0827C12.6744 13.2318 14.2248 13.757 15.4779 14.7387C16.7309 15.7205 17.6118 17.1001 17.9752 18.65Z" fill="currentColor"></path>
+        <path d="M21.5004 10.9998C21.5108 13.3645 20.7174 15.6626 19.2504 17.5173C18.8356 16.2987 18.1466 15.1916 17.2363 14.2814C16.3261 13.3712 15.219 12.6821 14.0004 12.2673C14.8135 11.6501 15.4123 10.7933 15.7124 9.81765C16.0126 8.842 15.9989 7.79676 15.6733 6.82931C15.3477 5.86186 14.7266 5.02102 13.8977 4.42536C13.0687 3.8297 12.0737 3.50928 11.0529 3.50928C10.0321 3.50928 9.03713 3.8297 8.20818 4.42536C7.37922 5.02102 6.75816 5.86186 6.43256 6.82931C6.10697 7.79676 6.09327 8.842 6.39341 9.81765C6.69354 10.7933 7.29236 11.6501 8.10542 12.2673C6.88682 12.6821 5.77973 13.3712 4.8695 14.2814C3.95927 15.1916 3.2702 16.2987 2.85542 17.5173C1.79166 16.2095 1.05841 14.6648 0.717686 13.0138C0.376957 11.3629 0.438759 9.65409 0.897868 8.03203C1.35698 6.40996 2.19989 4.92228 3.35535 3.69477C4.51081 2.46726 5.94484 1.536 7.5362 0.979724C9.12757 0.423451 10.8295 0.25852 12.498 0.498875C14.1666 0.73923 15.7528 1.3778 17.1224 2.36061C18.4921 3.34341 19.605 4.64156 20.367 6.14528C21.129 7.64901 21.5178 9.31411 21.5004 10.9998Z" fill="currentColor"></path>
+      </svg>
+      <img class="avatar user-avatar" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/global_user_profile.svg" alt="User Profile">
+      <div class="profile-greeting toggle-mobile-profile">
+        <!-- Set user greeting here -->
+        <span class="open-profile-menu-mobile">
+          <svg width="10" height="15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 14.5a1.002 1.002 0 01-1.006-1 1 1 0 01.296-.71l5.3-5.29-5.3-5.29A1.004 1.004 0 012.71.79l6 6a1 1 0 010 1.42l-6 6a1 1 0 01-.71.29z" fill="currentColor"></path>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+      </div>
+
+      <!-- Burger menu -->
+      <div class="burger-menu">
+        <div class="burger-main-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" id="burger-menu" viewBox="0 0 18 13" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/headerIcon-burger-menu.svg">
+  <path d="M17.25 7.25H0.75C0.551088 7.25 0.360322 7.17098 0.21967 7.03033C0.0790178 6.88968 0 6.69891 0 6.5C0 6.30109 0.0790178 6.11032 0.21967 5.96967C0.360322 5.82902 0.551088 5.75 0.75 5.75H17.25C17.4489 5.75 17.6397 5.82902 17.7803 5.96967C17.921 6.11032 18 6.30109 18 6.5C18 6.69891 17.921 6.88968 17.7803 7.03033C17.6397 7.17098 17.4489 7.25 17.25 7.25Z" fill="currentColor"></path>
+  <path d="M17.25 2H0.75C0.551088 2 0.360322 1.92098 0.21967 1.78033C0.0790178 1.63968 0 1.44891 0 1.25C0 1.05109 0.0790178 0.860322 0.21967 0.71967C0.360322 0.579018 0.551088 0.5 0.75 0.5H17.25C17.4489 0.5 17.6397 0.579018 17.7803 0.71967C17.921 0.860322 18 1.05109 18 1.25C18 1.44891 17.921 1.63968 17.7803 1.78033C17.6397 1.92098 17.4489 2 17.25 2Z" fill="currentColor"></path>
+  <path d="M17.25 12.5H0.75C0.551088 12.5 0.360322 12.421 0.21967 12.2803C0.0790178 12.1397 0 11.9489 0 11.75C0 11.5511 0.0790178 11.3603 0.21967 11.2197C0.360322 11.079 0.551088 11 0.75 11H17.25C17.4489 11 17.6397 11.079 17.7803 11.2197C17.921 11.3603 18 11.5511 18 11.75C18 11.9489 17.921 12.1397 17.7803 12.2803C17.6397 12.421 17.4489 12.5 17.25 12.5Z" fill="currentColor"></path>
+</svg>
+        </div>
+        <div class="burger-close-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" id="burger-close" viewBox="0 0 20 19" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/headerIcon-burger-close.svg">
+  <path d="M18.7099 16.7899C18.8037 16.8829 18.8781 16.9935 18.9288 17.1154C18.9796 17.2372 19.0057 17.3679 19.0057 17.4999C19.0057 17.632 18.9796 17.7627 18.9288 17.8845C18.8781 18.0064 18.8037 18.117 18.7099 18.2099C18.617 18.3037 18.5064 18.3781 18.3845 18.4288C18.2627 18.4796 18.132 18.5057 17.9999 18.5057C17.8679 18.5057 17.7372 18.4796 17.6154 18.4288C17.4935 18.3781 17.3829 18.3037 17.2899 18.2099L9.99994 10.9199L2.70994 18.2099C2.61698 18.3037 2.50638 18.3781 2.38452 18.4288C2.26266 18.4796 2.13195 18.5057 1.99994 18.5057C1.86793 18.5057 1.73722 18.4796 1.61536 18.4288C1.4935 18.3781 1.3829 18.3037 1.28994 18.2099C1.19621 18.117 1.12182 18.0064 1.07105 17.8845C1.02028 17.7627 0.994141 17.632 0.994141 17.4999C0.994141 17.3679 1.02028 17.2372 1.07105 17.1154C1.12182 16.9935 1.19621 16.8829 1.28994 16.7899L8.57994 9.49994L1.28994 2.20994C1.1967 2.1167 1.12274 2.00601 1.07228 1.88419C1.02182 1.76237 0.995847 1.6318 0.995847 1.49994C0.995847 1.36808 1.02182 1.23751 1.07228 1.11569C1.12274 0.99387 1.1967 0.88318 1.28994 0.789941C1.38318 0.696703 1.49387 0.622742 1.61569 0.572282C1.73751 0.521822 1.86808 0.49585 1.99994 0.49585C2.1318 0.49585 2.26237 0.521822 2.38419 0.572282C2.50601 0.622742 2.6167 0.696703 2.70994 0.789941L9.99994 8.07994L17.2899 0.789941C17.4782 0.601638 17.7336 0.49585 17.9999 0.49585C18.2662 0.49585 18.5216 0.601638 18.7099 0.789941C18.8982 0.978245 19.004 1.23364 19.004 1.49994C19.004 1.76624 18.8982 2.02164 18.7099 2.20994L11.4199 9.49994L18.7099 16.7899Z" fill="currentColor"></path>
+</svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- portal element-->
+    <div id="ino-portal-element"></div>
+
+    <!-- information banner -->
+    <div id="information-banner"></div>
+  </nav>
+  <div id="consent-modal-container"></div>
+</header>
+<nagbar data-ref="0.4204693447171761"></nagbar>
+<snackbar></snackbar></header>
+
+<!-- This is hidden but its content is used to populate the header. Don't remove it -->
+<img class="hidden-user-avatar" alt="" data-user-avatar="true" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/default_avatar.png">
+
+<header class="header" style="display: none">
+  <div class="logo">
+    <a title="Home" href="https://support.arduino.cc/hc/en-us">
+      <img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/6bdefaf710d85c6de0206ffbf1b0da3572f839ba.png" alt="Arduino Help Center Help Center home page">
+    </a>
+  </div>
+  <div class="nav-wrapper">
+    <button class="menu-button" aria-controls="user-nav" aria-expanded="false" aria-label="Toggle navigation menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" focusable="false" viewBox="0 0 16 16" class="icon-menu">
+        <path fill="none" stroke="currentColor" stroke-linecap="round" d="M1.5 3.5h13m-13 4h13m-13 4h13"></path>
+      </svg>
+    </button>
+<!-- This is removed to avoid spam and a non-followed contact point -->
+<!--     <nav class="user-nav" id="user-nav"> -->
+<!--        -->
+<!--       <a class="submit-a-request" href="/hc/en-us/requests/new">Submit a request</a> -->
+<!--     </nav> -->
+  
+    
+      <a rel="nofollow" data-auth-action="signin" title="Opens a dialog" role="button" href="https://support.arduino.cc/hc/en-us/signin?return_to=https%3A%2F%2Fsupport.arduino.cc%2Fhc%2Fen-us%2Farticles%2F7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi">
+        Sign in
+      </a>
+    
+  </div>
+</header>
+
+  <main role="main">
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const votes = document.querySelector(".article-votes");
+    const controls = document.querySelector(".article-votes-controls");
+    const downVotebutton = document.querySelector(".article-vote-down");
+    const upVotebutton = document.querySelector(".article-vote-up");
+    const negativeFollowup = document.querySelector(".negative-followup__c");
+    const submitButton = document.getElementById("submitBtn");
+    const commentField = document.getElementById("commentField");
+
+    negativeFollowup.style.display = "none";
+
+    controls.addEventListener('click',function(){
+      if (negativeFollowup.style.display === "none") {
+        negativeFollowup.style.display = "flex";
+        votes.style.display = "none";
+      } else {
+        negativeFollowup.style.display = "none";
+        votes.style.display = "flex";
+        console.log('none');
+      }
+    });
+
+    upVotebutton.addEventListener('click',function(){
+      document.getElementById("voteValue").setAttribute('value', 1);
+  		document.getElementById("commentField").placeholder = "Anything else we should know? (Optional)"
+    });
+
+    downVotebutton.addEventListener('click',function(){
+      document.getElementById("voteValue").setAttribute('value', -1);
+  		document.getElementById("commentField").placeholder = "How can we improve this article? (Optional)"
+    });
+
+    submitButton.addEventListener('click',function(){
+      if (negativeFollowup.style.display === "none") {
+        negativeFollowup.style.display = "flex";
+        votes.style.display = "none";
+      }
+  		
+  		// Submit form
+  		if (commentField.value != "") {
+        submitForm();
+  			negativeFollowup.innerHTML = '<p>Feedback submitted.</p>';
+  		} else {
+  			negativeFollowup.innerHTML = '<p>Thank you.</p>';
+      }
+
+    });
+		
+  	/*
+    commentField.addEventListener('input',function(){
+        submitButton.disabled = commentField.value == "";
+    });
+  	*/
+  
+});
+
+function submitForm() {
+    var form = document.getElementById('feedbackForm');
+    var data = new FormData(form);
+    var req = new XMLHttpRequest();
+  	req.open("POST", "https://hooks.zapier.com/hooks/catch/13286391/bpjnh0h");
+    req.send(data);
+}
+</script>
+
+<img src="" width="100%">
+
+<div>
+  
+		<a href="https://support.arduino.cc/hc/en-us" class="return-link link-chevron-left">Back to Arduino Support</a>
+  
+</div>
+
+
+  <div class="container-article">
+
+  
+  <!-- What is this for?
+  <nav class="sub-nav">
+  </nav>
+	-->
+  
+<div class="article-container" id="article-container">
+    
+  <!-- Disable articlesidebar
+    <aside class="article-sidebar" aria-labelledby="section-articles-title">
+      
+    </aside>
+-->
+
+
+      
+    
+      <article id="main-content" class="article">
+      <!-- <ol class="breadcrumbs">
+  
+    <li title="Arduino Help Center">
+      
+        <a href="/hc/en-us">Arduino Help Center</a>
+      
+    </li>
+  
+    <li title="Hardware Support">
+      
+        <a href="/hc/en-us/categories/360001637274-Hardware-Support">Hardware Support</a>
+      
+    </li>
+  
+    <li title="GIGA R1">
+      
+        <a href="/hc/en-us/sections/7980658170908-GIGA-R1">GIGA R1</a>
+      
+    </li>
+  
+</ol>
+ -->
+    
+
+      
+        <header class="article-header">
+          <h1 title="Update Wi-Fi firmware on GIGA R1 WiFi" class="article-title">
+      
+          Update Wi-Fi firmware on GIGA R1 WiFi
+          
+        </h1>
+
+        
+      </header>
+      	
+        <section class="article-info">
+        <div class="article-content">
+          <div class="article-body"><p>In this article, we will go through a step-by-step process on how to get the latest Wi-Fi firmware on your GIGA R1 WiFi board.</p>
+<h2 id="before-you-begin">Before you begin</h2>
+<ul>
+<li>Add the <strong>Arduino Mbed OS Giga Boards</strong> to Arduino IDE using the <a href="https://support.arduino.cc/hc/en-us/articles/360016119519-Add-boards-to-Arduino-IDE">Boards Manager</a>.</li>
+</ul>
+<h2 id="instructions">Instructions</h2>
+<ol>
+<li>
+<p>Connect your GIGA R1 WiFi to your computer using a USB-C cable.</p>
+</li>
+<li>
+<p>Select your board in the board selector, or use the <em>Tools &gt; Port</em> and <em>Tools &gt; Board</em> menus.</p>
+</li>
+<li>
+<p>Open the <code>WiFiFirmwareUpdater</code> sketch by selecting <em>File &gt; Examples &gt; STM32H747_System &gt; WiFiFirmwareUpdater</em> in the menu bar.</p>
+</li>
+<li>
+<p><img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/symbol_upload2.png" alt="Upload button"> <strong>Upload</strong> the sketch, wait for the upload to complete and then open the Serial Monitor.</p>
+</li>
+<li>
+<p>If you get a message like:</p>
+<pre><code>Searching for WiFi firmware file 4343WA1.BIN ...
+A WiFi firmware is already installed. Do you want to install the firmware anyway? Y/[n]
+</code></pre>
+<p>Enter and send <code>Y</code> to continue.</p>
+</li>
+<li>
+<p>Wait until you get the message <code>Firmware and certificates updated!</code> in the serial monitor.</p>
+</li>
+</ol>
+</div>
+
+          <div class="article-attachments">
+            <ul class="attachments">
+              
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div class="article-footer">
+          
+          <div class="article-author">
+          
+          <div class="article-meta">
+            
+
+            <ul class="meta-group">
+              
+                <li class="meta-data">Last edited: <time datetime="2024-01-29T15:07:20Z" title="01/29/2024, 07:07" data-format="LL" data-datetime="calendar">January 29, 2024</time></li>
+              
+            </ul>
+          </div>
+        </div>
+          
+          
+          
+        </div>
+        
+        
+          <div class="article-feedback">
+            <div class="article-votes">
+              <span class="article-votes-question" id="article-votes-label">Was this article helpful?</span>
+              <div class="article-votes-controls" role="group" aria-labelledby="article-votes-label">
+                <button type="button" class="button article-vote article-vote-up" aria-label="This article was helpful" aria-pressed="false">Yes</button>
+                <button type="button" class="button article-vote article-vote-down" aria-label="This article was not helpful" aria-pressed="false">No</button>
+              </div>
+            </div>
+
+            <div class="negative-followup__c" style="width: 500px; display: none;">
+              <form id="feedbackForm" class="feedback-form" onsubmit="return false">
+                <p>Thanks for letting us know.</p>
+                <input type="hidden" id="title" name="title" value="Update Wi-Fi firmware on GIGA R1 WiFi">
+                <input type="hidden" id="articleId" name="articleId" value="7991505977884">
+                <input type="hidden" id="url" name="url" value="https://support.arduino.cc//hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi">
+                <input type="hidden" id="voteValue" name="value" value="null">
+                <textarea id="commentField" name="comment" rows="10" cols="60" placeholder="Write something (optional)" required=""></textarea>
+                <p class="feedback-disclaimer">Please do not submit personal information. If you need a reply, contact us.</p>
+                <div class="feedback-form-buttons">
+                  <input id="submitBtn" class="button-large" type="button" value="Submit">
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="github-link-container">
+              <span>Do you want to contribute? Visit the <a id="github-link" href="https://github.com/arduino/help-center-content" target="_blank" rel="noopener noreferrer">Github repository</a></span>
+          </div>
+        
+        
+
+        <div class="article-return-to-top">
+          <a href="#article-container">
+            Return to top
+            <svg xmlns="http://www.w3.org/2000/svg" class="article-return-to-top-icon" width="20" height="20" focusable="false" viewBox="0 0 12 12" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-linecap="round" d="M3 4.5l2.6 2.6c.2.2.5.2.7 0L9 4.5"></path>
+            </svg>
+          </a>
+        </div>
+      </footer>
+
+      <div class="article-relatives">
+        
+        
+      </div>
+      
+    </article>
+  </div>
+</div>
+
+  </main>
+
+  <section class="footer-links">
+  <h1>Didn’t find what you were looking for?</h1>
+  <div class="actions-wrapper actions-wrapper-l-desc">
+    <div class="actions-item">
+      <a id="keep" href="https://docs.arduino.cc/"></a>
+      <img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/hc-docs.svg">
+      <span>Arduino Docs</span>
+      <p>Tutorials, data sheets, guides and other technical documentation.</p>
+    </div>
+    <div class="actions-item">
+      <a id="keep" href="https://forum.arduino.cc/"></a>
+      <img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/hc-forum.svg">
+      <span>Arduino Forum</span>
+      <p>Connect with the community, get help with your project, and discuss everything Arduino.</p>
+    </div>
+    <div class="actions-item">
+      <a id="keep" href="https://discord.com/invite/jQJFwW7"></a>
+      <img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/hc-Discord.svg">
+      <span>Arduino Discord</span>
+      <p>There are a lot of Arduino enthusiasts who are more than willing to help out. Head over Discord to start a discussion.</p>
+    </div>
+    <div class="actions-item">
+      <a id="keep" href="https://www.arduino.cc/en/contact-us/"></a>
+      <img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/hc-email.svg">
+      <span>Contact Arduino</span>
+      <p>Need help with a product, need to make an exchange, or can't 
+find a question answered? Email us and we'll answer as soon as possible.</p>
+    </div>
+  </div>
+</section>
+
+<footer id="footer" data-ref="0.5499966334670957"><div id="ino-footer-block" class="ino-footer-block">
+  <div class="app-footer-header">
+    <div class="app-footer-header__logo app-footer-logo logo-arduino" id="footer-logo"><svg width="102" height="14" fill="none" xmlns="http://www.w3.org/2000/svg" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerLogo-arduino.svg">
+  <path d="M0 13.812L4.162.19h3.784l4.351 13.622H8.703l-.757-2.649H4.162l-.757 2.649H0zM6.054 3.595L4.73 8.515h2.648l-1.324-4.92zM14.378.19h5.486c3.784 0 5.108 1.891 5.108 4.54 0 1.892-.756 3.216-2.27 3.973l2.649 4.919h-3.973l-1.892-4.163h-1.703v4.352h-3.405V.189zm7.19 4.54c0-1.135-.38-1.892-2.082-1.892h-1.703v3.784h1.703c1.324.189 2.081-.379 2.081-1.892zM27.811.19h4.352c5.108 0 6.81 2.459 6.81 6.62 0 3.217-.945 6.812-6.81 6.812h-4.54V.189h.188zm3.406 2.648v7.946h1.324c2.838 0 3.027-1.703 3.027-3.973 0-2.649-.19-3.973-3.216-3.973h-1.135zM48.81.19h3.217V9.08C52.027 13.054 49 14 46.541 14c-2.27 0-5.298-.757-5.298-4.919V.19h3.406v8.324c0 2.27.756 2.838 2.08 2.838 1.514 0 2.082-.756 2.082-2.838V.19zM55.054 10.973h3.594V3.027h-3.405V.189h10.405v2.838h-3.594v7.946h3.594v2.838H55.243v-2.838h-.19zM71.325 13.622h-3.217V.189h3.784l4.352 8.135V.19h3.216v13.622h-3.406l-4.54-8.703-.19 8.514zM93.082 7c0 3.973-1.514 7-5.865 7-3.973 0-5.676-2.27-5.676-6.81 0-4.163 1.514-7.19 5.676-7.19 3.973 0 5.865 1.703 5.865 7zm-3.595 0c0-3.405-.19-4.162-2.27-4.162-1.703-.19-2.081.946-2.081 4.351 0 2.649.189 4.162 2.08 4.162 2.082-.189 2.271-1.324 2.271-4.351zM95.352 3.027C95.352 1.324 96.676 0 98.189 0c1.703 0 3.027 1.324 3.027 3.027s-1.324 3.027-3.027 3.027c-1.513-.19-2.837-1.513-2.837-3.027zm5.297 0c0-1.324-.946-2.46-2.46-2.46-1.324 0-2.27.947-2.27 2.46 0 1.514 1.135 2.46 2.27 2.46 1.514 0 2.46-.946 2.46-2.46zm-3.973-1.892h1.703c1.135 0 1.513.568 1.513 1.135 0 .379-.19.757-.567 1.135l.567 1.325h-1.135l-.378-1.135H98V4.73h-1.135V1.135h-.19zm1.513 1.703c.379 0 .568-.19.568-.568 0-.378-.19-.378-.568-.378h-.378v.946h.378z" fill="currentColor"></path>
+</svg></div>
+
+    <div class="app-footer-header__controls no-select app-footer-controls" id="footer-controls"><div class="app-footer-button" id="go-top">
+  <div class="app-footer-button__icon"><svg xmlns="http://www.w3.org/2000/svg" id="control-icon-back2top" viewBox="0 0 15 14" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerControl-back2top.svg">
+  <path d="M10.3125 8.40628C10.2508 8.40664 10.1896 8.39481 10.1325 8.37149C10.0754 8.34816 10.0235 8.31379 9.97965 8.27034L7.49996 5.78597L5.02028 8.27034C4.97657 8.31405 4.92469 8.34872 4.86758 8.37237C4.81048 8.39603 4.74927 8.4082 4.68746 8.4082C4.62566 8.4082 4.56445 8.39603 4.50735 8.37237C4.45024 8.34872 4.39836 8.31405 4.35465 8.27034C4.31095 8.22664 4.27628 8.17475 4.25262 8.11765C4.22897 8.06054 4.2168 7.99934 4.2168 7.93753C4.2168 7.87572 4.22897 7.81452 4.25262 7.75742C4.27628 7.70031 4.31095 7.64843 4.35465 7.60472L7.16715 4.79222C7.21073 4.74828 7.26257 4.71341 7.31969 4.68961C7.37682 4.66582 7.43808 4.65356 7.49996 4.65356C7.56185 4.65356 7.62311 4.66582 7.68023 4.68961C7.73736 4.71341 7.7892 4.74828 7.83278 4.79222L10.6453 7.60472C10.6892 7.6483 10.7241 7.70014 10.7479 7.75726C10.7717 7.81438 10.7839 7.87565 10.7839 7.93753C10.7839 7.99941 10.7717 8.06068 10.7479 8.1178C10.7241 8.17492 10.6892 8.22677 10.6453 8.27034C10.6015 8.31379 10.5495 8.34816 10.4924 8.37149C10.4353 8.39481 10.3742 8.40664 10.3125 8.40628Z" fill="currentColor"></path>
+  <path d="M7.5 13.5625C6.20206 13.5625 4.93327 13.1776 3.85407 12.4565C2.77488 11.7354 1.93374 10.7105 1.43704 9.51136C0.940343 8.31222 0.810384 6.99272 1.0636 5.71972C1.31682 4.44672 1.94183 3.2774 2.85961 2.35961C3.7774 1.44183 4.94672 0.816815 6.21972 0.5636C7.49272 0.310384 8.81222 0.440343 10.0114 0.937043C11.2105 1.43374 12.2354 2.27488 12.9565 3.35407C13.6776 4.43327 14.0625 5.70206 14.0625 7C14.0625 8.74049 13.3711 10.4097 12.1404 11.6404C10.9097 12.8711 9.24049 13.5625 7.5 13.5625ZM7.5 1.375C6.38748 1.375 5.29995 1.7049 4.37492 2.32299C3.44989 2.94107 2.72892 3.81957 2.30318 4.84741C1.87744 5.87524 1.76604 7.00624 1.98309 8.09738C2.20013 9.18853 2.73586 10.1908 3.52253 10.9775C4.3092 11.7641 5.31148 12.2999 6.40262 12.5169C7.49376 12.734 8.62476 12.6226 9.6526 12.1968C10.6804 11.7711 11.5589 11.0501 12.177 10.1251C12.7951 9.20006 13.125 8.11252 13.125 7C13.125 5.50816 12.5324 4.07742 11.4775 3.02253C10.4226 1.96764 8.99185 1.375 7.5 1.375Z" fill="currentColor"></path>
+</svg></div>
+  <span class="app-footer-button__text">Back to top</span>
+</div></div>
+  </div>
+
+  <div class="app-footer-content main">
+    <div class="footer-menu-desktop app-footer-menu-desktop"><div class="app-footer-menu-desktop__item"><div class="app-footer-menu-desktop__link "><a href="https://www.arduino.cc/en/Trademark/HomePage"><span title="Trademark">Trademark</span></a></div><div class="app-footer-menu-desktop__link "><a href="https://www.arduino.cc/en/contact-us"><span title="Contact Us">Contact Us</span></a></div><div class="app-footer-menu-desktop__link "><a href="https://store.arduino.cc/distributors"><span title="Distributors">Distributors</span></a></div><div class="app-footer-menu-desktop__link "><a href="https://careers.arduino.cc/"><span title="Careers">Careers</span></a></div></div><div class="app-footer-menu-desktop__item"><div class="app-footer-menu-desktop__link "><a href="https://support.arduino.cc/"><span title="Help Center">Help Center</span></a></div><div class="app-footer-menu-desktop__link "><a href="https://whistleblowersoftware.com/secure/GruppoArduino"><span title="Whistleblowing">Whistleblowing</span></a></div><div class="app-footer-menu-desktop__link "><a href="https://www.arduino.cc/en/digital-services-act"><span title="Digital Services Act">Digital Services Act</span></a></div></div></div>
+
+    <div class="news-letter arduino-view">
+      <newsletter data-ref="0.3248979237226842"><div class="newsletter-form">
+    <h4 id="newsletter-input-label">Newsletter</h4>
+    <div class="subscribe-wrapper">
+        <div id="newsletter-email-error" class="upper-error-notif">Please insert a valid email</div>
+        <div class="input-wrapper">
+            <input id="newsletter-email" aria-labelledby="newsletter-input-label" type="email" name="email" class="email" placeholder="Enter your email to sign up">
+            <button id="subscribe-btn" aria-label="Subscribe" class="button">Subscribe</button>
+        </div>
+    </div>
+</div></newsletter>
+    </div>
+
+    <div class="social-container app-footer-social-apps"><h4>FOLLOW US</h4>
+<div class="app-footer-social-btns">
+  <div class="app-footer-social-btn">
+    <a href="https://www.facebook.com/official.arduino" target="_blank" id="facebook" class="facebook" rel="noopener">
+      <div class="app-footer-social-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" id="social-facebook" viewBox="0 0 7 13" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerSocial-facebook.svg">
+  <path d="M4.66301 3.54026V4.93745H6.72426L6.39488 7.08901H4.66301V12.3749H2.33613V7.08901H0.450195V4.93745H2.33613V3.3012C2.33613 1.43651 3.44645 0.405884 5.14645 0.405884C5.70345 0.413533 6.25917 0.46147 6.80926 0.549321V2.38213H5.87426C5.71438 2.35869 5.55126 2.37203 5.39731 2.42112C5.24336 2.47021 5.10264 2.55377 4.98585 2.66544C4.86906 2.77711 4.77927 2.91395 4.72333 3.06554C4.66739 3.21713 4.64676 3.37949 4.66301 3.54026Z" fill="currentColor"></path>
+</svg>
+      </div>
+    </a>
+  </div>
+  <div class="app-footer-social-btn">
+    <a href="https://www.instagram.com/arduino.cc/" target="_blank" id="instagram" class="instagram" rel="noopener">
+      <div class="app-footer-social-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" id="social-instagram" viewBox="0 0 13 14" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerSocial-instagram.svg">
+  <path d="M6.5 1.772c1.7 0 1.902 0 2.577.038.404.006.805.081 1.184.223a2.066 2.066 0 011.206 1.206c.142.379.217.78.223 1.184.032.675.037.877.037 2.577s0 1.902-.037 2.577a3.541 3.541 0 01-.223 1.184 2.065 2.065 0 01-1.206 1.206c-.379.142-.78.217-1.184.223-.675.032-.877.037-2.577.037s-1.902 0-2.577-.037a3.542 3.542 0 01-1.184-.223 2.066 2.066 0 01-1.206-1.206 3.543 3.543 0 01-.223-1.184C1.278 8.902 1.272 8.7 1.272 7s0-1.902.038-2.577c.006-.404.081-.805.223-1.184a2.066 2.066 0 011.206-1.206c.379-.142.78-.217 1.184-.223.675-.032.877-.038 2.577-.038zm0-1.147c-1.732 0-1.95 0-2.63.037A4.654 4.654 0 002.324.96 3.224 3.224 0 00.46 2.824 4.654 4.654 0 00.162 4.37C.125 5.05.125 5.268.125 7c0 1.732 0 1.95.037 2.63.01.528.111 1.05.298 1.546a3.225 3.225 0 001.864 1.864 4.65 4.65 0 001.546.298c.68.037.898.037 2.63.037 1.732 0 1.95 0 2.63-.037a4.65 4.65 0 001.546-.298 3.226 3.226 0 001.864-1.864c.184-.487.284-1 .298-1.52.037-.706.037-.924.037-2.656 0-1.732 0-1.95-.037-2.63a4.65 4.65 0 00-.298-1.546A3.226 3.226 0 0010.676.96c-.487-.184-1-.284-1.52-.298C8.45.625 8.232.625 6.5.625z" fill="currentColor"></path>
+  <path d="M6.5 3.728a3.273 3.273 0 100 6.545 3.273 3.273 0 000-6.545zm0 5.397a2.125 2.125 0 110-4.25 2.125 2.125 0 010 4.25zM9.906 4.36a.765.765 0 100-1.53.765.765 0 000 1.53z" fill="currentColor"></path>
+</svg>
+      </div>
+    </a>
+  </div>
+  <div class="app-footer-social-btn">
+    <a href="https://twitter.com/arduino" target="_blank" id="twitter" class="twitter" rel="noopener">
+      <div class="app-footer-social-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" id="social-twitter" viewBox="0 0 24 24" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerSocial-twitter.svg">
+  <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>  
+</svg>
+      </div>
+    </a>
+  </div>
+  <div class="app-footer-social-btn">
+    <a href="https://github.com/arduino/" target="_blank" id="github" class="github" rel="noopener">
+      <div class="app-footer-social-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" id="social-github" viewBox="0 0 11 13" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerSocial-github.svg">
+  <path d="M6.85 8.337a1.77 1.77 0 01.504 1.382v2.008a.531.531 0 01-.409.531 7.52 7.52 0 01-2.869 0 .531.531 0 01-.409-.531v-1.233c-2.066.447-2.502-.998-2.502-.998a1.97 1.97 0 00-.829-1.09c-.674-.456.054-.451.054-.451a1.562 1.562 0 011.136.77 1.594 1.594 0 002.168.617c.03-.377.196-.73.467-.994C2.515 8.157.777 7.52.777 4.672a2.869 2.869 0 01.744-2.003A2.656 2.656 0 011.596.687s.621-.201 2.045.76a7.066 7.066 0 013.719 0C8.783.502 9.405.687 9.405.687c.275.622.302 1.325.074 1.966.503.542.777 1.258.765 1.998 0 2.874-1.737 3.5-3.394 3.686z" fill="currentColor"></path>
+</svg>
+      </div>
+    </a>
+  </div>
+  <div class="app-footer-social-btn">
+    <a href="https://www.linkedin.com/company/arduino" target="_blank" id="linkedin" class="linkedin" rel="noopener">
+      <div class="app-footer-social-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" id="social-linkedin" viewBox="0 0 11 12" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerSocial-linkedin.svg">
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M3.863 11.313h2.125V7.338c-.006-.18.02-.36.075-.531A1.222 1.222 0 017.237 6c.967 0 1.307.616 1.307 1.525v3.787h2.167V7.239c0-2.067-.632-3.188-2.576-3.188A2.183 2.183 0 006.01 5.33V4.205H3.885c.031.633 0 7.109 0 7.109h-.022z" fill="currentColor"></path>
+  <path d="M1.361 3.248a1.28 1.28 0 100-2.56 1.28 1.28 0 000 2.56zM2.45 4.204H.247v7.109h2.205V4.204z" fill="currentColor"></path>
+</svg>
+      </div>
+    </a>
+  </div>
+  <div class="app-footer-social-btn">
+    <a href="https://www.youtube.com/user/arduinoteam" target="_blank" id="youtube" class="youtube" rel="noopener">
+      <div class="app-footer-social-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" id="social-youtube" viewBox="0 0 15 12" data-inject-url="https://cdn.arduino.cc/header-footer/prod/assets/footerSocial-youtube.svg">
+  <path d="M14.624 2.398a1.854 1.854 0 00-1.312-1.323C12.154.762 7.5.762 7.5.762s-4.653 0-5.811.313A1.854 1.854 0 00.376 2.398 19.407 19.407 0 00.063 6a19.407 19.407 0 00.313 3.602 1.855 1.855 0 001.313 1.323c1.158.313 5.811.313 5.811.313s4.654 0 5.812-.313a1.855 1.855 0 001.313-1.323c.216-1.188.32-2.394.313-3.602a19.412 19.412 0 00-.314-3.602zM5.981 8.21V3.79L9.864 6 5.981 8.21z" fill="currentColor"></path>
+</svg>
+      </div>
+    </a>
+  </div>
+</div></div>
+  </div>
+
+  <div class="footer-mobile-menu-list app-footer-menu-mobile"><div class="app-footer-menu-mobile__link "><a href="https://www.arduino.cc/en/Trademark/HomePage"><span title="Trademark">Trademark</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://www.arduino.cc/en/contact-us"><span title="Contact Us">Contact Us</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://store.arduino.cc/distributors"><span title="Distributors">Distributors</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://careers.arduino.cc/"><span title="Careers">Careers</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://support.arduino.cc/"><span title="Help Center">Help Center</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://whistleblowersoftware.com/secure/GruppoArduino"><span title="Whistleblowing">Whistleblowing</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://www.arduino.cc/en/digital-services-act"><span title="Digital Services Act">Digital Services Act</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://www.arduino.cc/en/Main/TermsOfService"><span title="Terms Of Service">Terms Of Service</span></a></div><div class="app-footer-menu-mobile__link app-footer-menu-mobile__link--bold"><a href="https://www.arduino.cc/en/Main/PrivacyPolicy"><span title="Privacy Policy">Privacy Policy</span></a></div><div class="app-footer-menu-mobile__link "><a href="https://www.arduino.cc/en/Main/Security"><span title="Security">Security</span></a></div><div class="app-footer-menu-mobile__link "><a class="iubenda-cs-preferences-link" role="button" data-iub-enabled="1"><span title="Cookie Settings">Cookie Settings</span></a></div><div class="app-footer-menu-mobile__link "><a class="iubenda-cs-preferences-link" role="button" data-iub-enabled="1"><span title="Do Not Sell or Share My Personal Information">Do Not Sell or Share My Personal Information</span></a></div></div>
+
+  <div class="app-footer-bottom">
+    <div class="app-footer-bottom__left footer-year app-footer-copyright" id="footer-copyright"><p id="footer-copyright-container">
+  <a id="footer-copyright-url" href="https://www.arduino.cc/en/Main/CopyrightNotice">
+    <span class="text">
+      © <span id="current-year">2025</span> Arduino
+    </span>
+  </a>
+</p></div>
+
+    <div class="app-footer-bottom__middle">
+      <div class="footer-menu-copyright app-footer-menu-copyright"><div class="app-footer-menu-copyright__link "><a href="https://www.arduino.cc/en/Main/TermsOfService"><span title="Terms Of Service">Terms Of Service</span></a></div><div class="app-footer-menu-copyright__link app-footer-menu-copyright__link--bold"><a href="https://www.arduino.cc/en/Main/PrivacyPolicy"><span title="Privacy Policy">Privacy Policy</span></a></div><div class="app-footer-menu-copyright__link "><a href="https://www.arduino.cc/en/Main/Security"><span title="Security">Security</span></a></div><div class="app-footer-menu-copyright__link "><a class="iubenda-cs-preferences-link" role="button" data-iub-enabled="1"><span title="Cookie Settings">Cookie Settings</span></a></div><div class="app-footer-menu-copyright__link "><a class="iubenda-cs-preferences-link" role="button" data-iub-enabled="1"><span title="Do Not Sell or Share My Personal Information">Do Not Sell or Share My Personal Information</span></a></div></div>
+    </div>
+
+    <div class="app-footer-bottom__right">
+      <div class="payments" id="footer-payments"></div>
+      <div class="app-footer-report hide" id="footer-report"></div>
+    </div>
+
+    <div class="footer-help-container hide">
+      <a href="https://support.arduino.cc/" aria-haspopup="true" aria-label="Help" class="footer-help-button">
+        <span class="footer-help-icon" type="Icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <title></title>
+            <g id="Layer_4">
+              <path d="M11,12.3V13c0,0-1.8,0-2,0v-0.6c0-0.6,0.1-1.4,0.8-2.1c0.7-0.7,1.6-1.2,1.6-2.1c0-0.9-0.7-1.4-1.4-1.4 c-1.3,0-1.4,1.4-1.5,1.7H6.6C6.6,7.1,7.2,5,10,5c2.4,0,3.4,1.6,3.4,3C13.4,10.4,11,10.8,11,12.3z"></path>
+              <circle cx="10" cy="15" r="1"></circle>
+              <path d="M10,2c4.4,0,8,3.6,8,8s-3.6,8-8,8s-8-3.6-8-8S5.6,2,10,2 M10,0C4.5,0,0,4.5,0,10s4.5,10,10,10s10-4.5,10-10S15.5,0,10,0 L10,0z"></path>
+            </g>
+          </svg>
+        </span>
+        <span class="footer-help-text">Help</span>
+      </a>
+    </div>
+  </div>
+  <!-- footer-block -->
+  <snackbar data-ref="0.3904443300091268"></snackbar>
+</div>
+</footer>
+
+<footer class="footer" style="display: none">
+  <div class="footer-inner">
+    <a title="Home" href="https://support.arduino.cc/hc/en-us">Arduino Help Center</a>
+
+    <div class="footer-language-selector">
+      
+    </div>
+  </div>
+</footer>
+
+
+
+  <!-- / -->
+
+  
+  <script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/en-us.29d2a0b7c4dc52f7b504.js"></script>
+  <script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/host-without-iframe.js" data-brand-id="114095098553" data-return-to="https://support.arduino.cc/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi" data-theme="hc" data-locale="en-us" data-auth-origin="114095098553,true,true"></script>
+
+  <script type="text/javascript">
+  /*
+
+    Greetings sourcecode lurker!
+
+    This is for internal Zendesk and legacy usage,
+    we don't support or guarantee any of these values
+    so please don't build stuff on top of them.
+
+  */
+
+  HelpCenter = {};
+  HelpCenter.account = {"subdomain":"arduino","environment":"production","name":"Arduino"};
+  HelpCenter.user = {"identifier":"da39a3ee5e6b4b0d3255bfef95601890afd80709","email":null,"name":"","role":"anonymous","avatar_url":"https://assets.zendesk.com/hc/assets/default_avatar.png","is_admin":false,"organizations":[],"groups":[]};
+  HelpCenter.internal = {"asset_url":"//static.zdassets.com/hc/assets/","web_widget_asset_composer_url":"https://static.zdassets.com/ekr/snippet.js","current_session":{"locale":"en-us","csrf_token":null,"shared_csrf_token":null},"usage_tracking":{"event":"article_viewed","data":"BAh7CDoLbG9jYWxlSSIKZW4tdXMGOgZFVDoPYXJ0aWNsZV9pZGwrCBwC4KpEBzoKX21ldGF7DDoPYWNjb3VudF9pZGkDTsogOhNoZWxwX2NlbnRlcl9pZGwrCBpBi8YaADoNYnJhbmRfaWRsKwi5CpmQGgA6DHVzZXJfaWQwOhN1c2VyX3JvbGVfbmFtZUkiDkFOT05ZTU9VUwY7BlQ7AEkiCmVuLXVzBjsGVDoaYW5vbnltb3VzX3RyYWNraW5nX2lkMA==--18e013f56416c376cd6f795a71dd09c12169ec75","url":"https://support.arduino.cc/hc/activity"},"current_record_id":"7991505977884","current_record_url":"/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi","current_record_title":"Update Wi-Fi firmware on GIGA R1 WiFi","current_text_direction":"ltr","current_brand_id":114095098553,"current_brand_name":"Arduino","current_brand_url":"https://arduino.zendesk.com","current_brand_active":true,"current_path":"/hc/en-us/articles/7991505977884-Update-Wi-Fi-firmware-on-GIGA-R1-WiFi","show_autocomplete_breadcrumbs":true,"user_info_changing_enabled":false,"has_user_profiles_enabled":false,"has_end_user_attachments":true,"user_aliases_enabled":false,"has_anonymous_kb_voting":true,"has_multi_language_help_center":true,"show_at_mentions":false,"embeddables_config":{"embeddables_web_widget":false,"embeddables_help_center_auth_enabled":false,"embeddables_connect_ipms":false},"answer_bot_subdomain":"static","general_settings_url":"https://support.arduino.cc/hc/admin/general_settings?locale=en-us","user_segments_url":"https://arduino.zendesk.com/knowledge/user_segments?brand_id=114095098553","has_gather":true,"has_ckeditor":false,"has_community_enabled":false,"has_community_badges":true,"has_community_post_content_tagging":false,"has_gather_content_tags":true,"has_guide_content_tags":true,"has_user_segments":true,"has_answer_bot_web_form_enabled":true,"has_garden_modals":false,"theming_cookie_key":"hc-da39a3ee5e6b4b0d3255bfef95601890afd80709-2-preview","is_preview":false,"has_alternate_templates":false,"arrange_articles_url":"https://arduino.zendesk.com/knowledge/arrange?brand_id=114095098553","article_verification_url":"https://arduino.zendesk.com/knowledge/verification?brand_id=114095098553","has_article_verification":false,"guide_language_settings_url":"https://support.arduino.cc/hc/admin/language_settings?locale=en-us","docs_importer_url":"https://arduino.zendesk.com/knowledge/import_articles?brand_id=114095098553","content_tags_url":"https://arduino.zendesk.com/knowledge/content_tags?brand_id=114095098553","community_badges_url":"https://arduino.zendesk.com/knowledge/community_badges?brand_id=114095098553","community_settings_url":"https://arduino.zendesk.com/knowledge/community_settings?brand_id=114095098553","gather_plan_state":"subscribed","search_settings_url":"https://arduino.zendesk.com/knowledge/search_settings?brand_id=114095098553","has_search_settings_in_plan":true,"theming_api_version":2,"theming_settings":{"brand_color":"rgba(0, 117, 130, 1)","brand_text_color":"rgba(255, 255, 255, 1)","text_color":"#333333","link_color":"rgba(0, 129, 132, 1)","background_color":"rgba(255, 255, 255, 1)","heading_font":"-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif","text_font":"-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif","logo":"/hc/theming_assets/01HZPC7TM3NKJB5F60A3WJRHG4","favicon":"/hc/theming_assets/01HZPC7TQDWZK3XGB97WNCGJR5","homepage_background_image":"/hc/theming_assets/01HZPC7TWZKCW02J7CTW7FVT7K","community_background_image":"/hc/theming_assets/01HZPC7V2P8CDAQK6WVGGZJD32","community_image":"/hc/theming_assets/01HZPC7V6C326NX7KZEAKRDW35","instant_search":true,"scoped_kb_search":true,"scoped_community_search":false,"show_recent_activity":false,"show_articles_in_section":false,"show_article_author":false,"show_article_comments":false,"show_follow_article":false,"show_recently_viewed_articles":false,"show_related_articles":false,"show_article_sharing":false,"show_follow_section":false,"show_follow_post":false,"show_post_sharing":false,"show_follow_topic":false},"has_pci_credit_card_custom_field":false,"help_center_restricted":false,"is_assuming_someone_else":false,"flash_messages":[],"user_photo_editing_enabled":true,"user_preferred_locale":"en-us","base_locale":"en-us","login_url":"https://arduino.zendesk.com/access?brand_id=114095098553\u0026locale=en-us\u0026return_to=https%3A%2F%2Fsupport.arduino.cc%2Fhc%2F","has_custom_statuses_enabled":false,"has_hc_generative_answers_setting_enabled":true,"has_generative_search_with_zgpt_enabled":false,"has_suggested_initial_questions_enabled":false,"has_guide_service_catalog":true,"has_service_catalog_search_poc":false,"has_service_catalog_itam":false,"has_csat_reverse_2_scale_in_mobile":false,"has_knowledge_navigation":false,"version":"v26613","dev_mode":false};
+</script>
+
+  
+  <script src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/hc_enduser-cee3f72342f85971d7e590b25cd21603.js"></script>
+  <script type="text/javascript" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/script.js"></script>
+  
+
+<div data-ref="0.6576600558507644"><div class="iframe-modal micromodal-slide" id="iframe-modal" aria-hidden="true">
+  <div class="modal__overlay" tabindex="-1" data-micromodal-close="">
+    <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="iframe-modal-title">
+      <header class="modal__header with-close-button">
+        <h2 class="modal__title" id="iframe-modal-title">Title</h2>
+        <button class="modal__close" aria-label="Close modal" data-micromodal-close=""></button>
+      </header>
+      <main class="modal__content" id="iframe-modal-content">
+        <iframe id="iframe-content" class="iframe-modal__iframe" name="modalIframe" scrolling="yes" frameborder="0" marginheight="0px" marginwidth="0px" allowfullscreen=""></iframe>
+      </main>
+    </div>
+  </div>
+</div>
+</div><div data-ref="0.3764528170750998"><div class="privacy-modal micromodal-slide" id="privacy-modal" aria-hidden="true">
+  <div class="modal__overlay" tabindex="-1" data-micromodal-close="">
+    <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
+      <header class="modal__header with-close-button">
+        <h2 class="modal__title" id="privacy-modal-title">
+          Arduino Newsletter
+        </h2>
+        <button class="modal__close" aria-label="Close modal" data-micromodal-close=""></button>
+      </header>
+      <main class="modal__content" id="privacy-modal-content">
+        <div>
+          <p>
+            We care about the privacy and personal data of our users.<br>
+            To continue, please give us your consent:
+          </p>
+          <ul class="privacy-settings">
+            <li>
+              <div class="upper-error-notif privacy-error">
+                Please confirm that you have read the privacy policy
+              </div>
+              <label class="checkbox">
+                <input type="checkbox" id="privacy-consent" name="privacy-consent" value="privacy_approval">
+
+                <span class="custom-checkbox"></span>
+                <span>I confirm to have read the <a href="https://www.arduino.cc/en/privacy-policy/" target="_blank">Privacy Policy</a> and accept the <a href="https://www.arduino.cc/en/terms-conditions/" target="_blank">Terms of Service</a>.<span class="required-asterisk">*</span></span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="marketing-consent" value="marketing_approval">
+                <span class="custom-checkbox"></span>
+                <span>I would like to receive emails about special deals and commercial offers from Arduino.</span>
+              </label>
+            </li>
+          </ul>
+          <div class="my-error-notification">
+            <div id="newsletterSubscribeStatus"></div>
+          </div>
+        </div>
+      </main>
+      <footer class="modal__footer">
+        <button name="Ok" class="submit">Sign up</button>
+      </footer>
+    </div>
+  </div>
+</div>
+</div><div data-ref="0.4733336054410515"><div class="tags-modal micromodal-slide" id="tags-modal" aria-hidden="true">
+  <div class="modal__overlay" tabindex="-1" data-micromodal-close="">
+    <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="tags-modal-title">
+      <header class="modal__header with-close-button">
+        <h2 class="modal__title" id="tags-modal-title">
+         Thank you for subscribing!
+        </h2>
+        <button class="modal__close" aria-label="Close modal" data-micromodal-close=""></button>
+      </header>
+      <main class="modal__content" id="tags-modal-content">
+        <div>
+          <h3>Curious to learn more?</h3>
+          <p class="tags-subtitle">Are you also a <b>teacher</b>, <b>student</b>, or <b>professional</b> that loves using Arduino in your day-to-day activities?
+            Then keep up-to-date with either our <b>STEM</b> or <b>Professional monthly newsletters</b>.
+          </p>
+          <div class="subscription-confirmed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="17" viewBox="0 0 25 17" fill="none">
+              <path d="M8.99994 17.0002C8.86833 17.0009 8.73787 16.9757 8.61603 16.926C8.4942 16.8762 8.38338 16.8029 8.28994 16.7102L1.28994 9.71018C1.10164 9.52188 0.99585 9.26649 0.99585 9.00019C0.99585 8.73388 1.10164 8.47849 1.28994 8.29019C1.47825 8.10188 1.73364 7.99609 1.99994 7.99609C2.26624 7.99609 2.52164 8.10188 2.70994 8.29019L8.99994 14.5902L22.2899 1.29018C22.4782 1.10188 22.7336 0.996094 22.9999 0.996094C23.2662 0.996094 23.5216 1.10188 23.7099 1.29018C23.8982 1.47849 24.004 1.73388 24.004 2.00019C24.004 2.26649 23.8982 2.52188 23.7099 2.71019L9.70994 16.7102C9.6165 16.8029 9.50569 16.8762 9.38385 16.926C9.26201 16.9757 9.13155 17.0009 8.99994 17.0002Z" fill="#1DA086"></path>
+            </svg>
+            <span><b>Arduino weekly newsletter</b> (already subscribed)</span>
+          </div>
+        </div>
+          <ul class="tags-form">
+            <li>
+              <div class="text-container">
+                <label class="checkbox">
+                  <input type="checkbox" id="stem" value="stem" class="tag">
+                  <span class="custom-checkbox"></span>
+                  <b>Education</b>
+                </label>
+                <p>Educators can benefit from the ever growing tech that shapes our environment through fun cool projects.</p>
+              </div>
+              <img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/stem.png">
+            </li>
+            <li>
+              <div class="text-container">
+                <label class="checkbox">
+                  <input type="checkbox" id="professional" value="professional" class="tag">
+                  <span class="custom-checkbox"></span>
+                  <b>Professional</b>
+                </label>
+                <p>Why not awe your boss with highly innovative ways to help keep your enterprise connected at no extra cost?</p>
+              </div>
+              <img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/professional.png">
+            </li>
+          </ul>
+      </main>
+      <footer class="modal__footer">
+        <button name="Ok" class="submit-tags">Subscribe</button>
+      </footer>
+    </div>
+  </div>
+</div></div><div data-ref="0.962922437685012"><div class="survey-modal micromodal-slide" id="survey-modal" aria-hidden="true">
+  <div class="modal__overlay" tabindex="-1" data-micromodal-close="">
+    <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="survey-modal-title">
+      <header class="modal__header with-close-button">
+        <h2 class="modal__title" id="survey-modal-title">
+          Arduino Survey
+        </h2>
+        <button class="modal__close" aria-label="Close modal" data-micromodal-close=""></button>
+      </header>
+      <main class="modal__content" id="survey-modal-content">
+        <div>
+          <p>
+            We'd like to get to know you little better.
+            Please help us improve by answering this super short optional survey.
+          </p>
+          <p class="survey-title">
+            What is your profession?
+          </p>
+
+          <ul class="survey-settings">
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="designer-artist" value="designer_artist">
+                <span class="custom-checkbox"></span>
+                <span>Designer / Artist</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="teacher" value="teacher">
+                <span class="custom-checkbox"></span>
+                <span>Teacher</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="student" value="student">
+                <span class="custom-checkbox"></span>
+                <span>Student</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="entrepreneur" value="entrepreneur">
+                <span class="custom-checkbox"></span>
+                <span>Entrepreneur</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="engineer-developer" value="engineer_developer">
+                <span class="custom-checkbox"></span>
+                <span>Engineer / Developer</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="maker" value="maker">
+                <span class="custom-checkbox"></span>
+                <span>Maker</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="other-profession" value="other_profession">
+                <span class="custom-checkbox"></span>
+                <span>Other</span>
+              </label>
+            </li>
+          </ul>
+          <p class="survey-title">
+            Which categories best describe your interests?
+          </p>
+
+          <ul class="survey-settings">
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="sustainability-social-innovation" value="sustainability_social_innovation">
+                <span class="custom-checkbox"></span>
+                <span>Sustainability, Social Innovation</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="gaming" value="gaming">
+                <span class="custom-checkbox"></span>
+                <span>Gaming</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="healthcare-fitness" value="healthcare_fitness">
+                <span class="custom-checkbox"></span>
+                <span>Healthcare and Fitness</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="ai" value="ai">
+                <span class="custom-checkbox"></span>
+                <span>AI</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="robotics" value="robotics">
+                <span class="custom-checkbox"></span>
+                <span>Robotics</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="fashion-wearables" value="fashion_wearables">
+                <span class="custom-checkbox"></span>
+                <span>Fashion and Wearables</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="pro-industrial" value="pro_industrial">
+                <span class="custom-checkbox"></span>
+                <span>PRO / Industrial</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="agriculture-gardening" value="agriculture_gardening">
+                <span class="custom-checkbox"></span>
+                <span>Agriculture and gardening</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="education" value="education">
+                <span class="custom-checkbox"></span>
+                <span>Education</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="art-music-design" value="art_music_design">
+                <span class="custom-checkbox"></span>
+                <span>Art, Music and Design</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox">
+                <input type="checkbox" id="home-automation" value="home_automation">
+                <span class="custom-checkbox"></span>
+                <span>Home Automation</span>
+              </label>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <select id="countriesDropDown" class="custom-select">
+            <option value="" disabled="disabled" selected="selected">Select your country (optional)</option>
+          <option value="Afghanistan">Afghanistan</option><option value="Aaland Islands">Aaland Islands</option><option value="Albania">Albania</option><option value="Algeria">Algeria</option><option value="American Samoa">American Samoa</option><option value="Andorra">Andorra</option><option value="Angola">Angola</option><option value="Anguilla">Anguilla</option><option value="Antarctica">Antarctica</option><option value="Antigua and Barbuda">Antigua and Barbuda</option><option value="Argentina">Argentina</option><option value="Armenia">Armenia</option><option value="Aruba">Aruba</option><option value="Australia">Australia</option><option value="Austria">Austria</option><option value="Azerbaijan">Azerbaijan</option><option value="Bahamas">Bahamas</option><option value="Bahrain">Bahrain</option><option value="Bangladesh">Bangladesh</option><option value="Barbados">Barbados</option><option value="Belarus">Belarus</option><option value="Belgium">Belgium</option><option value="Belize">Belize</option><option value="Benin">Benin</option><option value="Bermuda">Bermuda</option><option value="Bhutan">Bhutan</option><option value="Bolivia">Bolivia</option><option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option><option value="Botswana">Botswana</option><option value="Bouvet Island">Bouvet Island</option><option value="Brazil">Brazil</option><option value="British Indian Ocean Territory">British Indian Ocean Territory</option><option value="Brunei Darussalam">Brunei Darussalam</option><option value="Bulgaria">Bulgaria</option><option value="Burkina Faso">Burkina Faso</option><option value="Burundi">Burundi</option><option value="Cambodia">Cambodia</option><option value="Cameroon">Cameroon</option><option value="Canada">Canada</option><option value="Cape Verde">Cape Verde</option><option value="Cayman Islands">Cayman Islands</option><option value="Central African Republic">Central African Republic</option><option value="Chad">Chad</option><option value="Chile">Chile</option><option value="China">China</option><option value="Christmas Island">Christmas Island</option><option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option><option value="Colombia">Colombia</option><option value="Comoros">Comoros</option><option value="Congo">Congo</option><option value="Congo, The Democratic Republic of the">Congo, The Democratic Republic of the</option><option value="Cook Islands">Cook Islands</option><option value="Costa Rica">Costa Rica</option><option value="Cote D&quot;Ivoire">Cote D"Ivoire</option><option value="Croatia">Croatia</option><option value="Cuba">Cuba</option><option value="Cyprus">Cyprus</option><option value="Czech Republic">Czech Republic</option><option value="Denmark">Denmark</option><option value="Djibouti">Djibouti</option><option value="Dominica">Dominica</option><option value="Dominican Republic">Dominican Republic</option><option value="Ecuador">Ecuador</option><option value="Egypt">Egypt</option><option value="El Salvador">El Salvador</option><option value="Equatorial Guinea">Equatorial Guinea</option><option value="Eritrea">Eritrea</option><option value="Estonia">Estonia</option><option value="Ethiopia">Ethiopia</option><option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option><option value="Faroe Islands">Faroe Islands</option><option value="Fiji">Fiji</option><option value="Finland">Finland</option><option value="France">France</option><option value="French Guiana">French Guiana</option><option value="French Polynesia">French Polynesia</option><option value="French Southern Territories">French Southern Territories</option><option value="Gabon">Gabon</option><option value="Gambia">Gambia</option><option value="Georgia">Georgia</option><option value="Germany">Germany</option><option value="Ghana">Ghana</option><option value="Gibraltar">Gibraltar</option><option value="Greece">Greece</option><option value="Greenland">Greenland</option><option value="Grenada">Grenada</option><option value="Guadeloupe">Guadeloupe</option><option value="Guam">Guam</option><option value="Guatemala">Guatemala</option><option value="Guernsey">Guernsey</option><option value="Guinea">Guinea</option><option value="Guinea-Bissau">Guinea-Bissau</option><option value="Guyana">Guyana</option><option value="Haiti">Haiti</option><option value="Heard Island and Mcdonald Islands">Heard Island and Mcdonald Islands</option><option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option><option value="Honduras">Honduras</option><option value="Hong Kong">Hong Kong</option><option value="Hungary">Hungary</option><option value="Iceland">Iceland</option><option value="India">India</option><option value="Indonesia">Indonesia</option><option value="Iran, Islamic Republic Of">Iran, Islamic Republic Of</option><option value="Iraq">Iraq</option><option value="Ireland">Ireland</option><option value="Isle of Man">Isle of Man</option><option value="Israel">Israel</option><option value="Italy">Italy</option><option value="Jamaica">Jamaica</option><option value="Japan">Japan</option><option value="Jersey">Jersey</option><option value="Jordan">Jordan</option><option value="Kazakhstan">Kazakhstan</option><option value="Kenya">Kenya</option><option value="Kiribati">Kiribati</option><option value="Korea, Democratic People's Republic of">Korea, Democratic People's Republic of</option><option value="Korea, Republic of">Korea, Republic of</option><option value="Kuwait">Kuwait</option><option value="Kyrgyzstan">Kyrgyzstan</option><option value="Lao People's Democratic Republic">Lao People's Democratic Republic</option><option value="Latvia">Latvia</option><option value="Lebanon">Lebanon</option><option value="Lesotho">Lesotho</option><option value="Liberia">Liberia</option><option value="Libyan Arab Jamahiriya">Libyan Arab Jamahiriya</option><option value="Liechtenstein">Liechtenstein</option><option value="Lithuania">Lithuania</option><option value="Luxembourg">Luxembourg</option><option value="Macao">Macao</option><option value="Macedonia, The Former Yugoslav Republic of">Macedonia, The Former Yugoslav Republic of</option><option value="Madagascar">Madagascar</option><option value="Malawi">Malawi</option><option value="Malaysia">Malaysia</option><option value="Maldives">Maldives</option><option value="Mali">Mali</option><option value="Malta">Malta</option><option value="Marshall Islands">Marshall Islands</option><option value="Martinique">Martinique</option><option value="Mauritania">Mauritania</option><option value="Mauritius">Mauritius</option><option value="Mayotte">Mayotte</option><option value="Mexico">Mexico</option><option value="Micronesia, Federated States of">Micronesia, Federated States of</option><option value="Moldova, Republic of">Moldova, Republic of</option><option value="Monaco">Monaco</option><option value="Mongolia">Mongolia</option><option value="Montserrat">Montserrat</option><option value="Montenegro">Montenegro</option><option value="Morocco">Morocco</option><option value="Mozambique">Mozambique</option><option value="Myanmar">Myanmar</option><option value="Namibia">Namibia</option><option value="Nauru">Nauru</option><option value="Nepal">Nepal</option><option value="Netherlands">Netherlands</option><option value="Netherlands Antilles">Netherlands Antilles</option><option value="New Caledonia">New Caledonia</option><option value="New Zealand">New Zealand</option><option value="Nicaragua">Nicaragua</option><option value="Niger">Niger</option><option value="Nigeria">Nigeria</option><option value="Niue">Niue</option><option value="Norfolk Island">Norfolk Island</option><option value="Northern Mariana Islands">Northern Mariana Islands</option><option value="Norway">Norway</option><option value="Oman">Oman</option><option value="Pakistan">Pakistan</option><option value="Palau">Palau</option><option value="Palestinian Territory, Occupied">Palestinian Territory, Occupied</option><option value="Panama">Panama</option><option value="Papua New Guinea">Papua New Guinea</option><option value="Paraguay">Paraguay</option><option value="Peru">Peru</option><option value="Philippines">Philippines</option><option value="Pitcairn">Pitcairn</option><option value="Poland">Poland</option><option value="Portugal">Portugal</option><option value="Puerto Rico">Puerto Rico</option><option value="Qatar">Qatar</option><option value="Reunion">Reunion</option><option value="Romania">Romania</option><option value="Russian Federation">Russian Federation</option><option value="Rwanda">Rwanda</option><option value="Saint Helena">Saint Helena</option><option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option><option value="Saint Lucia">Saint Lucia</option><option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option><option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option><option value="Samoa">Samoa</option><option value="San Marino">San Marino</option><option value="Sao Tome and Principe">Sao Tome and Principe</option><option value="Saudi Arabia">Saudi Arabia</option><option value="Senegal">Senegal</option><option value="Serbia">Serbia</option><option value="Seychelles">Seychelles</option><option value="Sierra Leone">Sierra Leone</option><option value="Singapore">Singapore</option><option value="Slovakia">Slovakia</option><option value="Slovenia">Slovenia</option><option value="Solomon Islands">Solomon Islands</option><option value="Somalia">Somalia</option><option value="South Africa">South Africa</option><option value="South Georgia and the South Sandwich Islands">South Georgia and the South Sandwich Islands</option><option value="Spain">Spain</option><option value="Sri Lanka">Sri Lanka</option><option value="Sudan">Sudan</option><option value="Suriname">Suriname</option><option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option><option value="Swaziland">Swaziland</option><option value="Sweden">Sweden</option><option value="Switzerland">Switzerland</option><option value="Syrian Arab Republic">Syrian Arab Republic</option><option value="Taiwan, Province of China">Taiwan, Province of China</option><option value="Tajikistan">Tajikistan</option><option value="Tanzania, United Republic of">Tanzania, United Republic of</option><option value="Thailand">Thailand</option><option value="Timor-Leste">Timor-Leste</option><option value="Togo">Togo</option><option value="Tokelau">Tokelau</option><option value="Tonga">Tonga</option><option value="Trinidad and Tobago">Trinidad and Tobago</option><option value="Tunisia">Tunisia</option><option value="Turkey">Turkey</option><option value="Turkmenistan">Turkmenistan</option><option value="Turks and Caicos Islands">Turks and Caicos Islands</option><option value="Tuvalu">Tuvalu</option><option value="Uganda">Uganda</option><option value="Ukraine">Ukraine</option><option value="United Arab Emirates">United Arab Emirates</option><option value="United Kingdom">United Kingdom</option><option value="United States">United States</option><option value="United States Minor Outlying Islands">United States Minor Outlying Islands</option><option value="Uruguay">Uruguay</option><option value="Uzbekistan">Uzbekistan</option><option value="Vanuatu">Vanuatu</option><option value="Venezuela">Venezuela</option><option value="Viet Nam">Viet Nam</option><option value="Virgin Islands, British">Virgin Islands, British</option><option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option><option value="Wallis and Futuna">Wallis and Futuna</option><option value="Western Sahara">Western Sahara</option><option value="Yemen">Yemen</option><option value="Zambia">Zambia</option><option value="Zimbabwe">Zimbabwe</option></select>
+        </div>
+      </main>
+      <footer class="modal__footer">
+        <button name="skip" class="skip secondary">Skip Survey</button>
+        <button name="Ok" class="submit">Submit</button>
+      </footer>
+    </div>
+  </div>
+</div></div><iframe style="display: none;" aria-hidden="true" title="GPP Locator" name="__gppLocator"></iframe><script type="text/javascript" id="" charset="">consentStoredStatistics=localStorage.getItem("cookie_consent_statistics");consentStoredMarketing=localStorage.getItem("cookie_consent_marketing");currentConsentStatistics=google_tag_manager["rm"]["12394649"](44);currentConsentMarketing=google_tag_manager["rm"]["12394649"](45);
+if(consentStoredStatistics!==currentConsentStatistics||consentStoredMarketing!==currentConsentMarketing)analytics.identify(google_tag_manager["rm"]["12394649"](46),{cookie_consent_statistics:JSON.parse(google_tag_manager["rm"]["12394649"](47)),cookie_consent_marketing:JSON.parse(google_tag_manager["rm"]["12394649"](48))},google_tag_manager["rm"]["12394649"](58)),localStorage.setItem("cookie_consent_statistics",google_tag_manager["rm"]["12394649"](59)),localStorage.setItem("cookie_consent_marketing",google_tag_manager["rm"]["12394649"](60));</script><script type="text/javascript" id="" charset="">name="";"cloud.arduino.cc"===google_tag_manager["rm"]["12394649"](62)?name="Cloud":google_tag_manager["rm"]["12394649"](63).includes("makeyouruno.arduino.cc")?name="MakeYourUnoKit":google_tag_manager["rm"]["12394649"](64).includes("store")&&google_tag_manager["rm"]["12394649"](65).includes("pages/make-your-uno-kit")?name="MakeYourUnoKit":google_tag_manager["rm"]["12394649"](66).includes("store")&&!google_tag_manager["rm"]["12394649"](67).includes("digital-store")&&(name="Store");analytics.page(name,google_tag_manager["rm"]["12394649"](77));</script><script type="text/javascript" id="" charset="">consentStoredStatistics=localStorage.getItem("cookie_consent_statistics");consentStoredMarketing=localStorage.getItem("cookie_consent_marketing");currentConsentStatistics=google_tag_manager["rm"]["12394649"](78);currentConsentMarketing=google_tag_manager["rm"]["12394649"](79);
+if(consentStoredStatistics!==currentConsentStatistics||consentStoredMarketing!==currentConsentMarketing)analytics.identify(google_tag_manager["rm"]["12394649"](80),{cookie_consent_statistics:JSON.parse(google_tag_manager["rm"]["12394649"](81)),cookie_consent_marketing:JSON.parse(google_tag_manager["rm"]["12394649"](82))},google_tag_manager["rm"]["12394649"](92)),localStorage.setItem("cookie_consent_statistics",google_tag_manager["rm"]["12394649"](93)),localStorage.setItem("cookie_consent_marketing",google_tag_manager["rm"]["12394649"](94));</script><script type="text/javascript" id="" charset="">consentStoredStatistics=localStorage.getItem("cookie_consent_statistics");consentStoredMarketing=localStorage.getItem("cookie_consent_marketing");currentConsentStatistics=google_tag_manager["rm"]["12394649"](96);currentConsentMarketing=google_tag_manager["rm"]["12394649"](97);
+if(consentStoredStatistics!==currentConsentStatistics||consentStoredMarketing!==currentConsentMarketing)analytics.identify(google_tag_manager["rm"]["12394649"](98),{cookie_consent_statistics:JSON.parse(google_tag_manager["rm"]["12394649"](99)),cookie_consent_marketing:JSON.parse(google_tag_manager["rm"]["12394649"](100))},google_tag_manager["rm"]["12394649"](110)),localStorage.setItem("cookie_consent_statistics",google_tag_manager["rm"]["12394649"](111)),localStorage.setItem("cookie_consent_marketing",google_tag_manager["rm"]["12394649"](112));</script><iframe height="0" width="0" style="display: none; visibility: hidden;"></iframe><iframe height="0" width="0" style="display: none; visibility: hidden;"></iframe><script type="text/javascript" id="" charset="">(function(c,d,f,g,e){c[e]=c[e]||[];var h=function(){var b={ti:"187036717",enableAutoSpaTracking:!0};b.q=c[e];c[e]=new UET(b);c[e].push("pageLoad")};var a=d.createElement(f);a.src=g;a.async=1;a.onload=a.onreadystatechange=function(){var b=this.readyState;b&&"loaded"!==b&&"complete"!==b||(h(),a.onload=a.onreadystatechange=null)};d=d.getElementsByTagName(f)[0];d.parentNode.insertBefore(a,d)})(window,document,"script","//bat.bing.com/bat.js","uetq");</script><div style="width: 0px; height: 0px; display: none; visibility: hidden;" id="batBeacon143799475468"><img style="width: 0px; height: 0px; display: none; visibility: hidden;" id="batBeacon828945179559" width="0" height="0" alt="" src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/0"></div><script type="text/javascript" id="" charset="">!function(d,g,e){d.TiktokAnalyticsObject=e;var a=d[e]=d[e]||[];a.methods="page track identify instances debug on off once ready alias group enableCookie disableCookie".split(" ");a.setAndDefer=function(b,c){b[c]=function(){b.push([c].concat(Array.prototype.slice.call(arguments,0)))}};for(d=0;d<a.methods.length;d++)a.setAndDefer(a,a.methods[d]);a.instance=function(b){b=a._i[b]||[];for(var c=0;c<a.methods.length;c++)a.setAndDefer(b,a.methods[c]);return b};a.load=function(b,c){var f="https://analytics.tiktok.com/i18n/pixel/events.js";
+a._i=a._i||{};a._i[b]=[];a._i[b]._u=f;a._t=a._t||{};a._t[b]=+new Date;a._o=a._o||{};a._o[b]=c||{};c=document.createElement("script");c.type="text/javascript";c.async=!0;c.src=f+"?sdkid\x3d"+b+"\x26lib\x3d"+e;b=document.getElementsByTagName("script")[0];b.parentNode.insertBefore(c,b)};a.load("CO1UDRRC77UEH42ABQ4G");a.page({event_id:google_tag_manager["rm"]["12394649"](119)})}(window,document,"ttq");</script><img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/adsct_002.gif" height="1" width="1" style="display: none;"><img src="Update%20Wi-Fi%20firmware%20on%20GIGA%20R1%20WiFi%20%E2%80%93%20Arduino%20Help%20Center_files/adsct.gif" height="1" width="1" style="display: none;"></body></html>
