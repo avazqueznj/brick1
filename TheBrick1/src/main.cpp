@@ -375,44 +375,41 @@ void loop() {
             if (cmd == "show config") {
               Serial.println("===== SHOW CONFIG =====");
               domainManagerClass::getInstance()->printDebugContents();               
-            } 
+            } else
             if (cmd == "delete config") {
               Serial.println("===== delete CONFIG =====");
               const std::vector<String> empty;
               saveToKVStore( "/kv/config", &empty );     
               domainManagerClass::getInstance()->emptyAll();
               Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
-            } 
+            } else
             
 
-            else if (cmd == "show settings") {
-              
+            if (cmd == "show settings") {              
               Serial.println("===== SHOW SETTINGS =====");
               Serial.println("===== in file");
               for (const auto& kv : stateManager->settings ) {
                   Serial.print(kv.first); Serial.print(" = "); Serial.println(kv.second);
               }
-
               Serial.println("===== loaded");              
               stateManager->printLoadedSettings();
               Serial.println("=================");
-
-            }              
-            else if (cmd == "reset settings") {
+            }else              
+            if (cmd == "reset settings") {
               Serial.println("===== RESET SETTINGS  =====");
               stateManager->resetSettingsFile();
-            }              
+            }else
+                      
             
-
-            else if (cmd == "show inspection") {
+            if (cmd == "show inspection") {
               Serial.println("===== SHW INSPECTION  =====");
               Serial.println( domainManagerClass::getInstance()->currentInspection.toString() );
-            } 
+            } else
             
 
 
 
-            else if (cmd == "?") {
+            if (cmd == "?") {
               Serial.println("show config");
               Serial.println("delete config");
 
@@ -420,9 +417,9 @@ void loop() {
               Serial.println("reset settings");              
               
               Serial.println("show inspection");
-            }             
+            } else         
 
-            else {
+            {
               Serial.println( "*** Unknown brick command  ***" );
             }
         }
