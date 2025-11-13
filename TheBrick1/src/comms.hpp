@@ -249,7 +249,7 @@ public:
             if (response.indexOf("\"success\":true") != -1) {
                 Serial.println( "Success !!!" );            
             } else {
-                throw std::runtime_error("ERROR. Could not read reply. inspection might not be submitted."); 
+                throw std::runtime_error("ERROR: Transmission error."); 
             }
 
             return response;
