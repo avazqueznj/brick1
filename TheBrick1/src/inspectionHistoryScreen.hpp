@@ -15,6 +15,9 @@ class inspectionHistoryScreenClass:public screenClass{
 public:
 
     std::vector<String> inspectionHistory;
+    String inspectionEDI = "";
+    String inspectionTEXT = "";
+    String currentEDIPath = "";
 
     inspectionHistoryScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_INSPECTION_HISTORY ){    
     }
@@ -25,11 +28,27 @@ public:
         lv_label_set_text(  objects.driver_name_history, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }    
 
-   void handleKeyboardEvent( String key ) override {        
+   void handleKeyboardEvent( String key ) override {    
+    
+        if( !lv_obj_has_flag(objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN) ){
+            
+            // modal is open -->
+
+            if(  key == "4"  ){
+                lv_obj_add_flag(  objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN);   
+                lv_textarea_set_text(objects.inspection_view, "" );
+            }        
+            
+            if (  key == "3"  ){        
+                static const char* btns[] = { "Ok", "Cancel", "" };
+                showDialog( "Submit inspection?", "Submit", btns );
+            }        
+
+            return; // modal
+        }
+    
         screenClass::handleKeyboardEvent( key );
         lv_obj_t* focused = lv_group_get_focused(inputGroup);
-
-
         
         // NAVI ================================
         if( focused == objects.back_from_history  && key == "#" ){
@@ -40,10 +59,6 @@ public:
             openInspectionDetail();
         }
         
-        if( ( focused == objects.history_close  && key == "#"  ) || key == "4"  ){
-            lv_obj_add_flag(  objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN);   
-            lv_textarea_set_text(objects.inspection_view, "" );
-        }        
 
 
 
@@ -86,6 +101,11 @@ public:
         if( target == objects.history_close ){
             lv_obj_add_flag(  objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN);   
             lv_textarea_set_text(objects.inspection_view, "" );
+        }
+
+        if( target == objects.re_submit_inspection ){
+            static const char* btns[] = { "Ok", "Cancel", "" };
+            showDialog( "Submit inspection?", "Submit", btns );
         }
 
     }
@@ -179,6 +199,27 @@ public:
 
     }
 
+    void modalDialogEvent(const String modalActionTouch, const String button) override {
+
+        Serial.println( "Override Modal event " + modalActionTouch + ":" + button );
+
+        if( modalActionTouch == "Submit" && button == "Ok" ){
+            doSubmitInspection();
+        }
+
+    }
+
+    virtual void modalDialogKey( String key ){    
+        screenClass::modalDialogKey( key );
+
+        Serial.println( "Inspection modal key " + modalAction + ":" + key );
+
+        if( modalAction == "Submit" && key == "#" ){
+            doSubmitInspection();
+        }
+
+    }        
+
 
     void openInspectionDetail(){
 
@@ -205,10 +246,16 @@ public:
 
                     std::vector<String> row = loadFromKVStore(path);    
 
-                    // show it
-                    String text = "";
+                    // show it                    
                     bool afterDataRecord = false;
+                    inspectionEDI = "";
+                    inspectionTEXT = "";
+                    currentEDIPath = path;
                     for (size_t i = 0; i < row.size(); ++i) {
+
+                        if( !afterDataRecord ){
+                            inspectionEDI += row[i] + "\n";
+                        }
 
                         if( row[i].startsWith( "END***") ){
                             afterDataRecord = true;
@@ -216,12 +263,12 @@ public:
                         }
 
                         if( afterDataRecord ){
-                            text += row[i];
-                            if (i < row.size() - 1) text += "\n"; 
+                            inspectionTEXT += row[i];
+                            if (i < row.size() - 1) inspectionTEXT += "\n";                             
                         }
                     }
-                    Serial.println(text.c_str());
-                    lv_textarea_set_text(objects.inspection_view, text.c_str());
+                    Serial.println(inspectionTEXT.c_str());
+                    lv_textarea_set_text(objects.inspection_view, inspectionTEXT.c_str());
 
                     lv_textarea_set_cursor_pos(objects.inspection_view, 0); // Cursor at very start
                     lv_obj_scroll_to_y(objects.inspection_view, 0, LV_ANIM_OFF);
@@ -241,6 +288,48 @@ public:
         }    
 
     }
+
+    void doSubmitInspection(){
+
+        Serial.println("Submit ...");
+
+        spinnerStart();
+
+        domainManagerClass* domain = domainManagerClass::getInstance(); 
+        String result = "";
+        try{            
+
+            result =  domain->comms->POST( 
+                domain->serverURL, 
+                domain->postInspectionsPath + "?company=" + domain->company,  
+                inspectionEDI
+                );
+            
+            String filingRecord = inspectionEDI + inspectionTEXT + result;
+            Serial.println("Update ... " + currentEDIPath);
+            Serial.println("With ... " + filingRecord);
+            saveToKVStore( currentEDIPath,  filingRecord);                
+            Serial.println("Submit ... done!");
+            spinnerEnd();      
+
+            lv_obj_add_flag(  objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN);   
+            lv_textarea_set_text(objects.inspection_view, "" );            
+
+            showDialog( "Submitted!" );        
+            
+        }catch( const std::runtime_error& error ){
+            spinnerEnd();       
+            String chainedError = String( "ERROR: Inspection possibly not sent." ) + error.what();           
+            showDialog( chainedError.c_str() );
+
+            String filingRecord = inspectionEDI + inspectionTEXT + error.what();
+            Serial.println("Update ... " + currentEDIPath);
+            Serial.println("With ... " + filingRecord);
+            saveToKVStore( currentEDIPath,  filingRecord);            
+        }
+
+
+    }    
 
 };
 

@@ -1438,6 +1438,7 @@ public:
             String filingRecord = 
                 domain->currentInspection.toEDI()  +
                 domain->currentInspection.toHumanString() ;
+
             saveInspectionToDisk( filingRecord );
 
             Serial.println("Submit ... done!");
@@ -1496,10 +1497,13 @@ public:
                 return;
             } 
 
+            domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));               
+
             // save it
             String filingRecord = 
                 domain->currentInspection.toEDI()  +
                 domain->currentInspection.toHumanString() ;
+
             saveInspectionToDisk( filingRecord );
 
             Serial.println("Save ... done!");
@@ -1569,25 +1573,8 @@ public:
 
 
         String path = "/kv/insp" + String(oldestSlot);
-
         Serial.println( "SAVE: saving: " + path );
-
-        // SPLIT THE MULTILINE EDI INTO VECTOR FOR KV SAVE:
-        std::vector<String> lines;
-        int start = 0;
-        while (true) {
-            int end = edi.indexOf('\n', start);
-            if (end < 0) {
-                String lastLine = edi.substring(start);
-                if (lastLine.length() > 0) lines.push_back(lastLine);
-                break;
-            }
-            String line = edi.substring(start, end);
-            lines.push_back(line);
-            start = end + 1;
-        }
-
-        saveToKVStore(path, &lines);
+        saveToKVStore(path, edi);
 
         Serial.print("Saved inspection to slot ");
         Serial.println(oldestSlot);

@@ -149,6 +149,8 @@ void spinnerStart() {
 
     //------------------------------
 
+
+
     void saveToKVStore( const String path, const std::vector<String>* file) {
 
         Serial.print("Save to KVStore....");
@@ -167,6 +169,25 @@ void spinnerStart() {
 
         Serial.println("Saved to KVStore.");
     }
+
+    void saveToKVStore( const String path, const String &data) {
+        
+        std::vector<String> lines;
+        int start = 0;
+        while (true) {
+            int end = data.indexOf('\n', start);
+            if (end < 0) {
+                String lastLine = data.substring(start);
+                if (lastLine.length() > 0) lines.push_back(lastLine);
+                break;
+            }
+            String line = data.substring(start, end);
+            lines.push_back(line);
+            start = end + 1;
+        }
+
+        saveToKVStore(path, &lines);
+    }    
 
     //-----
 

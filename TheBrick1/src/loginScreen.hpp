@@ -61,19 +61,16 @@ public:
             ( focused == objects.login && key == "#" ) ||
             ( focused == objects.login_password && key == "#" )
         ){
-
-            navigateTo( SCREEN_ID_MAIN );
-
-        //    if(
-                domainManagerClass::getInstance()->login(    
-                    String( lv_textarea_get_text( objects.login_username ) ),
-                    String( lv_textarea_get_text( objects.login_password ) ) )
-                    ;
-          //      ){
+            if(
+                    domainManagerClass::getInstance()->login(    
+                        String( lv_textarea_get_text( objects.login_username ) ),
+                        String( lv_textarea_get_text( objects.login_password ) ) 
+                        )                    
+                ){
                     navigateTo( SCREEN_ID_MAIN );
-            //    }else{
-              //      createDialog( "Invalid credentials" );  
-               //   }
+                }else{
+                    showDialog( "Invalid credentials" );  
+                }
 
         }
 
@@ -113,19 +110,16 @@ public:
         if( 
             ( target == objects.login  )
         ){
-
-            navigateTo( SCREEN_ID_MAIN );
-
-        //    if(
+            if(
                 domainManagerClass::getInstance()->login(    
                     String( lv_textarea_get_text( objects.login_username ) ),
                     String( lv_textarea_get_text( objects.login_password ) ) )
-                    ;
-          //      ){
-                    navigateTo( SCREEN_ID_MAIN );
-            //    }else{
-              //      createDialog( "Invalid credentials" );  
-               //   }
+                    
+            ){
+                navigateTo( SCREEN_ID_MAIN );
+            }else{
+                showDialog( "Invalid credentials" );  
+            }
 
         }
 
