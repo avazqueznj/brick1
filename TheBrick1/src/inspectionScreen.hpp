@@ -548,7 +548,7 @@ public:
             defects.push_back(newDefect);
 
             Serial.println("OK defect saved!");
-            Serial.println(domain->currentInspection.toString().c_str());
+            Serial.println(domain->currentInspection.toEDI().c_str());
 
         } else {
             Serial.println("No component selected!");
@@ -637,7 +637,7 @@ public:
                 Serial.println(" components.");
             }
 
-            Serial.println(domain->currentInspection.toString().c_str());
+            Serial.println(domain->currentInspection.toEDI().c_str());
     }
 
     void defectClick(){
@@ -721,7 +721,7 @@ public:
             closeDefectDialog();
 
             // debugo
-            Serial.println( domain->currentInspection.toString().c_str() );                    
+            Serial.println( domain->currentInspection.toEDI().c_str() );                    
         }
 
     }
@@ -1414,13 +1414,16 @@ public:
 
             // for the record                        
             domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));               
-            Serial.println( domain->currentInspection.toString() );                                      
+            Serial.println( domain->currentInspection.toEDI() );                                      
 
             String result = "<<TEST NO SUBMIT>>";                
-            result =  domain->comms->POST( domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toString() );
+            result =  domain->comms->POST( domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toEDI() );
 
             domainManagerClass::getInstance()->currentInspection.submitted = true;
             domainManagerClass::getInstance()->currentInspection.serverReply = result;
+
+            // save it
+            saveInspectionOffline(  domain->currentInspection.toEDI() );
 
             Serial.println("Submit ... done!");
             spinnerEnd();      
@@ -1435,6 +1438,81 @@ public:
             showDialog( chainedError.c_str() );
         }
                        
+    }
+
+//==============================================    
+
+    void saveInspectionOffline(const String& edi) {
+
+        // Slot selection logic as above (find empty or oldest based on parsed DISPLAYHEADER* timestamp)
+        int oldestSlot = 1;  // the one to delete
+        uint32_t oldestTime = UINT32_MAX;  //oldest to start
+
+        // for each slot
+        Serial.println( "SAVE: find slot...." );
+        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
+
+            String path = "/kv/insp" + String(i);
+            uint32_t ts = 0;
+
+            try {
+
+                // parse the time stamp
+                std::vector<String> file = loadFromKVStore(path);
+                for (const String& line : file) {
+                    if (line.startsWith("DISPLAYHEADER*")) {
+                        int firstStar = line.indexOf('*');
+                        int secondStar = line.indexOf('*', firstStar + 1);
+                        if (firstStar >= 0 && secondStar > firstStar) {
+                            String tsStr = line.substring(firstStar + 1, secondStar);
+                            ts = (uint32_t)tsStr.toInt();
+                        }
+                        break;
+                    }
+                }
+
+            } catch (...) {
+                Serial.println( "ERROR!!!: Cannor parse slot ovewrite it!" );
+                ts = 0;
+            }
+
+            // checking time stamp
+
+            if (ts == 0) {
+                oldestSlot = i;
+                break;
+            }
+
+            if (ts < oldestTime) {
+                oldestTime = ts;
+                oldestSlot = i;
+            }
+        }
+
+
+        String path = "/kv/insp" + String(oldestSlot);
+
+        Serial.println( "SAVE: saving: " + path );
+
+        // SPLIT THE MULTILINE EDI INTO VECTOR FOR KV SAVE:
+        std::vector<String> lines;
+        int start = 0;
+        while (true) {
+            int end = edi.indexOf('\n', start);
+            if (end < 0) {
+                String lastLine = edi.substring(start);
+                if (lastLine.length() > 0) lines.push_back(lastLine);
+                break;
+            }
+            String line = edi.substring(start, end);
+            lines.push_back(line);
+            start = end + 1;
+        }
+
+        saveToKVStore(path, &lines);
+
+        Serial.print("Saved inspection to slot ");
+        Serial.println(oldestSlot);
     }
 
 //==============================================    

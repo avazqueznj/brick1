@@ -24,6 +24,8 @@
 #include "KVStore.h"
 #include "kvstore_global_api.h"
 
+extern RTC_DS3231* rtc;
+
 //----------------------------------------------
 
 // yea , really .... no other way in lvgl 8
@@ -167,7 +169,7 @@ void spinnerStart() {
     #define KV_BUFFER_SIZE  10240
     std::vector<String> loadFromKVStore( const String path ) {
         Serial.print("Load from KVStore   ....");
-        Serial.print(path);
+        Serial.print( path + " " );
 
         size_t actual_size = 0;
         char buffer[ KV_BUFFER_SIZE ]; 
@@ -302,6 +304,43 @@ String newUUID() {
         uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]
     );
     return String(buf);
+}
+
+//-------------------------------------------------
+
+#define NUM_INSPECTION_SLOTS 10
+std::vector<String> getInspectionHistory(){
+
+    std::vector<String> result;
+
+    // for each slot
+    for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
+        
+        String path = "/kv/insp" + String(i);
+        Serial.print(" Try read"  + path + " -> " );
+
+        // try decode
+        try {
+            std::vector<String> file = loadFromKVStore(path);
+            for (size_t j = 0; j < file.size(); ++j) {
+                if (file[j].startsWith("DISPLAYHEADER*")) {
+                    Serial.print("Slot ");
+                    Serial.print(i);
+                    Serial.print(": ");
+                    Serial.println(file[j]);
+
+                    result.push_back( file[j] );
+
+                    break; // Only one per file, skip rest
+                }
+            }
+        } catch (...) {
+            Serial.println( "ERROR Cant read slot..." );
+            // Slot empty or unreadable; skip
+        }
+    }    
+    
+    return result;
 }
 
 //-------------------------------------------------

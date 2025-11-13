@@ -172,7 +172,7 @@ public:
         serverReply = "";
     }
 
-    String toStringX() const {
+    String toHumanString() const {
         String result = "INSPECTION\n";
 
         result += "ID: " + id + "\n";
@@ -184,9 +184,14 @@ public:
         result += driver_name;
         result += "\n";            
 
+        result += "Start time: ";
+        result += startTime;
+        result += "\n";           
+
         result += "Submit time: ";
         result += submitTime;
         result += "\n";           
+        
 
         // --- Inspection Type ---
         if (type != NULL) {
@@ -194,12 +199,12 @@ public:
             result += type->name;
             result += "\n";
 
-            result += "Layouts:\n";
-            for (const auto& layout : type->layouts) {
-                result += " - ";
-                result += layout;
-                result += "\n";
-            }
+            // result += "Layouts:\n";
+            // for (const auto& layout : type->layouts) {
+            //     result += " - ";
+            //     result += layout;
+            //     result += "\n";
+            // }
 
             result += "Form Fields:\n";
             size_t rowIndex = 0;
@@ -241,19 +246,19 @@ public:
         }
 
         // --- Defects: severity == 0 first ---
-        result += "Defects (sev == 0):\n";
-        for (const auto& defect : defects) {
-            if (defect.severity == 0) {
-                result += " - Asset ID: ";
-                result += defect.asset.ID;
-                result += ", Zone: " + defect.zoneName;
-                result += ", Component: " + defect.componentName;
-                result += ", Type: " + defect.defectType;
-                result += ", Severity: " + String(defect.severity);
-                result += ", Notes: " + defect.notes;
-                result += "\n";
-            }
-        }
+        // result += "Defects (sev == 0):\n";
+        // for (const auto& defect : defects) {
+        //     if (defect.severity == 0) {
+        //         result += " - Asset ID: ";
+        //         result += defect.asset.ID;
+        //         result += ", Zone: " + defect.zoneName;
+        //         result += ", Component: " + defect.componentName;
+        //         result += ", Type: " + defect.defectType;
+        //         result += ", Severity: " + String(defect.severity);
+        //         result += ", Notes: " + defect.notes;
+        //         result += "\n";
+        //     }
+        // }
 
         // --- Defects: severity > 0 after ---
         result += "Defects (sev > 0):\n";
@@ -270,6 +275,9 @@ public:
             }
         }
 
+        result += "\nServer reply:\n\n";
+        result += serverReply;
+
         return result;
     }   
     
@@ -277,14 +285,15 @@ public:
     //============
     //====================================
 
-    String toString() const {
-        String result;
-        
-        result += "BRICKINSPECTION*1\n";
+    String toEDI() const {
+
+        String result = "BRICKINSPECTION*1\n";
 
         // display header 
         result += 
-            "DISPLAYHEADER*" + id.substring(id.length() - 5) 
+            "DISPLAYHEADER*" 
+            + String(rtc->now().unixtime()) +
+            + "*" + id.substring(id.length() - 5) 
             + "*" + submitTime 
             + "*" + driver_username 
             + "*" + assets[0].buttonName

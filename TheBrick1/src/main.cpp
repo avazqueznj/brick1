@@ -403,13 +403,25 @@ void loop() {
             
             if (cmd == "show inspection") {
               Serial.println("===== SHW INSPECTION  =====");
-              Serial.println( domainManagerClass::getInstance()->currentInspection.toString() );
+              Serial.println( domainManagerClass::getInstance()->currentInspection.toEDI() );
+            } else
+            if (cmd == "show human inspection") {
+              Serial.println("===== SHW HUMAN INSPECTION  =====");
+              Serial.println( domainManagerClass::getInstance()->currentInspection.toHumanString() );
             } else
             
+
+           if (cmd == "show history") {
+              Serial.println("===== HISTORY  =====");
+              getInspectionHistory();
+            } else
+
 
 
 
             if (cmd == "?") {
+              Serial.println("===== HELP =====");
+              
               Serial.println("show config");
               Serial.println("delete config");
 
@@ -417,6 +429,9 @@ void loop() {
               Serial.println("reset settings");              
               
               Serial.println("show inspection");
+              Serial.println("show human inspection");
+
+              Serial.println("show history");
             } else         
 
             {
