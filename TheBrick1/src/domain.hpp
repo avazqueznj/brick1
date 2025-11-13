@@ -295,7 +295,7 @@ public:
             + String(rtc->now().unixtime()) +
             + "*" + id.substring(id.length() - 5) 
             + "*" + submitTime 
-            + "*" + driver_username 
+            + "*" + driver_name 
             + "*" + assets[0].buttonName
             + "\n";
 
@@ -514,6 +514,8 @@ public:
 
     String sync(){
         
+return "";
+
         spinnerStart();
 
         try{

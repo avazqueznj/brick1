@@ -56,6 +56,14 @@ public:
             navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
         }           
 
+        if( 
+            ( focused == objects.do_history && key == "#" )
+        ){
+
+            navigateTo( SCREEN_ID_INSPECTION_HISTORY );
+        }           
+
+
     }
 
     void handleTouchEvent( lv_event_t* e ) override{
@@ -85,7 +93,15 @@ public:
         ){
 
             navigateTo( SCREEN_ID_SELECT_ASSET_SCREEN );
+        }     
+        
+        if( 
+            ( target == objects.do_history )        
+        ){
+
+            navigateTo( SCREEN_ID_INSPECTION_HISTORY );
         }           
+        
 
     }
 
@@ -100,6 +116,7 @@ public:
 
 
             lv_group_add_obj(inputGroup, objects.do_inspect_button  );
+            lv_group_add_obj(inputGroup, objects.do_history);
             lv_group_add_obj(inputGroup, objects.do_sync);
             lv_group_add_obj(inputGroup, objects.logout);            
             

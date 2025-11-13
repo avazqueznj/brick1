@@ -200,7 +200,7 @@ public:
                 } else {
                     domain->currentInspection.type = NULL;
                     Serial.println("Type in button was NULL");
-                    sosBlink();
+                    sosBlink("Type in button was NULL");
                 }
             }
         }   

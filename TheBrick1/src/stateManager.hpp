@@ -180,13 +180,13 @@ public:
   // handle touch events
   void handleScreenEvents( lv_event_t* e ){
 
-    Serial.print("*** Screen event : ");
+    Serial.print("*** Screen event : [");
     lv_obj_t *target = lv_event_get_target(e);
     if (lv_obj_check_type( target, &lv_btn_class)) {
         lv_obj_t *label = lv_obj_get_child( target, 0);
         if (label && lv_obj_check_type(label, &lv_label_class)) {
             const char *text = lv_label_get_text(label);
-            Serial.println(text);
+            Serial.println( String(text) + "]");
         }
     }else{
       Serial.println("");
@@ -253,7 +253,7 @@ public:
   //=--------------------------------------------------------------------------------------------------
 
 
-  screenClass* screenStates[8] = {nullptr}; // index 1..7
+  screenClass* screenStates[10] = {nullptr}; // index 
   screenClass* currentScreenState = nullptr;
 
 
@@ -288,6 +288,7 @@ public:
           if (isNew) {
               switch (nextScreen) {
 
+                  case SCREEN_ID_INSPECTION_HISTORY:       screenStates[nextScreen] = new inspectionHistoryScreenClass( &settings ); break;
                   case SCREEN_ID_INSPECTION_ZONES:       screenStates[nextScreen] = new inspectionZonesScreenClass( &settings ); break;
                   case SCREEN_ID_INSPECTION_FORM:       screenStates[nextScreen] = new formFieldsScreenClass( &settings ); break;
                   case SCREEN_ID_SELECT_INSPECTION_TYPE:       screenStates[nextScreen] = new selectInspectionTypeScreenClass( &settings ); break;
@@ -324,7 +325,7 @@ public:
       } catch (const std::runtime_error& error) {
           Serial.println("*** Screen transition error ***");
           Serial.println(error.what());
-          sosBlink();
+          sosBlink(error.what());
       }
   }
 

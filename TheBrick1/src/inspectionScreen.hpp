@@ -259,7 +259,14 @@ public:
             return;              
         }
         
-
+        if (
+        (key == "5") ||
+        ( key == "#" && focused == objects.save_insp  )
+        ){
+            saveInspection();
+            return;              
+        }
+        
 
 
         Serial.println("DONE key handling");                                    
@@ -391,6 +398,11 @@ public:
 
         if ( target == objects.submit  ) {
             submitInspection();
+            return;              
+        }
+
+        if ( target == objects.save_insp  ) {
+            saveInspection();
             return;              
         }
 
@@ -1401,9 +1413,9 @@ public:
         Serial.println("Submit ...");
         spinnerStart();
 
-        try{
+        domainManagerClass* domain = domainManagerClass::getInstance(); 
 
-            domainManagerClass* domain = domainManagerClass::getInstance(); 
+        try{            
             // guard            
             if (domain->currentInspection.defects.size() == 0) {
                 spinnerEnd(); 
@@ -1423,7 +1435,10 @@ public:
             domainManagerClass::getInstance()->currentInspection.serverReply = result;
 
             // save it
-            saveInspectionOffline(  domain->currentInspection.toEDI() );
+            String filingRecord = 
+                domain->currentInspection.toEDI()  +
+                domain->currentInspection.toHumanString() ;
+            saveInspectionToDisk( filingRecord );
 
             Serial.println("Submit ... done!");
             spinnerEnd();      
@@ -1433,16 +1448,79 @@ public:
             navigateTo( SCREEN_ID_MAIN );
             
         }catch( const std::runtime_error& error ){
+
+            domainManagerClass::getInstance()->currentInspection.serverReply =error.what();          
+
+            // save it
+            String filingRecord = 
+                domain->currentInspection.toEDI()  +
+                domain->currentInspection.toHumanString() ;
+            saveInspectionToDisk( filingRecord );
+
             spinnerEnd();       
-            String chainedError = String( "ERROR: Could not POST: " ) + error.what();           
+            String chainedError = String( "ERROR: Inspection saved, but possibly not sent:" ) + error.what();           
+            showDialog( chainedError.c_str() );
+
+            navigateTo( SCREEN_ID_MAIN );
+        }
+                       
+    }
+
+    void saveInspection() {
+        
+        if (!isInspectionComplete()) {
+            static const char* btns[] = { "Ok", "Cancel", "" };
+            showDialog( "Save <<incomplete>> inspection?", "Save", btns );
+            return;
+        }
+        
+        static const char* btns[] = { "Ok", "Cancel", "" };
+        showDialog( "Save inspection?", "Save", btns );
+        return;
+    }
+
+    void doSaveInspection(){
+
+        Serial.println("Save ...");
+        spinnerStart();
+
+        try{
+
+            domainManagerClass* domain = domainManagerClass::getInstance(); 
+
+            // guard            
+            if (domain->currentInspection.defects.size() == 0) {
+                spinnerEnd(); 
+                Serial.println("ERROR: Cannot save empty inspection.");
+                showDialog("ERROR: Cannot save empty inspection.");
+                return;
+            } 
+
+            // save it
+            String filingRecord = 
+                domain->currentInspection.toEDI()  +
+                domain->currentInspection.toHumanString() ;
+            saveInspectionToDisk( filingRecord );
+
+            Serial.println("Save ... done!");
+            spinnerEnd();      
+
+            showDialog( "Saved!" );
+
+            navigateTo( SCREEN_ID_MAIN );
+            
+        }catch( const std::runtime_error& error ){
+            spinnerEnd();       
+            String chainedError = String( "ERROR: Could not SAVE: " ) + error.what();           
             showDialog( chainedError.c_str() );
         }
                        
     }
 
+
 //==============================================    
 
-    void saveInspectionOffline(const String& edi) {
+    void saveInspectionToDisk(const String& edi) {
 
         // Slot selection logic as above (find empty or oldest based on parsed DISPLAYHEADER* timestamp)
         int oldestSlot = 1;  // the one to delete
@@ -1518,13 +1596,18 @@ public:
 //==============================================    
    
     
-    void modalDialogEvent(const String action, const String button) override {
+    void modalDialogEvent(const String modalActionTouch, const String button) override {
 
-        Serial.println( "Override Modal event " + action + ":" + button );
+        Serial.println( "Override Modal event " + modalActionTouch + ":" + button );
 
-        if( action == "Submit" && button == "Ok" ){
+        if( modalActionTouch == "Submit" && button == "Ok" ){
             doSubmitInspection();
         }
+
+        if( modalActionTouch == "Save" && button == "Ok" ){
+            doSaveInspection();
+        }
+
     }
 
     virtual void modalDialogKey( String key ){    
@@ -1535,6 +1618,11 @@ public:
         if( modalAction == "Submit" && key == "#" ){
             doSubmitInspection();
         }
+
+        if( modalAction == "Save" && key == "#" ){
+            doSaveInspection();
+        }
+
     }    
 
 };

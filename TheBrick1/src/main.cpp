@@ -39,8 +39,9 @@
       #include "selectInspectionTypeScreen.hpp"  
       #include "inspectionFormScreen.hpp"    
       #include "inspectionScreen.hpp"
+      #include "inspectionHistoryScreen.hpp"
 
-#include "state.hpp"
+#include "stateManager.hpp"
 
 //-------------------------------
 
@@ -123,7 +124,7 @@ void setup() {
   Serial.println(sdram_ok ? "OK" : "FAIL");
   if (!sdram_ok) {
     Serial.println("SDRAM init failed! Will halt.");
-    sosBlink();
+    sosBlink("SDRAM init failed! Will halt.");
   }
 
   // Let SDRAM settle
@@ -142,7 +143,7 @@ void setup() {
   }
   if (!lvgl_sdram_pool) {
     Serial.println("SDRAM.malloc failed after retries! HALT.");
-    sosBlink();
+    sosBlink("SDRAM.malloc failed after retries! HALT.");
   }
   Serial.print("LVGL pool at 0x");
   Serial.println((uintptr_t)lvgl_sdram_pool, HEX);
@@ -152,15 +153,20 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);   
   Serial.println("Disp");
   Display = new Arduino_H7_Video(800, 480, GigaDisplayShield);
-  Display->begin();
+  if( Display->begin() != 0 ){
+    sosBlink( "Display did not initialize!!!" );
+  };
 
   // touch sensor setup
   Serial.println("Touch");
-  TouchDetector = new Arduino_GigaDisplayTouch();
-  TouchDetector->begin();
+  TouchDetector = new Arduino_GigaDisplayTouch();  
+  if( !TouchDetector->begin() ){
+    sosBlink( "Touch sensor did not initialize!!!" );
+  };
+
 
   // start spi bus
-  Serial.println("SPI");
+  Serial.println("SPI");  
   SPI.begin();
 
   //check the rfid reader on spi
@@ -415,6 +421,10 @@ void loop() {
               Serial.println("===== HISTORY  =====");
               getInspectionHistory();
             } else
+           if (cmd == "zap history") {
+              Serial.println("===== ZAP HISTORY  =====");
+              zapInspectionHistory();
+            } else
 
 
 
@@ -432,6 +442,7 @@ void loop() {
               Serial.println("show human inspection");
 
               Serial.println("show history");
+              Serial.println("zap history");
             } else         
 
             {

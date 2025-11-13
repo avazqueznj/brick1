@@ -50,12 +50,15 @@ void delayBlink() {
     thread_sleep_for( 25 );    
 }
 
-void sosBlink() {
+void sosBlink( String fatal ) {
     const int dot = 100;    // ms
     const int dash = 500;
     const int gap = 300;
 
     while( true ){
+
+        Serial.println( "FATAL:" + fatal );
+
         // S : dot dot dot
         for (int i = 0; i < 3; i++) {
             digitalWrite(LED_BUILTIN, HIGH);
@@ -74,7 +77,8 @@ void sosBlink() {
             delay(dash);
         }
 
-        delay(1000);        
+        delay(1000);   
+                
     }
 }
 
@@ -341,6 +345,15 @@ std::vector<String> getInspectionHistory(){
     }    
     
     return result;
+}
+
+void zapInspectionHistory(){
+
+    for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
+        String path = "/kv/insp" + String(i);
+        kv_remove(path.c_str());
+    }
+    Serial.println("All inspection slots deleted.");
 }
 
 //-------------------------------------------------

@@ -16,12 +16,14 @@ typedef struct _objects_t {
     lv_obj_t *login_screen;
     lv_obj_t *settings;
     lv_obj_t *sandbox;
+    lv_obj_t *inspection_history;
     lv_obj_t *clock;
     lv_obj_t *driver_name_main;
     lv_obj_t *logo1;
     lv_obj_t *do_inspect_button;
     lv_obj_t *do_sync;
     lv_obj_t *logout;
+    lv_obj_t *do_history;
     lv_obj_t *logo1_1;
     lv_obj_t *do_select_inspection_type;
     lv_obj_t *back_from_select_asset;
@@ -108,6 +110,19 @@ typedef struct _objects_t {
     lv_obj_t *obj11;
     lv_obj_t *clock_settings;
     lv_obj_t *clock_settings_1;
+    lv_obj_t *logo1_7;
+    lv_obj_t *history_list;
+    lv_obj_t *obj12;
+    lv_obj_t *back_from_history;
+    lv_obj_t *obj13;
+    lv_obj_t *clock_history;
+    lv_obj_t *driver_name_history;
+    lv_obj_t *open_inspection;
+    lv_obj_t *inspection_detail_dialog;
+    lv_obj_t *re_submit_inspection;
+    lv_obj_t *obj14;
+    lv_obj_t *history_close;
+    lv_obj_t *inspection_view;
 } objects_t;
 
 extern objects_t objects;
@@ -121,6 +136,7 @@ enum ScreensEnum {
     SCREEN_ID_LOGIN_SCREEN = 6,
     SCREEN_ID_SETTINGS = 7,
     SCREEN_ID_SANDBOX = 8,
+    SCREEN_ID_INSPECTION_HISTORY = 9,
 };
 
 void create_screen_main();
@@ -146,6 +162,9 @@ void tick_screen_settings();
 
 void create_screen_sandbox();
 void tick_screen_sandbox();
+
+void create_screen_inspection_history();
+void tick_screen_inspection_history();
 
 void tick_screen_by_id(enum ScreensEnum screenId);
 void tick_screen(int screen_index);
