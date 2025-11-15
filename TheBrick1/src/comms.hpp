@@ -20,6 +20,7 @@
 extern RTC_DS3231* rtc;
 
 #define BEARER_TOKEN "eyJhbGciOiJSUzI1NiJ9.eyJ1c2VySWQiOiJhdmF6cXVleiIsImNvbXBhbnlJZCI6Ik5FQyIsImlzU3VwZXJ1c2VyIjpmYWxzZSwiaXNEZXZpY2VUb2tlbiI6dHJ1ZSwiaWF0IjoxNzYzMTg1OTYwLCJpc3MiOiJpbnNwZWN0aW9uLWJyaWNrIiwiYXVkIjoiaW5zcGVjdGlvbi1icmljay1hcGkiLCJleHAiOjIwNzg1NDU5NjAsInN1YiI6ImF2YXpxdWV6In0.xPVELWZnBdfFz5ZwvmzLEgFoWAruTfklyjgZzx8T82BJy2mDNu06X33lovyqWOp3JDpBkE1jdTgnHAHuATTdr85UYl2IYUvG672imIAcEVCHDljuW21nLmScDbiqHcbHKcx8oboF5k4LcRZluC6M_0v2BGrcGLWb0jjzXWgmmfd_Q5DxUrwyVy7KiLAz64JQK-_H6vLUZJsnMdAIQ1JD-fWyF_JsTFrC_vxxFTcnxTDTlwzGQ6YR8hL-3swC2_Z_-FSKvtZPUJ8xDvHG1quqC12ToL9EATqGNc1iRoe8I8Dj0N5xYdvx1QPH3QI-mnND-Qtb8hwL8aBi2lDRNPK_Eg"
+#define BRICK_HTTP_READ_TIMEOUT 30000
 
 class commsClass{
 public:
@@ -180,7 +181,7 @@ public:
                     Serial.println("{no data wait}");
                     delayBlink();
                     wait += 100;
-                    if( wait >= 10000 ) throw std::runtime_error( "*** ERROR *** read timeout -" );
+                    if( wait >= BRICK_HTTP_READ_TIMEOUT ) throw std::runtime_error( "*** ERROR *** read timeout -" );
                 }                        
             }
 
