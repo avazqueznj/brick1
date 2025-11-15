@@ -4756,7 +4756,7 @@
               "left": 523,
               "top": 179,
               "width": 262,
-              "height": 168,
+              "height": 213,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -4767,12 +4767,13 @@
               },
               "timeline": [],
               "eventHandlers": [],
+              "identifier": "insp_component_instructions",
               "leftUnit": "px",
               "topUnit": "px",
               "widthUnit": "px",
               "heightUnit": "px",
               "children": [],
-              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_ON_FOCUS|SCROLL_WITH_ARROW|SNAPPABLE",
+              "widgetFlags": "GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_ON_FOCUS|SCROLL_WITH_ARROW|SNAPPABLE",
               "hiddenFlagType": "literal",
               "clickableFlag": true,
               "clickableFlagType": "literal",
@@ -4784,7 +4785,15 @@
               "disabledStateType": "literal",
               "states": "",
               "localStyles": {
-                "objID": "57ba2e9b-2e96-4847-d7aa-a5075df02e59"
+                "objID": "57ba2e9b-2e96-4847-d7aa-a5075df02e59",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "text_font": "MONTSERRAT_28",
+                      "text_color": "#3b4b90"
+                    }
+                  }
+                }
               },
               "group": "",
               "groupIndex": 0,

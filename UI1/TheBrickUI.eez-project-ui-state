@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/4",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/8",
     "selectedStyleObject": "[TheBrickUI.eez-project]:/lvglStyles/styles/3",
     "subnavigationSelectedItems": {}
   },
@@ -194,15 +194,16 @@
                 {
                   "type": "tab",
                   "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
-                  "name": "inspectionZones",
+                  "name": "inspectionHistory",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[TheBrickUI.eez-project]:/userPages/4",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/8",
                     "permanent": false
                   },
                   "icon": "svg:page"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "tabset",
@@ -225,8 +226,7 @@
                   "enableClose": false,
                   "icon": "svg:components"
                 }
-              ],
-              "active": true
+              ]
             }
           ]
         }
@@ -1446,8 +1446,7 @@
           "7": {},
           "8": {
             "0": {},
-            "2": {},
-            "$selected": true
+            "2": {}
           }
         }
       },

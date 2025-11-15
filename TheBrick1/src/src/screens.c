@@ -1059,14 +1059,19 @@ void create_screen_inspection_zones() {
             }
         }
         {
+            // insp_component_instructions
             lv_obj_t *obj = lv_textarea_create(parent_obj);
+            objects.insp_component_instructions = obj;
             lv_obj_set_pos(obj, 523, 179);
-            lv_obj_set_size(obj, 262, 168);
+            lv_obj_set_size(obj, 262, 213);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, false);
             lv_textarea_set_password_mode(obj, false);
+            lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_VER);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xff3b4b90), LV_PART_MAIN | LV_STATE_DEFAULT);
         }
         {
             // save_insp

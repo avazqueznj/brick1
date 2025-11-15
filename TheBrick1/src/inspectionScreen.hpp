@@ -187,6 +187,7 @@ public:
         screenClass::handleKeyboardEvent(key);
         lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
+        // Navi
         if ( key == "#" and focused == objects.back_from_form_zones  ) {
             navigateTo( SCREEN_ID_INSPECTION_FORM );
             return;              
@@ -200,7 +201,9 @@ public:
 
         Serial.println("ABCD refresh?");                                    
         if (key == "A" || key == "B" || key == "C" || key == "D") {
-            lv_obj_t* focused = lv_group_get_focused(inputGroup);
+            lv_obj_t* focused = lv_group_get_focused(inputGroup);     
+            
+            lv_textarea_set_text(objects.insp_component_instructions, "");                                
 
             if (focused == objects.zone_asset_list) {
                 assetClass* asset = nullptr;
@@ -226,6 +229,25 @@ public:
                 renderComponents();
                 updateComponentSeverityLabels();
             }
+            else if (focused == objects.zone_component_list) {
+
+                // update instructions
+                uint32_t child_count = lv_obj_get_child_cnt(objects.zone_component_list  ); 
+                for (uint32_t i = 0; i < child_count; ++i) {
+
+                    lv_obj_t* btn = lv_obj_get_child(objects.zone_component_list, i);
+                    if (!lv_obj_check_type(btn, &lv_btn_class)) continue;
+                    if (lv_obj_has_state(btn, LV_STATE_CHECKED)) {                    
+                        // show instructions - get vector
+                        const std::vector<String>* compVec = static_cast<const std::vector<String>*>(lv_obj_get_user_data(btn));
+                        if (compVec) {
+                            lv_textarea_set_text(objects.insp_component_instructions ,  (*compVec)[2].c_str() );                    
+                        }
+                    }
+                }   
+                
+            }
+
             // else: do nothing
         }
 
@@ -289,6 +311,8 @@ public:
         if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == objects.zone_asset_list ) {
             Serial.println("Asset clicked...");
 
+            lv_textarea_set_text(objects.insp_component_instructions, "");      
+
             // go over the asset list
             bool render  = false;
             uint32_t child_count = lv_obj_get_child_cnt(objects.zone_asset_list  ); // ZONE assetrs list
@@ -336,8 +360,9 @@ public:
 
         // On ZONE click -->
         if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == objects.zone_list ) {
-
             Serial.println("Zone clicked...");
+
+            lv_textarea_set_text(objects.insp_component_instructions, "");      
 
             // go over zones
             uint32_t child_count = lv_obj_get_child_cnt(objects.zone_list  ); // ZONE assetrs list
@@ -361,8 +386,10 @@ public:
 
         // On COMPONENT click reset check -->
         if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == objects.zone_component_list ) {
-            Serial.println("compo click");
-            // iterate the  list and reset
+            Serial.println("compo click");            
+
+            lv_textarea_set_text(objects.insp_component_instructions, "");                                
+
             uint32_t child_count = lv_obj_get_child_cnt(objects.zone_component_list  ); 
             for (uint32_t i = 0; i < child_count; ++i) {
                 // reset selection
@@ -371,10 +398,18 @@ public:
 
                 if (btn != target) {
                     lv_obj_clear_state(btn, LV_STATE_CHECKED);
+                    
                 } else {
                     lv_obj_add_state(btn, LV_STATE_CHECKED);
+
+                    // show instructions - get vector
+                    const std::vector<String>* compVec = static_cast<const std::vector<String>*>(lv_obj_get_user_data(btn));
+                    if (compVec) {
+                        lv_textarea_set_text(objects.insp_component_instructions ,  (*compVec)[2].c_str() );                    
+                    }
                 }
-            }
+            }   
+
             Serial.println("compo click DONE");
             return;
         }     
@@ -840,8 +875,8 @@ public:
             if (compVec.empty()) {
                 throw std::runtime_error("Component vector is empty");
             }
-            if (compVec.size() <= 1) {
-                throw std::runtime_error("Component vector missing name");
+            if (compVec.size() <= 3) {
+                throw std::runtime_error("Component vector incomplete !>3");
             }
 
             String compName = compVec[1];
@@ -1286,7 +1321,7 @@ public:
         }        
     
         // defect dialog ==========
-        if (compVec->size() >= 2) {
+        if (compVec->size() >= 4) {
             String compName = (*compVec)[1];
             Serial.print("Selected component: ");
             Serial.println(compName);
@@ -1297,7 +1332,7 @@ public:
 
             // Add defect buttons
             lv_obj_clean(objects.defect_dialog_list);
-            for (size_t i = 2; i < compVec->size(); ++i) {
+            for (size_t i = 3; i < compVec->size(); ++i) {
                 String defectName = (*compVec)[i];
 
                 lv_obj_t* defect_btn = lv_btn_create(objects.defect_dialog_list);
@@ -1323,11 +1358,11 @@ public:
                     lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
                 }
                 // or default
-                else if (i == 2 && !existingDefect) {                     
+                else if (i == 3 && !existingDefect) {                     
                     lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
                 }
                 // if the defect is good defect also choose 2
-                else if (i == 2 && existingDefect) {
+                else if (i == 3 && existingDefect) {
                     if( existingDefect->defectType == "GOOD" ){ 
                         lv_obj_add_state(defect_btn, LV_STATE_CHECKED);
                     }

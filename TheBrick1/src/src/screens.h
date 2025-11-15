@@ -73,6 +73,7 @@ typedef struct _objects_t {
     lv_obj_t *submit_label;
     lv_obj_t *back_from_form_zones;
     lv_obj_t *back_from_form_1;
+    lv_obj_t *insp_component_instructions;
     lv_obj_t *save_insp;
     lv_obj_t *submit_label_1;
     lv_obj_t *inspection_zones_overlay;
