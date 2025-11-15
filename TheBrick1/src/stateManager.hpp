@@ -125,7 +125,7 @@ public:
         settings.defaultKey( "DST" , "0" );                        
 
         settings.defaultKey( "serverURL" , "inspection-brick.replit.app" );        
-        settings.defaultKey( "getConfigPath" , "/brickServer1/config" );        
+        settings.defaultKey( "getConfigPath" , "/api/device/config" );        
         settings.defaultKey( "postInspectionsPath" , "/api/device/inspections" );                        
 
         // commos        

@@ -421,8 +421,8 @@ public:
     int DST = 0;
 
     // internal
-    String getConfigPath = "/brickServer1/config";
-    String postInspectionsPath = "/brickServer1/inspections";
+    String getConfigPath = "NOT SET";
+    String postInspectionsPath = "NOT SET";
 
 private:
     // database
@@ -514,8 +514,6 @@ public:
 
     String sync(){
         
-return "";
-
         spinnerStart();
 
         try{

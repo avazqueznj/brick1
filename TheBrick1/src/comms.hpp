@@ -19,6 +19,8 @@
 
 extern RTC_DS3231* rtc;
 
+#define BEARER_TOKEN "eyJhbGciOiJSUzI1NiJ9.eyJ1c2VySWQiOiJhdmF6cXVleiIsImNvbXBhbnlJZCI6Ik5FQyIsImlzU3VwZXJ1c2VyIjpmYWxzZSwiaXNEZXZpY2VUb2tlbiI6dHJ1ZSwiaWF0IjoxNzYzMTg1OTYwLCJpc3MiOiJpbnNwZWN0aW9uLWJyaWNrIiwiYXVkIjoiaW5zcGVjdGlvbi1icmljay1hcGkiLCJleHAiOjIwNzg1NDU5NjAsInN1YiI6ImF2YXpxdWV6In0.xPVELWZnBdfFz5ZwvmzLEgFoWAruTfklyjgZzx8T82BJy2mDNu06X33lovyqWOp3JDpBkE1jdTgnHAHuATTdr85UYl2IYUvG672imIAcEVCHDljuW21nLmScDbiqHcbHKcx8oboF5k4LcRZluC6M_0v2BGrcGLWb0jjzXWgmmfd_Q5DxUrwyVy7KiLAz64JQK-_H6vLUZJsnMdAIQ1JD-fWyF_JsTFrC_vxxFTcnxTDTlwzGQ6YR8hL-3swC2_Z_-FSKvtZPUJ8xDvHG1quqC12ToL9EATqGNc1iRoe8I8Dj0N5xYdvx1QPH3QI-mnND-Qtb8hwL8aBi2lDRNPK_Eg"
+
 class commsClass{
 public:
 
@@ -128,9 +130,15 @@ public:
 
             // send request
             client.print("GET ");
-            client.println( path );
+            client.print(path);         
+            client.println(" HTTP/1.1");
+            client.print("Host: ");
+            client.println(serverURL);  
             client.println("Accept: */*");
-            client.println();
+            client.print("Authorization: Bearer ");
+            client.println(BEARER_TOKEN); 
+            client.println("Connection: close");             
+            client.println();             
             
             // read the response ...
             int wait = 0;
@@ -139,7 +147,7 @@ public:
             while (true) {            
 
                 if( !client.connected() ){
-                    client.println( "Server closed the connection" );
+                    Serial.println( "Server closed the connection" );
                     break;
                 }
 
@@ -176,6 +184,10 @@ public:
                 }                        
             }
 
+            if( currentRow != "" ){
+                response.push_back( currentRow );
+            }
+
             Serial.println("GET done!");
 
             // one every get? 
@@ -187,7 +199,7 @@ public:
 
             return response;
 
-        } catch (...) {
+        } catch (...) { 
             WiFi.end();         
             throw;             
         }        
@@ -201,23 +213,23 @@ public:
 
             Serial.println("POSTing to server...");
 
-            connectToServer( serverURL );
+            connectToServer( serverURL );   
 
             // Compose HTTP POST request
             String request = "";
             request += "POST " + path + " HTTP/1.1\r\n";
             request += "Host: " + serverURL + "\r\n";
             request += "Content-Type: text/plain\r\n";
+            request += "Authorization: Bearer " BEARER_TOKEN "\r\n";            
             request += "Content-Length: " + String(payload.length()) + "\r\n";
             request += "Connection: close\r\n";
             request += "\r\n";
             request += payload;
             
-            Serial.println( request );
+            //Serial.println( request ); // leaks the token!!!
             Serial.println( "Sending ..." );
 
             client.print(request); // send - 
-
             // wait reply
             unsigned long timeout = millis();
             while (client.available() == 0) {
