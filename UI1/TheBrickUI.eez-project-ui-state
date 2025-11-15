@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/8",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/5",
     "selectedStyleObject": "[TheBrickUI.eez-project]:/lvglStyles/styles/3",
     "subnavigationSelectedItems": {}
   },
@@ -194,16 +194,15 @@
                 {
                   "type": "tab",
                   "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
-                  "name": "inspectionHistory",
+                  "name": "loginScreen",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[TheBrickUI.eez-project]:/userPages/8",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/5",
                     "permanent": false
                   },
                   "icon": "svg:page"
                 }
-              ],
-              "active": true
+              ]
             },
             {
               "type": "tabset",
@@ -226,7 +225,8 @@
                   "enableClose": false,
                   "icon": "svg:components"
                 }
-              ]
+              ],
+              "active": true
             }
           ]
         }
@@ -1270,15 +1270,15 @@
     "[TheBrickUI.eez-project]:/userPages/5[flow-state]": {
       "selection": {
         "0": {
-          "0": {},
+          "0": {
+            "$selected": true
+          },
           "1": {},
           "3": {},
           "5": {},
           "6": {},
           "8": {},
-          "9": {
-            "$selected": true
-          }
+          "9": {}
         }
       },
       "transform": {
@@ -1393,9 +1393,7 @@
     "[TheBrickUI.eez-project]:/userPages/4[flow-state]": {
       "selection": {
         "0": {
-          "0": {
-            "$selected": true
-          },
+          "0": {},
           "2": {},
           "14": {}
         }
@@ -1403,7 +1401,7 @@
       "transform": {
         "translate": {
           "x": -244,
-          "y": -231
+          "y": -31
         },
         "scale": 0.67
       },
