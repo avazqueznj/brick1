@@ -141,9 +141,9 @@ public:
 
         }
     
-        screenClass::makeKeyboard( LV_KEYBOARD_MODE_NUMBER );
-        screenClass::addKeyboard( objects.login_username );
-        screenClass::addKeyboard( objects.login_password );
+        screenClass::makeKeyboards();
+        screenClass::addNumericKeyboard( objects.login_username );
+        screenClass::addNumericKeyboard( objects.login_password );
 
         screenClass::init();
 

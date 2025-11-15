@@ -7662,7 +7662,7 @@
               "left": 21,
               "top": 117,
               "width": 759,
-              "height": 276,
+              "height": 260,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -8188,8 +8188,8 @@
             {
               "objID": "b2a50b5c-f17c-4311-acae-0cb6cc4cb144",
               "type": "LVGLMessageBoxWidget",
-              "left": 29,
-              "top": 36,
+              "left": 26,
+              "top": 29,
               "width": 751,
               "height": 430,
               "customInputs": [],

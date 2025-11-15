@@ -17,6 +17,7 @@
 //***************************************************** */
 
 LV_FONT_DECLARE(lv_font_montserrat_28);
+
 void fireModalDialogEvent( String action, String button );
 
 static lv_style_t style_font;
@@ -25,14 +26,15 @@ class screenClass{
 public:
 
     settingsClass *settings;
-
     ScreensEnum screenId;    
     lv_group_t* inputGroup = nullptr;
-    lv_obj_t* kb = nullptr;    
+
+    lv_obj_t* letterKeyboard = nullptr;    
+    lv_obj_t* numericKeyboard = nullptr;    
+
 
     screenClass( settingsClass* settingsParam, ScreensEnum screenIdParam ): 
-    settings{settingsParam}, screenId{screenIdParam}
-        {
+    settings{settingsParam}, screenId{screenIdParam}{
         inputGroup = lv_group_create();
     }
 
@@ -71,12 +73,8 @@ public:
     // base screen class key nav
     void handleSystemKeys(String key) {
 
-        if( kb != nullptr )
-        {
-            lv_obj_add_flag( kb, LV_OBJ_FLAG_HIDDEN );
-        }
+        hideKeyboards();
         
-
         // get the focused thing
         Serial.print( "*** *** Screen Base: Key Handler: " );            
         Serial.println( key );            
@@ -111,25 +109,27 @@ public:
     }
 
 
-    //---
-    // LV_KEYBOARD_MODE_NUMBER 
+// lv_keyboard_mode_t mode = LV_KEYBOARD_MODE_TEXT_LOWER)    
 
-    void makeKeyboard(lv_keyboard_mode_t mode = LV_KEYBOARD_MODE_TEXT_LOWER) {
-        if (kb == nullptr) {
-            kb = lv_keyboard_create(lv_scr_act());
-            lv_obj_set_size(kb, 800, 200);
-            lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
-            lv_keyboard_set_mode(kb, mode);
+    void makeKeyboards() {
+
+        if (letterKeyboard == nullptr) {
+
+            letterKeyboard = lv_keyboard_create(lv_scr_act());
+            lv_obj_set_size(letterKeyboard, 800, 200);
+            lv_obj_align(letterKeyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
+            lv_obj_add_flag(letterKeyboard, LV_OBJ_FLAG_HIDDEN);
+
+            lv_keyboard_set_mode(letterKeyboard, LV_KEYBOARD_MODE_TEXT_LOWER);
 
             lv_obj_add_event_cb(
-                kb,
+                letterKeyboard,
                 [](lv_event_t* e) {
                     lv_event_code_t code = lv_event_get_code(e);
                     screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
                     if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
-                        lv_obj_add_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
+                        lv_obj_add_flag(self->letterKeyboard, LV_OBJ_FLAG_HIDDEN);
                         // Optionally, restore settings screen position if you moved it
             
                     }
@@ -139,12 +139,48 @@ public:
             );
             Serial.println("Keyboard created");
         }
+
+        if (numericKeyboard == nullptr) {
+
+            numericKeyboard = lv_keyboard_create(lv_scr_act());
+            lv_obj_set_size(numericKeyboard, 800, 200);
+            lv_obj_align(numericKeyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
+            lv_obj_add_flag(numericKeyboard, LV_OBJ_FLAG_HIDDEN);
+
+            lv_keyboard_set_mode(numericKeyboard, LV_KEYBOARD_MODE_NUMBER);
+
+            lv_obj_add_event_cb(
+                numericKeyboard,
+                [](lv_event_t* e) {
+                    lv_event_code_t code = lv_event_get_code(e);
+                    screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
+                    if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
+                        lv_obj_add_flag(self->numericKeyboard, LV_OBJ_FLAG_HIDDEN);
+                        // Optionally, restore settings screen position if you moved it
+            
+                    }
+                },
+                LV_EVENT_ALL,
+                this
+            );
+            Serial.println("Keyboard created");
+        }
+
+
+    }
+
+    void hideKeyboards(){
+        if( ( letterKeyboard != nullptr ) && ( numericKeyboard != nullptr ) )
+        {
+            lv_obj_add_flag( letterKeyboard, LV_OBJ_FLAG_HIDDEN );
+            lv_obj_add_flag( numericKeyboard, LV_OBJ_FLAG_HIDDEN );
+        }
     }
 
 
+    void addLetterKeyboard(lv_obj_t* textarea) {
 
-    void addKeyboard(lv_obj_t* textarea) {
-        if (!kb) {
+        if (!letterKeyboard) {
             throw std::runtime_error("Keyboard not created before addKeyboard()!");
         }
         Serial.println("Keyboard attached");
@@ -156,8 +192,31 @@ public:
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
 
                 // Show keyboard
-                lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
-                lv_keyboard_set_textarea(self->kb, ta);                       
+                lv_obj_clear_flag(self->letterKeyboard, LV_OBJ_FLAG_HIDDEN);
+                lv_keyboard_set_textarea(self->letterKeyboard, ta);                       
+
+            },
+            LV_EVENT_PRESSED,
+            this
+        );
+    }
+
+    void addNumericKeyboard(lv_obj_t* textarea) {
+
+        if (!numericKeyboard) {
+            throw std::runtime_error("Keyboard not created before addKeyboard()!");
+        }
+        Serial.println("Keyboard attached");
+
+        lv_obj_add_event_cb(
+            textarea,
+            [](lv_event_t* e) {
+                lv_obj_t* ta = lv_event_get_target(e);
+                screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
+
+                // Show keyboard
+                lv_obj_clear_flag(self->numericKeyboard, LV_OBJ_FLAG_HIDDEN);
+                lv_keyboard_set_textarea(self->numericKeyboard, ta);                       
 
             },
             LV_EVENT_PRESSED,
@@ -356,11 +415,17 @@ public:
             Serial.println("mainScreenClass: Screen Class destroyed, inputGroup destroyed");
         }        
 
-        if (kb != NULL) {
-            lv_obj_del(kb);
-            kb = NULL;
-            Serial.println("Keyboard destroyed");
-        }        
+        if (letterKeyboard != NULL) {
+            lv_obj_del(letterKeyboard);
+            letterKeyboard = NULL;
+            Serial.println("Letter Keyboard destroyed");
+        }   
+        
+        if (numericKeyboard != NULL) {
+            lv_obj_del(numericKeyboard);
+            numericKeyboard = NULL;
+            Serial.println("Numeric Keyboard destroyed");
+        }   
     }
 
 

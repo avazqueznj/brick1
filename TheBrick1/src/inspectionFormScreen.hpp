@@ -79,7 +79,7 @@ public:
 
     void init() override {
 
-        screenClass::makeKeyboard();
+        screenClass::makeKeyboards();
 
 
         {
@@ -192,7 +192,16 @@ public:
 
                     // , LV_EVENT_PRESSED, this);
 
-                    addKeyboardHacked( textarea );
+                    if( fieldType == "num" ){
+                        addNumericKeyboardHacked( textarea ); 
+                    }else
+                    if( fieldType == "text" ){
+                        addLetterKeyboardHacked( textarea ); 
+                    }else{
+                        addNumericKeyboardHacked( textarea ); 
+                        //throw std::runtime_error( "Invalid keyboard type from config:" );
+                    }
+                    
         }
 
         // keyboard spacer ============
@@ -231,16 +240,10 @@ public:
 
     }
 
-    virtual ~formFieldsScreenClass() {
-        if (kb != NULL) {
-            lv_obj_del(kb);
-            kb = NULL;
-            Serial.println("Keyboard destroyed by formFieldsScreenClass destructor.");
-        }
-    }
 
-    void addKeyboardHacked(lv_obj_t* textarea) {
-        if (!kb) {
+    void addLetterKeyboardHacked(lv_obj_t* textarea) {
+
+        if (!letterKeyboard) {
             throw std::runtime_error("Keyboard not created before addKeyboard()!");
         }
         Serial.println("Keyboard attached");
@@ -248,14 +251,15 @@ public:
         lv_obj_add_event_cb(
             textarea,
             [](lv_event_t* e) {
+
                 lv_obj_t* ta = lv_event_get_target(e);
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
 
                 // Show keyboard
-                lv_obj_clear_flag(self->kb, LV_OBJ_FLAG_HIDDEN);
-                lv_keyboard_set_textarea(self->kb, ta);  
+                lv_obj_clear_flag(self->letterKeyboard, LV_OBJ_FLAG_HIDDEN);
+                lv_keyboard_set_textarea(self->letterKeyboard, ta);  
                                 
-                // work around for lvgl no able to do it on its own
+                // work around for lvgl no able to do it on its own - force scroll
                 lv_obj_t* row = lv_obj_get_parent(ta);
                 if (row != nullptr) {
                     // Get Y offset of row inside form_fields
@@ -270,5 +274,41 @@ public:
         );
     }
 
+    void addNumericKeyboardHacked(lv_obj_t* textarea) {
+
+        if (!numericKeyboard) {
+            throw std::runtime_error("Keyboard not created before addKeyboard()!");
+        }
+        Serial.println("Keyboard attached");
+
+        lv_obj_add_event_cb(
+            textarea,
+            [](lv_event_t* e) {
+
+                lv_obj_t* ta = lv_event_get_target(e);
+                screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
+
+                // Show keyboard
+                lv_obj_clear_flag(self->numericKeyboard, LV_OBJ_FLAG_HIDDEN);
+                lv_keyboard_set_textarea(self->numericKeyboard, ta);  
+                                
+                // work around for lvgl no able to do it on its own - force scroll
+                lv_obj_t* row = lv_obj_get_parent(ta);
+                if (row != nullptr) {
+                    // Get Y offset of row inside form_fields
+                    lv_coord_t y = lv_obj_get_y(row);
+                    // Scroll the list to the row
+                    lv_obj_scroll_to_y(objects.form_fields, y, LV_ANIM_ON );
+                }                
+
+            },
+            LV_EVENT_PRESSED,
+            this
+        );
+    }
+
+    virtual ~formFieldsScreenClass() {
+
+    }
 };
 

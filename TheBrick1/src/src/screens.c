@@ -1714,7 +1714,7 @@ void create_screen_inspection_history() {
             lv_obj_t *obj = lv_list_create(parent_obj);
             objects.history_list = obj;
             lv_obj_set_pos(obj, 21, 117);
-            lv_obj_set_size(obj, 759, 276);
+            lv_obj_set_size(obj, 759, 260);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);
             lv_obj_set_scroll_dir(obj, LV_DIR_ALL);
@@ -1829,7 +1829,7 @@ void create_screen_inspection_history() {
             // inspectionDetailDialog
             lv_obj_t *obj = lv_msgbox_create(parent_obj, "", "", 0, true);
             objects.inspection_detail_dialog = obj;
-            lv_obj_set_pos(obj, 29, 36);
+            lv_obj_set_pos(obj, 26, 29);
             lv_obj_set_size(obj, 751, 430);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_ON);

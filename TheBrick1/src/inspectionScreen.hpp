@@ -1127,8 +1127,8 @@ public:
         lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
         lv_obj_add_flag(  objects.inspection_zones_overlay, LV_OBJ_FLAG_HIDDEN);     
 
-        makeKeyboard();
-        addKeyboard( objects.defect_dialog_notes );
+        makeKeyboards();
+        addLetterKeyboard( objects.defect_dialog_notes );
         
     }
 

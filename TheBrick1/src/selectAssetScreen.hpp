@@ -402,8 +402,8 @@ public:
         screenClass::init(); // always last, only if no issues
 
 
-        screenClass::makeKeyboard();
-        screenClass::addKeyboard( objects.search_asset);
+        screenClass::makeKeyboards();
+        screenClass::addLetterKeyboard( objects.search_asset);
     }
 
     void start() override{

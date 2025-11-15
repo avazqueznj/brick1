@@ -137,11 +137,11 @@ public:
 
         }
     
-        screenClass::makeKeyboard();
-        screenClass::addKeyboard( objects.setting_company );
-        screenClass::addKeyboard( objects.setting_server_url );
-        screenClass::addKeyboard( objects.setting_wifi_name );
-        screenClass::addKeyboard( objects.setting_wifi_password );                        
+        screenClass::makeKeyboards();
+        screenClass::addLetterKeyboard( objects.setting_company );
+        screenClass::addLetterKeyboard( objects.setting_server_url );
+        screenClass::addLetterKeyboard( objects.setting_wifi_name );
+        screenClass::addLetterKeyboard( objects.setting_wifi_password );                        
 
         Serial.println( "Setting inited *********" );
     }
