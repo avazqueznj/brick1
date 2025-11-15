@@ -7662,7 +7662,7 @@
               "left": 21,
               "top": 117,
               "width": 759,
-              "height": 298,
+              "height": 276,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -8082,9 +8082,9 @@
               "objID": "3d383489-0433-4ac2-aa0c-c7b6191607d1",
               "type": "LVGLButtonWidget",
               "left": 323,
-              "top": 426,
+              "top": 414,
               "width": 170,
-              "height": 40,
+              "height": 52,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -8188,8 +8188,8 @@
             {
               "objID": "b2a50b5c-f17c-4311-acae-0cb6cc4cb144",
               "type": "LVGLMessageBoxWidget",
-              "left": 26,
-              "top": 31,
+              "left": 29,
+              "top": 36,
               "width": 751,
               "height": 430,
               "customInputs": [],
