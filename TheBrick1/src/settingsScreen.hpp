@@ -129,7 +129,6 @@ public:
 
             lv_group_add_obj(inputGroup, objects.back_from_settings);                                                
 
-            lv_group_add_obj(inputGroup, objects.setting_server_url  );
             lv_group_add_obj(inputGroup, objects.setting_wifi_name  );
             lv_group_add_obj(inputGroup, objects.setting_wifi_password  );                                                
 
@@ -139,7 +138,6 @@ public:
     
         screenClass::makeKeyboards();
         screenClass::addLetterKeyboard( objects.setting_company );
-        screenClass::addLetterKeyboard( objects.setting_server_url );
         screenClass::addLetterKeyboard( objects.setting_wifi_name );
         screenClass::addLetterKeyboard( objects.setting_wifi_password );                        
 
@@ -159,7 +157,6 @@ public:
             lv_obj_clear_state(objects.dst, LV_STATE_CHECKED);
         }
 
-        lv_textarea_set_text( objects.setting_server_url , domainManagerClass::getInstance()->serverURL.c_str() );
         lv_textarea_set_text( objects.setting_wifi_name , domainManagerClass::getInstance()->comms->ssid.c_str() );
         lv_textarea_set_text( objects.setting_wifi_password , domainManagerClass::getInstance()->comms->pass.c_str() );
 
@@ -177,9 +174,6 @@ public:
 
         // Write back DST switch (true if checked, false otherwise)
         domainManagerClass::getInstance()->DST = lv_obj_has_state(objects.dst, LV_STATE_CHECKED);
-
-        // Write back server URL
-        domainManagerClass::getInstance()->serverURL = lv_textarea_get_text(objects.setting_server_url);
 
         // Write back WiFi credentials
         if(domainManagerClass::getInstance()->comms) {

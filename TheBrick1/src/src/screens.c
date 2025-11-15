@@ -1539,19 +1539,10 @@ void create_screen_settings() {
             lv_label_set_text(obj, "Company");
         }
         {
-            lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.obj8 = obj;
-            lv_obj_set_pos(obj, 573, 66);
-            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "Brick Server");
-        }
-        {
             // setting_wifi_name
             lv_obj_t *obj = lv_textarea_create(parent_obj);
             objects.setting_wifi_name = obj;
-            lv_obj_set_pos(obj, 400, 202);
+            lv_obj_set_pos(obj, 419, 96);
             lv_obj_set_size(obj, 343, 60);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, true);
@@ -1563,19 +1554,7 @@ void create_screen_settings() {
             // setting_wifi_password
             lv_obj_t *obj = lv_textarea_create(parent_obj);
             objects.setting_wifi_password = obj;
-            lv_obj_set_pos(obj, 400, 270);
-            lv_obj_set_size(obj, 345, 60);
-            lv_textarea_set_max_length(obj, 128);
-            lv_textarea_set_one_line(obj, true);
-            lv_textarea_set_password_mode(obj, false);
-            add_style_text_area(obj);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-        }
-        {
-            // setting_server_url
-            lv_obj_t *obj = lv_textarea_create(parent_obj);
-            objects.setting_server_url = obj;
-            lv_obj_set_pos(obj, 402, 96);
+            lv_obj_set_pos(obj, 419, 164);
             lv_obj_set_size(obj, 343, 60);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, true);
@@ -1585,8 +1564,8 @@ void create_screen_settings() {
         }
         {
             lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.obj9 = obj;
-            lv_obj_set_pos(obj, 461, 167);
+            objects.obj8 = obj;
+            lv_obj_set_pos(obj, 476, 66);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1606,7 +1585,7 @@ void create_screen_settings() {
         }
         {
             lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.obj10 = obj;
+            objects.obj9 = obj;
             lv_obj_set_pos(obj, 31, 167);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1640,7 +1619,7 @@ void create_screen_settings() {
         }
         {
             lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.obj11 = obj;
+            objects.obj10 = obj;
             lv_obj_set_pos(obj, 109, 285);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1731,7 +1710,7 @@ void create_screen_inspection_history() {
                 lv_obj_t *parent_obj = obj;
                 {
                     lv_obj_t *obj = lv_btn_create(parent_obj);
-                    objects.obj12 = obj;
+                    objects.obj11 = obj;
                     lv_obj_set_pos(obj, 369, 42);
                     lv_obj_set_size(obj, 411, 47);
                     lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
@@ -1779,7 +1758,7 @@ void create_screen_inspection_history() {
         }
         {
             lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.obj13 = obj;
+            objects.obj12 = obj;
             lv_obj_set_pos(obj, 21, 76);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1881,7 +1860,7 @@ void create_screen_inspection_history() {
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    objects.obj14 = obj;
+                    objects.obj13 = obj;
                     lv_obj_set_pos(obj, -2, 13);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
