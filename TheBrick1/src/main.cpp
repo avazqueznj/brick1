@@ -288,7 +288,21 @@ void loop() {
   }
 
   // ---------------- RFID ----------------
-  if (mfrc522 && (now - lastRfidAt >= RFID_MS)) {
+
+if (
+    ( 
+      ( stateManager->currentScreenState )
+      &&
+      ( stateManager->currentScreenState->screenId == SCREEN_ID_SELECT_ASSET_SCREEN 
+      || 
+      stateManager->currentScreenState->screenId == SCREEN_ID_INSPECTION_ZONES )
+    )
+
+    && 
+
+    mfrc522 && (now - lastRfidAt >= RFID_MS)
+) {
+
     lastRfidAt = now;
 
     static unsigned long lastCardReadTime = 0;
