@@ -209,21 +209,17 @@ public:
             result += "Form Fields:\n";
             size_t rowIndex = 0;
             for (const auto& row : type->formFields) {
-                result += "  Row ";
+                result += "";
                 result += String(rowIndex);
                 result += ": ";
-                for (size_t i = 0; i < row.size(); ++i) {
-                    result += row[i];
-                    if (i < row.size() - 1) {
-                        result += ", ";
-                    }
-                }
+                result += row[0];
+                                        
                 // Add the value if it exists
                 if (rowIndex < inspectionFormFieldValues.size()) {
-                    result += " => ";
+                    result += " : ";
                     result += inspectionFormFieldValues[rowIndex];
                 } else {
-                    result += " => <unset>";
+                    result += " : <unset>";
                 }
                 result += "\n";
                 ++rowIndex;
@@ -264,19 +260,19 @@ public:
         result += "Defects (sev > 0):\n";
         for (const auto& defect : defects) {
             if (defect.severity > 0) {
-                result += " - Asset ID: ";                
+                result += "Asset: ";                
                 result += defect.asset.ID;
-                result += ", Zone: " + defect.zoneName;
-                result += ", Component: " + defect.componentName;
-                result += ", Type: " + defect.defectType;
-                result += ", Severity: " + String(defect.severity);
-                result += ", Notes: " + defect.notes;
-                result += "\n";
+                result += " Zone: " + defect.zoneName;
+                result += ", " + defect.componentName;
+                result += ": " + defect.defectType;
+                result += " (" + String(defect.severity);
+                result += ") Notes: " + defect.notes;
+                result += "\n\n";
             }
         }
 
         result += "\nServer reply:\n\n";
-        result += serverReply;
+        result += submitTime + ">" + serverReply + "\n\n";
 
         return result;
     }   

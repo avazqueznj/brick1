@@ -120,7 +120,6 @@ public:
             lv_obj_set_size(letterKeyboard, 800, 200);
             lv_obj_align(letterKeyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
             lv_obj_add_flag(letterKeyboard, LV_OBJ_FLAG_HIDDEN);
-
             lv_keyboard_set_mode(letterKeyboard, LV_KEYBOARD_MODE_TEXT_LOWER);
 
             lv_obj_add_event_cb(
@@ -129,9 +128,9 @@ public:
                     lv_event_code_t code = lv_event_get_code(e);
                     screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
                     if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
+                        // hide
                         lv_obj_add_flag(self->letterKeyboard, LV_OBJ_FLAG_HIDDEN);
-                        // Optionally, restore settings screen position if you moved it
-            
+                    
                     }
                 },
                 LV_EVENT_ALL,
@@ -146,7 +145,6 @@ public:
             lv_obj_set_size(numericKeyboard, 800, 200);
             lv_obj_align(numericKeyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
             lv_obj_add_flag(numericKeyboard, LV_OBJ_FLAG_HIDDEN);
-
             lv_keyboard_set_mode(numericKeyboard, LV_KEYBOARD_MODE_NUMBER);
 
             lv_obj_add_event_cb(
@@ -155,9 +153,8 @@ public:
                     lv_event_code_t code = lv_event_get_code(e);
                     screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
                     if (self && (code == LV_EVENT_CANCEL || code == LV_EVENT_READY)) {
+                        // hide keyboard
                         lv_obj_add_flag(self->numericKeyboard, LV_OBJ_FLAG_HIDDEN);
-                        // Optionally, restore settings screen position if you moved it
-            
                     }
                 },
                 LV_EVENT_ALL,
@@ -192,7 +189,10 @@ public:
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
 
                 // Show keyboard
+               
                 lv_obj_clear_flag(self->letterKeyboard, LV_OBJ_FLAG_HIDDEN);
+                
+
                 lv_keyboard_set_textarea(self->letterKeyboard, ta);                       
 
             },
@@ -215,9 +215,10 @@ public:
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
 
                 // Show keyboard
+                
                 lv_obj_clear_flag(self->numericKeyboard, LV_OBJ_FLAG_HIDDEN);
-                lv_keyboard_set_textarea(self->numericKeyboard, ta);                       
 
+                lv_keyboard_set_textarea(self->numericKeyboard, ta);       
             },
             LV_EVENT_PRESSED,
             this

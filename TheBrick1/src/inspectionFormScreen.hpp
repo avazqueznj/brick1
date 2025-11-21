@@ -256,6 +256,7 @@ public:
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
 
                 // Show keyboard
+                lv_obj_add_flag(self->numericKeyboard, LV_OBJ_FLAG_HIDDEN);
                 lv_obj_clear_flag(self->letterKeyboard, LV_OBJ_FLAG_HIDDEN);
                 lv_keyboard_set_textarea(self->letterKeyboard, ta);  
                                 
@@ -289,6 +290,7 @@ public:
                 screenClass* self = static_cast<screenClass*>(lv_event_get_user_data(e));
 
                 // Show keyboard
+                lv_obj_add_flag(self->letterKeyboard, LV_OBJ_FLAG_HIDDEN);
                 lv_obj_clear_flag(self->numericKeyboard, LV_OBJ_FLAG_HIDDEN);
                 lv_keyboard_set_textarea(self->numericKeyboard, ta);  
                                 
