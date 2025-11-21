@@ -4918,8 +4918,8 @@
             {
               "objID": "0eb27aa4-d661-44b6-edfa-103cc4606b0b",
               "type": "LVGLPanelWidget",
-              "left": -22,
-              "top": -1,
+              "left": -26,
+              "top": 3,
               "width": 846,
               "height": 538,
               "customInputs": [],
