@@ -786,8 +786,8 @@ void create_screen_inspection_zones() {
             // allOkButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.all_ok_button = obj;
-            lv_obj_set_pos(obj, 411, 90);
-            lv_obj_set_size(obj, 120, 55);
+            lv_obj_set_pos(obj, 367, 86);
+            lv_obj_set_size(obj, 148, 65);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
             add_style_button_default(obj);
@@ -808,7 +808,7 @@ void create_screen_inspection_zones() {
             // compOkButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.comp_ok_button = obj;
-            lv_obj_set_pos(obj, 538, 90);
+            lv_obj_set_pos(obj, 530, 91);
             lv_obj_set_size(obj, 120, 55);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
@@ -830,7 +830,7 @@ void create_screen_inspection_zones() {
             // defectButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.defect_button = obj;
-            lv_obj_set_pos(obj, 665, 90);
+            lv_obj_set_pos(obj, 665, 91);
             lv_obj_set_size(obj, 120, 55);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
@@ -1101,7 +1101,7 @@ void create_screen_inspection_zones() {
             // inspection_zones_overlay
             lv_obj_t *obj = lv_obj_create(parent_obj);
             objects.inspection_zones_overlay = obj;
-            lv_obj_set_pos(obj, -23, -20);
+            lv_obj_set_pos(obj, -22, -1);
             lv_obj_set_size(obj, 846, 538);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_style_bg_color(obj, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1342,7 +1342,7 @@ void create_screen_login_screen() {
             lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_align(obj, LV_ALIGN_RIGHT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "v 1.3");
+            lv_label_set_text(obj, "v 1.4");
         }
         {
             // CLOCK_LOGIN

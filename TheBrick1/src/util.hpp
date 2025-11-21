@@ -147,82 +147,269 @@ void spinnerStart() {
 }
 
 
-    //------------------------------
 
 
+//-------------------------------------------------
 
-    void saveToKVStore( const String path, const std::vector<String>* file) {
+void scroll_widget_into_view( lv_obj_t* widget )
+{
+    if(!widget) return;
 
-        Serial.print("Save to KVStore....");
-        Serial.println( path );
-
-        String joined = "";
-        for (size_t i = 0; i < file->size(); i++) {
-            joined += file->at(i);
-            joined += '\n';
+    // Find the first scrollable ancestor
+    lv_obj_t* scrollable = lv_obj_get_parent(widget);
+    lv_obj_t* target = widget;
+    while(scrollable) {
+        if(lv_obj_has_flag(scrollable, LV_OBJ_FLAG_SCROLLABLE)) {
+            // Found the scrollable container
+            break;
         }
-
-        int ret = kv_set(path.c_str(), joined.c_str(), joined.length(), 0);
-        if (ret != MBED_SUCCESS) {
-            throw std::runtime_error("Failed to save  to KVStore!");
-        }
-
-        Serial.println("Saved to KVStore.");
+        target = scrollable;
+        scrollable = lv_obj_get_parent(scrollable);
     }
 
-    void saveToKVStore( const String path, const String &data) {
+    if(scrollable) {
+        // Find the Y position of the target within the scrollable
+        lv_coord_t y = lv_obj_get_y(target);
+        lv_obj_scroll_to_y(scrollable, y, LV_ANIM_OFF);
+    }
+    // else: not in a scrollable, do nothing
+}
+
+//-------------------------------------------------
+
+String newUUID() {
+    uint8_t uuid[16];
+    for (int i = 0; i < 16; ++i) {
+        uuid[i] = random(0, 256); // On Arduino, random(max) is [0, max)
+    }
+    // Set the UUID version (4) and variant (RFC 4122)
+    uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
+    uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1 (10xxxxxx)
+
+    char buf[37];
+    snprintf(buf, sizeof(buf),
+        "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+        uuid[0], uuid[1], uuid[2], uuid[3],
+        uuid[4], uuid[5],
+        uuid[6], uuid[7],
+        uuid[8], uuid[9],
+        uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]
+    );
+    return String(buf);
+}
+
+//-------------------------------------------------
+
+//++++
+
+
+#include <kvstore_global_api.h>  
+
+static bool kvKeyExists(const String &path, size_t *out_size /*nullable*/) {
+    kv_info_t info;
+    int ret = kv_get_info(path.c_str(), &info);
+    if (ret == MBED_SUCCESS) {
+        if (out_size != NULL) {
+            *out_size = info.size;
+        }
+        return true;
+    }
+    if (out_size != NULL) {
+        *out_size = 0;
+    }
+    return false;
+}
+
+// -----------------------------
+
+// Reference overload (actual impl)
+void saveToKVStore(const String path, const std::vector<String> &file) {
+    Serial.print("Save to KVStore....");
+    Serial.println(path);
+
+    // Join with '\n' and ensure trailing newline, so read-side is simple
+    String joined;
+    // Reserve a bit to reduce reallocs (optional, safe)
+    size_t est = 0;
+    for (size_t i = 0; i < file.size(); i++) {
+        est += file[i].length() + 1;
+    }
+    joined.reserve(est > 0 ? est : 16);
+
+    for (size_t i = 0; i < file.size(); i++) {
+        joined += file[i];
+        joined += '\n';
+    }
+
+    const char *data_ptr = joined.c_str();
+    size_t data_len = (size_t)joined.length();
+
+    int ret = kv_set(path.c_str(), data_ptr, data_len, 0);
+    if (ret != MBED_SUCCESS) {
+        Serial.println("ERROR: kv_set failed.");
+        throw std::runtime_error("Failed to save to KVStore!");
+    }
+
+    Serial.println("Saved to KVStore.");
+}
+
+// Pointer overload (kept for drop-in compatibility)
+void saveToKVStore(const String path, const std::vector<String> *file) {
+    if (file == NULL) {
+        throw std::runtime_error("saveToKVStore: file pointer is null");
+    }
+    saveToKVStore(path, *file);
+}
+
+// String overload (normalizes to line format then saves)
+void saveToKVStore(const String path, const String &data) {
+    std::vector<String> lines;
+    lines.reserve(16);
+
+    int start = 0;
+    while (true) {
+        int end = data.indexOf('\n', start);
+        if (end < 0) {
+            // push the tail even if no trailing newline
+            String lastLine = data.substring(start);
+            
+            if (lastLine.length() > 0) {
+                lines.push_back(lastLine);
+            }
+            break;
+        }
+        String line = data.substring(start, end);
         
-        std::vector<String> lines;
-        int start = 0;
-        while (true) {
-            int end = data.indexOf('\n', start);
-            if (end < 0) {
-                String lastLine = data.substring(start);
-                if (lastLine.length() > 0) lines.push_back(lastLine);
-                break;
-            }
-            String line = data.substring(start, end);
-            lines.push_back(line);
-            start = end + 1;
-        }
-
-        saveToKVStore(path, &lines);
-    }    
-
-    //-----
-
-    #define KV_BUFFER_SIZE  10240
-    std::vector<String> loadFromKVStore( const String path ) {
-        Serial.print("Load from KVStore   ....");
-        Serial.print( path + " " );
-
-        size_t actual_size = 0;
-        char buffer[ KV_BUFFER_SIZE ]; 
-
-        int ret = kv_get( path.c_str(), buffer, sizeof(buffer), &actual_size);
-        if (ret != MBED_SUCCESS || actual_size == 0) {
-            throw std::runtime_error("Failed to read file from disk!");
-        }
-
-        String joined = String(buffer).substring(0, actual_size);
-
-        std::vector<String> file;
-        int start = 0;
-        int end = joined.indexOf('\n');
-        while (end >= 0) {
-            String line = joined.substring(start, end);
-            line.trim();
-            if (line.length() > 0) {
-                file.push_back(line);
-            }
-            start = end + 1;
-            end = joined.indexOf('\n', start);
-        }
-
-        return( file );
-
-        Serial.println("Config loaded from KVStore and parsed!");
+        lines.push_back(line);
+        start = end + 1;
     }
+
+    saveToKVStore(path, lines);
+}
+
+// ------------------------------ 
+
+std::vector<String> loadFromKVStore(const String path) {
+    Serial.print("Load from KVStore .... ");
+    Serial.print(path);
+    Serial.print(" ");
+
+    size_t size_bytes = 0;
+    if (!kvKeyExists(path, &size_bytes) || size_bytes == 0) {
+        Serial.println("ERROR");
+        throw std::runtime_error("Failed to read from KVStore (missing or empty).");
+    }
+
+    // Allocate exact size + 1 for a null terminator
+    std::vector<char> buf;
+    buf.resize(size_bytes + 1);
+    size_t actual_size = 0;
+
+    int ret = kv_get(path.c_str(), &buf[0], size_bytes, &actual_size);
+    if (ret != MBED_SUCCESS || actual_size == 0) {
+        Serial.println("ERROR");
+        throw std::runtime_error("Failed to read from KVStore.");
+    }
+
+    // Ensure null-terminated for safe String construction
+    if (actual_size <= size_bytes) {
+        buf[actual_size] = '\0';
+    } else {
+        // Should not happen if kv_get behaved, but guard anyway
+        buf[size_bytes] = '\0';
+    }
+
+    String joined = String(&buf[0]); // safe now
+
+    std::vector<String> file;
+    file.reserve(32);
+
+    // Split on '\n' and KEEP the last segment even if no trailing newline
+    int start = 0;
+    while (true) {
+        int end = joined.indexOf('\n', start);
+        if (end < 0) {
+            String tail = joined.substring(start);
+            tail.trim();  // if  empties, remove this line
+            if (tail.length() > 0) {
+                file.push_back(tail);
+            }
+            break;
+        }
+        String line = joined.substring(start, end);
+        line.trim();      // remove if blank lines 
+        if (line.length() > 0) {
+            file.push_back(line);
+        }
+        start = end + 1;
+    }
+
+    Serial.println("OK");
+    return file;
+}
+
+// ------------------------------ HISTORY HELPERS
+
+#define NUM_INSPECTION_SLOTS 10
+
+std::vector<String> getInspectionHistory() {
+    std::vector<String> result;
+    result.reserve(NUM_INSPECTION_SLOTS);
+
+    for (int i = 1; i <= NUM_INSPECTION_SLOTS; i++) {
+        String path = "/kv/insp";
+        path += String(i);
+
+        Serial.print("Try read ");
+        Serial.print(path);
+        Serial.print(" -> ");
+
+        size_t size_bytes = 0;
+        if (!kvKeyExists(path, &size_bytes) || size_bytes == 0) {
+            Serial.println("empty");
+            continue;
+        }
+
+        // Safe read + parse
+        try {
+            std::vector<String> file = loadFromKVStore(path);
+            bool pushed = false;
+            for (size_t j = 0; j < file.size(); j++) {
+                if (file[j].startsWith("DISPLAYHEADER*")) {
+                    Serial.print("Slot ");
+                    Serial.print(i);
+                    Serial.print(": ");
+                    Serial.println(file[j]);
+                    result.push_back(file[j]);
+                    pushed = true;
+                    break; // Only one per file
+                }
+            }
+            if (!pushed) {
+                Serial.println("no DISPLAYHEADER*");
+            }
+        } catch (...) {
+            Serial.println("ERROR read slot");
+        }
+    }
+
+    return result;
+}
+
+void zapInspectionHistory() {
+    for (int i = 1; i <= NUM_INSPECTION_SLOTS; i++) {
+        String path = "/kv/insp";
+        path += String(i);
+        int ret = kv_remove(path.c_str());
+        if (ret != MBED_SUCCESS) {
+            // MBED_ERROR_ITEM_NOT_FOUND is fine to ignore
+        }
+    }
+    Serial.println("All inspection slots deleted.");
+}
+
+
+//-------------------------------------------------
 
 //-------------------------------------------------
 
@@ -282,102 +469,8 @@ public:
 
 };
 
-//-------------------------------------------------
 
-void scroll_widget_into_view( lv_obj_t* widget )
-{
-    if(!widget) return;
-
-    // Find the first scrollable ancestor
-    lv_obj_t* scrollable = lv_obj_get_parent(widget);
-    lv_obj_t* target = widget;
-    while(scrollable) {
-        if(lv_obj_has_flag(scrollable, LV_OBJ_FLAG_SCROLLABLE)) {
-            // Found the scrollable container
-            break;
-        }
-        target = scrollable;
-        scrollable = lv_obj_get_parent(scrollable);
-    }
-
-    if(scrollable) {
-        // Find the Y position of the target within the scrollable
-        lv_coord_t y = lv_obj_get_y(target);
-        lv_obj_scroll_to_y(scrollable, y, LV_ANIM_OFF);
-    }
-    // else: not in a scrollable, do nothing
-}
-
-//-------------------------------------------------
-
-String newUUID() {
-    uint8_t uuid[16];
-    for (int i = 0; i < 16; ++i) {
-        uuid[i] = random(0, 256); // On Arduino, random(max) is [0, max)
-    }
-    // Set the UUID version (4) and variant (RFC 4122)
-    uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
-    uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1 (10xxxxxx)
-
-    char buf[37];
-    snprintf(buf, sizeof(buf),
-        "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-        uuid[0], uuid[1], uuid[2], uuid[3],
-        uuid[4], uuid[5],
-        uuid[6], uuid[7],
-        uuid[8], uuid[9],
-        uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]
-    );
-    return String(buf);
-}
-
-//-------------------------------------------------
-
-#define NUM_INSPECTION_SLOTS 10
-std::vector<String> getInspectionHistory(){
-
-    std::vector<String> result;
-
-    // for each slot
-    for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
-        
-        String path = "/kv/insp" + String(i);
-        Serial.print(" Try read"  + path + " -> " );
-
-        // try decode
-        try {
-            std::vector<String> file = loadFromKVStore(path);
-            for (size_t j = 0; j < file.size(); ++j) {
-                if (file[j].startsWith("DISPLAYHEADER*")) {
-                    Serial.print("Slot ");
-                    Serial.print(i);
-                    Serial.print(": ");
-                    Serial.println(file[j]);
-
-                    result.push_back( file[j] );
-
-                    break; // Only one per file, skip rest
-                }
-            }
-        } catch (...) {
-            Serial.println( "ERROR Cant read slot..." );
-            // Slot empty or unreadable; skip
-        }
-    }    
-    
-    return result;
-}
-
-void zapInspectionHistory(){
-
-    for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
-        String path = "/kv/insp" + String(i);
-        kv_remove(path.c_str());
-    }
-    Serial.println("All inspection slots deleted.");
-}
-
-//-------------------------------------------------
+//=============================
 
 #endif
 
