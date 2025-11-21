@@ -257,10 +257,10 @@ public:
         // }
 
         // --- Defects: severity > 0 after ---
-        result += "Defects (sev > 0):\n";
+        result += "Defects:\n";
         for (const auto& defect : defects) {
             if (defect.severity > 0) {
-                result += "Asset: ";                
+                result += "- Asset: ";                
                 result += defect.asset.ID;
                 result += " Zone: " + defect.zoneName;
                 result += ", " + defect.componentName;
