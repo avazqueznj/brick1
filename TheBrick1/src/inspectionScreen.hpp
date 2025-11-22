@@ -1574,8 +1574,10 @@ public:
 
             try {
 
-                // parse the time stamp
+                // load
                 std::vector<String> file = loadFromKVStore(path);
+
+                // parse
                 for (const String& line : file) {
                     if (line.startsWith("DISPLAYHEADER*")) {
                         int firstStar = line.indexOf('*');

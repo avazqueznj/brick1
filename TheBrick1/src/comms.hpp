@@ -60,7 +60,7 @@ public:
         }
 
         if( WiFi.status() == WL_CONNECTED ){ 
-            Serial.println("WIFI connect.... CONNECTED");  
+            Serial.println("WIFI connect.... already CONNECTED !!");  
             return;
         }
 
@@ -72,7 +72,7 @@ public:
         for( int i = 0 ; i < 20; i++){
             status = WiFi.begin( ssid.c_str(), pass.c_str() );
             if( ( status ) != WL_CONNECTED ){
-                Serial.print("!WL_CONNECTED ... status: ");             
+                Serial.print(" not WL_CONNECTED ... status: ");             
                 Serial.println( status );        
                 delayBlink();     
                 delay(1000);
@@ -97,7 +97,8 @@ public:
 
         bool serverConnected = false;
         Serial.print("Connecting to server... ");        
-        Serial.println(serverURL);        
+        Serial.println(serverURL);     
+
         for( int i = 0 ; i < 3; i++){
             if( !client.connect( serverURL.c_str(), 443 ) ){
                 Serial.println("Cannto connect, retrying...");                
@@ -229,10 +230,11 @@ public:
             Serial.println( "Sending ..." );
 
             client.print(request); // send - 
+
             // wait reply
             unsigned long timeout = millis();
             while (client.available() == 0) {
-                if (millis() - timeout > 20000) {                    
+                if (millis() - timeout > BRICK_HTTP_READ_TIMEOUT) {                    
                     client.stop();
                     throw std::runtime_error("Server did not respond!"); 
                 }
@@ -247,7 +249,8 @@ public:
 
             Serial.println( "read reply done!:" );                        
             Serial.println( response );            
-            Serial.println( "Wifi shut down ***" );            
+            Serial.println( "Wifi shut down ***" );   
+
             client.stop();
             WiFi.end();                     
 
@@ -255,7 +258,10 @@ public:
             int bodyIndex = response.indexOf("\r\n\r\n");
             if (bodyIndex != -1) {
                 response = response.substring(bodyIndex + 4);
+            } else {
+                throw std::runtime_error("ERROR: could not find payload marker"); 
             }
+
 
             if (response.indexOf("\"success\":true") != -1) {
                 Serial.println( "Success !!!" );            
@@ -283,8 +289,7 @@ public:
         timeClient.begin();
 
         int tries = 0;
-        while (!timeClient.update()) {
-            timeClient.forceUpdate();
+        while ( !timeClient.forceUpdate() ) {
             delay(500);
             tries++;
             if (tries > 5) {
