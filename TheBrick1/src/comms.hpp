@@ -75,7 +75,6 @@ public:
                 Serial.print(" not WL_CONNECTED ... status: ");             
                 Serial.println( status );        
                 delayBlink();     
-                delay(1000);
             }else{
                 break;
             }
