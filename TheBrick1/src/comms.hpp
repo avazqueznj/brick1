@@ -238,6 +238,7 @@ public:
                     client.stop();
                     throw std::runtime_error("Server did not respond!"); 
                 }
+                delayBlink();
             }
 
             // Read response
@@ -245,6 +246,7 @@ public:
             while (client.available()) {
                 String line = client.readStringUntil('\n');
                 response += line + "\n";
+                delayBlink();
             }
 
             Serial.println( "read reply done!:" );                        
