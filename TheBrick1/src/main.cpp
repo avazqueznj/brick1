@@ -453,7 +453,7 @@ if (
            if (cmd.indexOf("set token") == 0) {
               Serial.println("===== SET TOKEN =====");
               BEARER_TOKEN = cmd.substring(9);
-              saveToKVStore( "/kv/token" , BEARER_TOKEN );
+              saveToKVStore( "/kv/token" , BEARER_TOKEN + "\n" );
               delay( 1000 );
               std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
               Serial.println( "B[" + BEARER_TOKEN + "]" );
