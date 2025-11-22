@@ -7,7 +7,7 @@
  ********************************************************************************************/
 
 void navigateTo(int screenId);
-
+extern String BEARER_TOKEN;
 
                                 // P R O B L E M  ***  D O M A I N 
 
@@ -289,7 +289,7 @@ public:
         result += 
             "DISPLAYHEADER*" 
             + String(rtc->now().unixtime()) +
-            + "*" + id.substring(id.length() - 5) 
+            + "*" + id.substring(id.length() - 5) + "(" + BEARER_TOKEN.substring(BEARER_TOKEN.length() - 5) + ")"
             + "*" + submitTime 
             + "*" + driver_name 
             + "*" + assets[0].buttonName

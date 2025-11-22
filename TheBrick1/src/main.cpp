@@ -45,6 +45,8 @@
 
 //-------------------------------
 
+// machine to machin token
+String BEARER_TOKEN = "";
 
 // RFID Pins
 #define SS_PIN 10  // SDA pin on RC522
@@ -214,6 +216,14 @@ void setup() {
 
   Serial.println("Start screens  ...");
   create_screens();           
+
+  try{
+    std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
+    BEARER_TOKEN = savedToken[0];
+  }catch(...){
+    Serial.println( "ERROR could not load token" );
+  }
+
 
   stateManager = new stateManagerClass();  
   stateManager->init();
@@ -440,8 +450,22 @@ if (
               zapInspectionHistory();
             } else
 
+           if (cmd.indexOf("set token") == 0) {
+              Serial.println("===== SET TOKEN =====");
+              BEARER_TOKEN = cmd.substring(9);
+              saveToKVStore( "/kv/token" , BEARER_TOKEN );
+              delay( 1000 );
+              std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
+              Serial.println( "B[" + BEARER_TOKEN + "]" );
+              Serial.println( "S[" + savedToken[0] + "]" );
+            } else
 
-
+            if (cmd.indexOf("show token") == 0) {
+              Serial.println("===== (SHOW TOKEN) =====");
+              std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
+              Serial.println( "S[" + savedToken[0] + "]" );
+              Serial.println( "B[" + BEARER_TOKEN + "]" );
+            } else
 
             if (cmd == "?") {
               Serial.println("===== HELP =====");
@@ -457,6 +481,9 @@ if (
 
               Serial.println("show history");
               Serial.println("zap history");
+
+              Serial.println("set token{token}");
+
             } else         
 
             {
