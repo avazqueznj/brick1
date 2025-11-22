@@ -283,216 +283,225 @@ void loop() {
     return;
   }
 
-  stateManager->processPendingScreenTransition();
+  try{
 
-  delayBlink();  // 50MSEC *********************
-  lv_timer_handler();
-  ui_tick();
+    stateManager->processPendingScreenTransition();
 
-  unsigned long now = millis();
+    delayBlink();  // 50MSEC *********************
+    lv_timer_handler();
+    ui_tick();
 
-  // ---------------- mem stats ----------------
-  if (now - lastMemAt >= MEM_MS) {
-    getInternalHeapFreeBytes();
-    lastMemAt = now;
-  }
+    unsigned long now = millis();
 
-  // ---------------- RFID ----------------
-
-if (
-    ( 
-      ( stateManager->currentScreenState )
-      &&
-      ( stateManager->currentScreenState->screenId == SCREEN_ID_SELECT_ASSET_SCREEN 
-      || 
-      stateManager->currentScreenState->screenId == SCREEN_ID_INSPECTION_ZONES )
-    )
-
-    && 
-
-    mfrc522 && (now - lastRfidAt >= RFID_MS)
-) {
-
-    lastRfidAt = now;
-
-    static unsigned long lastCardReadTime = 0;
-    static byte lastUID[10];
-    static byte lastUIDLength = 0;
-
-    mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x83); // Field ON
-
-    if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
-
-      bool isSameCard = false;
-      if (mfrc522->uid.size == lastUIDLength) {
-        if (memcmp(mfrc522->uid.uidByte, lastUID, lastUIDLength) == 0) {
-          if ((now - lastCardReadTime) < 3000UL) {
-            isSameCard = true;
-          }
-        }
-      }
-
-      if (!isSameCard) {
-        lastCardReadTime = now;
-        lastUIDLength = mfrc522->uid.size;
-        if (lastUIDLength > sizeof(lastUID)) lastUIDLength = sizeof(lastUID);
-        memcpy(lastUID, mfrc522->uid.uidByte, lastUIDLength);
-
-        // Build tag string in your style
-        String data = "RFID event [";
-        for (byte i = 0; i < mfrc522->uid.size; i++) {
-            data += ":";
-            data += String(mfrc522->uid.uidByte[i]);
-        }
-        data += "]";
-        Serial .println( data );
-
-        stateManager->rfidEvent(mfrc522->uid.uidByte, mfrc522->uid.size);
-      }
-
-      mfrc522->PICC_HaltA();
-      mfrc522->PCD_StopCrypto1();
+    // ---------------- mem stats ----------------
+    if (now - lastMemAt >= MEM_MS) {
+      getInternalHeapFreeBytes();
+      lastMemAt = now;
     }
 
-    mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x00); // Field OFF
-  }
+    // ---------------- RFID ----------------
 
-  // ---------------- RTC ----------------
-  if (rtcUp && rtc && (now - lastRtcAt >= RTC_MS)) {
-    lastRtcAt = now;    
-    stateManager->clockTic( rtc->now() ); // make copy
-  }
+    if (
+        ( 
+          ( stateManager->currentScreenState )
+          &&
+          ( stateManager->currentScreenState->screenId == SCREEN_ID_SELECT_ASSET_SCREEN 
+          || 
+          stateManager->currentScreenState->screenId == SCREEN_ID_INSPECTION_ZONES )
+        )
 
-  // ---------------- keypad ----------------
-  if (now - lastKeysAt >= KEYS_MS) {
-    lastKeysAt = now;
+        && 
 
-    for (byte row = 0; row < ROWS; row++) {
-      digitalWrite(rowPins[row], HIGH);
-      for (byte col = 0; col < COLS; col++) {
-        int val = analogRead(colPins[col]);
-        if (val > ANALOG_THRESHOLD) {
-          if (now - lastPressTime > DEBOUNCE_MS) {
-            char key = hexaKeys[row][col];
-            stateManager->keyboardEvent(String(key));
-            lastPressTime = now;
-          }
-        }
-      }
-      digitalWrite(rowPins[row], LOW);
-    }
-  }
+        mfrc522 && (now - lastRfidAt >= RFID_MS)
+    ) {
 
-  //-------------------  commands
+      lastRfidAt = now;
 
-  if (now - lastSerialPollAt >= SERIAL_POLL_MS) {
-    lastSerialPollAt = now;
+      static unsigned long lastCardReadTime = 0;
+      static byte lastUID[10];
+      static byte lastUIDLength = 0;
 
-    if (Serial.available()) {
+      mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x83); // Field ON
 
-        // read
-        String cmd = "";
-        while (Serial.available()) {
-            char c = Serial.read();
-            if (c == '\n' || c == '\r') break;
-            cmd += c;
-        }
+      if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
 
-        // do
-        cmd.trim();
-        if (cmd.length() > 0) {
-
-            if (cmd == "show config") {
-              Serial.println("===== SHOW CONFIG =====");
-              domainManagerClass::getInstance()->printDebugContents();               
-            } else
-            if (cmd == "delete config") {
-              Serial.println("===== delete CONFIG =====");
-              const std::vector<String> empty;
-              saveToKVStore( "/kv/config", &empty );     
-              domainManagerClass::getInstance()->emptyAll();
-              Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
-            } else
-            
-
-            if (cmd == "show settings") {              
-              Serial.println("===== SHOW SETTINGS =====");
-              Serial.println("===== in file");
-              for (const auto& kv : stateManager->settings ) {
-                  Serial.print(kv.first); Serial.print(" = "); Serial.println(kv.second);
-              }
-              Serial.println("===== loaded");              
-              stateManager->printLoadedSettings();
-              Serial.println("=================");
-            }else              
-            if (cmd == "reset settings") {
-              Serial.println("===== RESET SETTINGS  =====");
-              stateManager->resetSettingsFile();
-            }else
-                      
-            
-            if (cmd == "show inspection") {
-              Serial.println("===== SHW INSPECTION  =====");
-              Serial.println( domainManagerClass::getInstance()->currentInspection.toEDI() );
-            } else
-            if (cmd == "show human inspection") {
-              Serial.println("===== SHW HUMAN INSPECTION  =====");
-              Serial.println( domainManagerClass::getInstance()->currentInspection.toHumanString() );
-            } else
-            
-
-           if (cmd == "show history") {
-              Serial.println("===== HISTORY  =====");
-              getInspectionHistory();
-            } else
-           if (cmd == "zap history") {
-              Serial.println("===== ZAP HISTORY  =====");
-              zapInspectionHistory();
-            } else
-
-           if (cmd.indexOf("set token") == 0) {
-              Serial.println("===== SET TOKEN =====");
-              BEARER_TOKEN = cmd.substring(9);
-              saveToKVStore( "/kv/token" , BEARER_TOKEN + "\n" );
-              delay( 1000 );
-              std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
-              Serial.println( "B[" + BEARER_TOKEN + "]" );
-              Serial.println( "S[" + savedToken[0] + "]" );
-            } else
-
-            if (cmd.indexOf("show token") == 0) {
-              Serial.println("===== (SHOW TOKEN) =====");
-              std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
-              Serial.println( "S[" + savedToken[0] + "]" );
-              Serial.println( "B[" + BEARER_TOKEN + "]" );
-            } else
-
-            if (cmd == "?") {
-              Serial.println("===== HELP =====");
-              
-              Serial.println("show config");
-              Serial.println("delete config");
-
-              Serial.println("show settings");
-              Serial.println("reset settings");              
-              
-              Serial.println("show inspection");
-              Serial.println("show human inspection");
-
-              Serial.println("show history");
-              Serial.println("zap history");
-
-              Serial.println("set token{token}");
-
-            } else         
-
-            {
-              Serial.println( "*** Unknown brick command  ***" );
+        bool isSameCard = false;
+        if (mfrc522->uid.size == lastUIDLength) {
+          if (memcmp(mfrc522->uid.uidByte, lastUID, lastUIDLength) == 0) {
+            if ((now - lastCardReadTime) < 3000UL) {
+              isSameCard = true;
             }
+          }
         }
 
+        if (!isSameCard) {
+          lastCardReadTime = now;
+          lastUIDLength = mfrc522->uid.size;
+          if (lastUIDLength > sizeof(lastUID)) lastUIDLength = sizeof(lastUID);
+          memcpy(lastUID, mfrc522->uid.uidByte, lastUIDLength);
 
+          // Build tag string in your style
+          String data = "RFID event [";
+          for (byte i = 0; i < mfrc522->uid.size; i++) {
+              data += ":";
+              data += String(mfrc522->uid.uidByte[i]);
+          }
+          data += "]";
+          Serial .println( data );
+
+          stateManager->rfidEvent(mfrc522->uid.uidByte, mfrc522->uid.size);
+        }
+
+        mfrc522->PICC_HaltA();
+        mfrc522->PCD_StopCrypto1();
+      }
+
+      mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x00); // Field OFF
+    }
+
+    // ---------------- RTC ----------------
+    if (rtcUp && rtc && (now - lastRtcAt >= RTC_MS)) {
+      lastRtcAt = now;    
+      stateManager->clockTic( rtc->now() ); // make copy
+    }
+
+    // ---------------- keypad ----------------
+    if (now - lastKeysAt >= KEYS_MS) {
+      lastKeysAt = now;
+
+      for (byte row = 0; row < ROWS; row++) {
+        digitalWrite(rowPins[row], HIGH);
+        for (byte col = 0; col < COLS; col++) {
+          int val = analogRead(colPins[col]);
+          if (val > ANALOG_THRESHOLD) {
+            if (now - lastPressTime > DEBOUNCE_MS) {
+              char key = hexaKeys[row][col];
+              stateManager->keyboardEvent(String(key));
+              lastPressTime = now;
+            }
+          }
+        }
+        digitalWrite(rowPins[row], LOW);
+      }
+    }
+
+    //-------------------  commands
+
+    if (now - lastSerialPollAt >= SERIAL_POLL_MS) {
+      lastSerialPollAt = now;
+
+      if (Serial.available()) {
+
+          // read
+          String cmd = "";
+          while (Serial.available()) {
+              char c = Serial.read();
+              if (c == '\n' || c == '\r') break;
+              cmd += c;
+          }
+
+          // do
+          cmd.trim();
+          if (cmd.length() > 0) {
+
+              if (cmd == "show config") {
+                Serial.println("===== SHOW CONFIG =====");
+                domainManagerClass::getInstance()->printDebugContents();               
+              } else
+              if (cmd == "delete config") {
+                Serial.println("===== delete CONFIG =====");
+                const std::vector<String> empty;
+                saveToKVStore( "/kv/config", &empty );     
+                domainManagerClass::getInstance()->emptyAll();
+                Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
+              } else
+              
+
+              if (cmd == "show settings") {              
+                Serial.println("===== SHOW SETTINGS =====");
+                Serial.println("===== in file");
+                for (const auto& kv : stateManager->settings ) {
+                    Serial.print(kv.first); Serial.print(" = "); Serial.println(kv.second);
+                }
+                Serial.println("===== loaded");              
+                stateManager->printLoadedSettings();
+                Serial.println("=================");
+              }else              
+              if (cmd == "reset settings") {
+                Serial.println("===== RESET SETTINGS  =====");
+                stateManager->resetSettingsFile();
+              }else
+                        
+              
+              if (cmd == "show inspection") {
+                Serial.println("===== SHW INSPECTION  =====");
+                Serial.println( domainManagerClass::getInstance()->currentInspection.toEDI() );
+              } else
+              if (cmd == "show human inspection") {
+                Serial.println("===== SHW HUMAN INSPECTION  =====");
+                Serial.println( domainManagerClass::getInstance()->currentInspection.toHumanString() );
+              } else
+              
+
+            if (cmd == "show history") {
+                Serial.println("===== HISTORY  =====");
+                getInspectionHistory();
+              } else
+            if (cmd == "zap history") {
+                Serial.println("===== ZAP HISTORY  =====");
+                zapInspectionHistory();
+              } else
+
+            if (cmd.indexOf("set token") == 0) {
+                Serial.println("===== SET TOKEN =====");
+                BEARER_TOKEN = cmd.substring(9);
+                saveToKVStore( "/kv/token" , BEARER_TOKEN + "\n" );
+                delay( 1000 );
+                std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
+                Serial.println( "B[" + BEARER_TOKEN + "]" );
+                Serial.println( "S[" + savedToken[0] + "]" );
+              } else
+
+              if (cmd.indexOf("show token") == 0) {
+                Serial.println("===== (SHOW TOKEN) =====");
+                std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
+                Serial.println( "S[" + savedToken[0] + "]" );
+                Serial.println( "B[" + BEARER_TOKEN + "]" );
+              } else
+
+              if (cmd == "?") {
+                Serial.println("===== HELP =====");
+                
+                Serial.println("show config");
+                Serial.println("delete config");
+
+                Serial.println("show settings");
+                Serial.println("reset settings");              
+                
+                Serial.println("show inspection");
+                Serial.println("show human inspection");
+
+                Serial.println("show history");
+                Serial.println("zap history");
+
+                Serial.println("set token{token}");
+
+              } else         
+
+              {
+                Serial.println( "*** Unknown brick command  ***" );
+              }
+          }
+
+
+      }
+    }
+
+  }catch(const std::exception& e) {  
+    while(true){
+      sosBlink(  "FATAL: " + String( e.what() )  );
     }
   }
+      
 
 }

@@ -161,6 +161,7 @@ public:
                         if( currentRow == "" ) continue;  // null line
                         response.push_back( currentRow );  // add, next ...       
                         if( response.size() > 10000 ){
+                            Serial.println( "Error more than 10,000 rows read !!!" );            
                             throw std::runtime_error( "Error more than 10,000 rows read" );
                         }                
                         Serial.println(currentRow );
@@ -171,6 +172,7 @@ public:
                     // keep reading
                     currentRow += c;
                     if( currentRow.length() > 1000 ){
+                        Serial.println( "Error more than 1000 chars in line!!!" );            
                         throw std::runtime_error( "Error more than 1000 chars in line" );
                     }                
 
@@ -236,6 +238,7 @@ public:
             while (client.available() == 0) {
                 if (millis() - timeout > BRICK_HTTP_READ_TIMEOUT) {                    
                     client.stop();
+                    Serial.println( "Server did not respond!!!!" );      
                     throw std::runtime_error("Server did not respond!"); 
                 }
                 delayBlink();
@@ -261,6 +264,7 @@ public:
             if (bodyIndex != -1) {
                 response = response.substring(bodyIndex + 4);
             } else {
+                Serial.println( "ERROR: could not find payload marker!!!!" );      
                 throw std::runtime_error("ERROR: could not find payload marker"); 
             }
 
@@ -268,6 +272,8 @@ public:
             if (response.indexOf("\"success\":true") != -1) {
                 Serial.println( "Success !!!" );            
             } else {
+                Serial.println( "ERROR !!!" );            
+                Serial.println( response );            
                 throw std::runtime_error("ERROR: Transmission error."); 
             }
 
