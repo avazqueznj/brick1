@@ -272,7 +272,7 @@ public:
         }
 
         result += "\nServer reply:\n\n";
-        result += submitTime + ">" + serverReply + "\n\n";
+        result += serverReply + "\n\n";
 
         return result;
     }   
