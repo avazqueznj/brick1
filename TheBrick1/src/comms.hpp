@@ -136,6 +136,7 @@ public:
             client.println("Accept: */*");
             client.print("Authorization: Bearer ");
             client.println(BEARER_TOKEN); 
+            client.println("User-Agent: InspectionBrick/1.0 ( ARM; " + String( lv_label_get_text(objects.version_label) ) + ")"  );            
             client.println("Connection: close");             
             client.println();             
             
@@ -222,6 +223,7 @@ public:
             request += "Host: " + serverURL + "\r\n";
             request += "Content-Type: text/plain\r\n";
             request += "Authorization: Bearer " + BEARER_TOKEN + "\r\n";            
+            request += "User-Agent: InspectionBrick/1.0 ( ARM; " + String( lv_label_get_text(objects.version_label) ) + ")\r\n" ;
             request += "Content-Length: " + String(payload.length()) + "\r\n";
             request += "Connection: close\r\n";
             request += "\r\n";
@@ -229,6 +231,7 @@ public:
             
             //Serial.println( request ); // leaks the token!!!
             Serial.println( "Sending ..." );
+            Serial.println( request );
 
             client.print(request); // send - 
 
