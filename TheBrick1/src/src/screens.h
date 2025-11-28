@@ -62,6 +62,7 @@ typedef struct _objects_t {
     lv_obj_t *battery_form;
     lv_obj_t *clock_zones;
     lv_obj_t *driver_name_zones;
+    lv_obj_t *battery_zones;
     lv_obj_t *all_ok_button;
     lv_obj_t *comp_ok_button;
     lv_obj_t *defect_button;
@@ -92,7 +93,6 @@ typedef struct _objects_t {
     lv_obj_t *defect_dialog_delete;
     lv_obj_t *defect_dialog_minor;
     lv_obj_t *defect_dialog_major;
-    lv_obj_t *battery_zones;
     lv_obj_t *version_label;
     lv_obj_t *clock_login;
     lv_obj_t *battery_login;

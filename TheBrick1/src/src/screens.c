@@ -831,6 +831,18 @@ void create_screen_inspection_zones() {
             lv_label_set_text(obj, "driver name");
         }
         {
+            // battery_zones
+            lv_obj_t *obj = lv_label_create(parent_obj);
+            objects.battery_zones = obj;
+            lv_obj_set_pos(obj, 668, -219);
+            lv_obj_set_size(obj, 117, 16);
+            lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(obj, "                             ");
+        }
+        {
             // allOkButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.all_ok_button = obj;
@@ -1360,18 +1372,6 @@ void create_screen_inspection_zones() {
                     }
                 }
             }
-        }
-        {
-            // battery_zones
-            lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.battery_zones = obj;
-            lv_obj_set_pos(obj, 668, -219);
-            lv_obj_set_size(obj, 117, 16);
-            lv_obj_set_style_align(obj, LV_ALIGN_LEFT_MID, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "                             ");
         }
     }
     
