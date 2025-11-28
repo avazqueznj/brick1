@@ -145,6 +145,19 @@ public:
     currentScreenState->modalDialogEvent( action, button );
   }
 
+  void batteryInfo( String info){
+    try{
+      if( currentScreenState !=  NULL ){
+        Serial.println( "*** battery event ***" );                    
+        currentScreenState->batteryInfo( info );
+      }
+    }catch( const std::runtime_error& error ){
+      Serial.println( "*** ERROR while handling battery event ***" );                    
+      Serial.println( error.what() );                    
+    }          
+  }
+
+
    void rfidEvent( byte *uid, byte length ){
     try{
       if( currentScreenState !=  NULL ){

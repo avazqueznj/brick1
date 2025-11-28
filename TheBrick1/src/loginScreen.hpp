@@ -24,6 +24,9 @@ public:
         lv_label_set_text( objects.clock_login, time.c_str());
     }
 
+    void batteryInfo( String info ) override {
+        lv_label_set_text( objects.battery_login, info.c_str());
+    }
 
     void handleKeyboardEvent( String key ) override {
         screenClass::handleKeyboardEvent( key );

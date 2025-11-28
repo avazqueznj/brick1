@@ -27,6 +27,10 @@ public:
         lv_label_set_text(  objects.driver_name_zones, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }    
 
+    
+    void batteryInfo( String info ) override {
+        lv_label_set_text( objects.battery_zones, info.c_str());
+    }
 
     void rfidEvent(byte *uid, byte length) override {
 

@@ -47,6 +47,10 @@ public:
 
     settingsScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_SETTINGS ){    
     }
+    
+    void batteryInfo( String info ) override {
+        lv_label_set_text( objects.battery_settings, info.c_str());
+    }
 
     void clockTic( String time ) override {
         lv_label_set_text( objects.clock_settings, time.c_str());

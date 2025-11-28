@@ -26,6 +26,10 @@ public:
         lv_label_set_text(  objects.driver_name_main, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }
 
+    
+    void batteryInfo( String info ) override {
+        lv_label_set_text( objects.battery_main, info.c_str());
+    }
 
    void handleKeyboardEvent( String key ) override {        
         screenClass::handleKeyboardEvent( key );

@@ -23,7 +23,12 @@ public:
         lv_label_set_text(  objects.driver_name_insptype, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }    
 
-   void handleKeyboardEvent( String key ) override {        
+    
+    void batteryInfo( String info ) override {
+        lv_label_set_text( objects.battery_type, info.c_str());
+    }
+
+    void handleKeyboardEvent( String key ) override {        
         screenClass::handleKeyboardEvent( key );
         lv_obj_t* focused = lv_group_get_focused(inputGroup);
 

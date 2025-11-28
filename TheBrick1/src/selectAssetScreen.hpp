@@ -33,6 +33,11 @@ public:
         lv_label_set_text(  objects.driver_name_asset, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }    
 
+    
+    void batteryInfo( String info ) override {
+        lv_label_set_text( objects.battery_asset, info.c_str());
+    }
+
     virtual void rfidEvent(byte *uid, byte length) override {
 
         // 1) Convert UID to same tag format

@@ -245,6 +245,16 @@ void setup() {
 //================================================================================================================================================
 //================================================================================================================================================
 
+// voltaje check
+const int VOLTAGE_PIN = A2;
+// Divider resistors: R1 = 30k (high side), R2 = 7.5k (low side)
+const float R1 = 30000.0;
+const float R2 = 7500.0;
+const float VREF = 3.3;
+const int maxRaw = 260;  // 
+const int minRaw = 180;  // 
+const int battSamples = 60;
+
 // ---- tunable cadences (ms) ----
 const unsigned long RFID_MS = 500;     // RFID poll
 const unsigned long RTC_MS  = 250;     // clock tick 250
@@ -295,7 +305,11 @@ void loop() {
 
     // ---------------- mem stats ----------------
     if (now - lastMemAt >= MEM_MS) {
+
+      // memory
       getInternalHeapFreeBytes();
+      
+      //--------
       lastMemAt = now;
     }
 
@@ -387,8 +401,42 @@ void loop() {
 
     //-------------------  commands
 
-    if (now - lastSerialPollAt >= SERIAL_POLL_MS) {
-      lastSerialPollAt = now;
+  if (now - lastSerialPollAt >= SERIAL_POLL_MS) {
+    lastSerialPollAt = now;
+
+
+// battery moni
+static int samples[battSamples] = {0};
+static int idx = 0;
+static bool filled = false;
+
+int raw = analogRead(VOLTAGE_PIN);
+samples[idx++] = raw;
+if (idx >= battSamples) {
+  idx = 0;
+  filled = true;
+}
+
+// Find the highest value in the array
+int maxSeen = samples[0];
+int count = filled ? battSamples : idx;
+for (int i = 1; i < count; i++) {
+  if (samples[i] > maxSeen) maxSeen = samples[i];
+}
+
+float v_s = maxSeen * (VREF / 1023.0);
+float v_batt = v_s * (R1 + R2) / R2;
+float percent = 100.0 * (maxSeen - minRaw) / (maxRaw - minRaw);
+if (percent > 100.0) percent = 100.0;
+if (percent < 0.0) percent = 0.0;
+
+Serial.print("max (20): "); Serial.print(maxSeen);
+Serial.print(" | Bat(V): "); Serial.print(v_batt, 2);
+Serial.println(" | Bat %: "); Serial.print(percent, 1); Serial.println("%");
+
+stateManager->batteryInfo( "\uF242 " + String(percent) + "%");
+
+  //-----
 
       if (Serial.available()) {
 

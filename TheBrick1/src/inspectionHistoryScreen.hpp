@@ -28,7 +28,12 @@ public:
         lv_label_set_text(  objects.driver_name_history, domainManagerClass::getInstance()->loggedUser.name.c_str()  );        
     }    
 
-   void handleKeyboardEvent( String key ) override {    
+    
+    void batteryInfo( String info ) override {
+        lv_label_set_text( objects.battery_history, info.c_str());
+    }
+
+    void handleKeyboardEvent( String key ) override {    
     
         if( !lv_obj_has_flag(objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN) ){
             

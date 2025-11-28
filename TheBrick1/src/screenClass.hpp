@@ -55,6 +55,10 @@ public:
         }
     };
 
+    virtual void batteryInfo( String info ){
+        
+    }
+
     virtual void rfidEvent( byte *uid, byte length ){
     }
 
