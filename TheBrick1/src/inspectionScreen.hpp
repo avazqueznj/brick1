@@ -1476,7 +1476,8 @@ public:
             // save it
             String filingRecord = 
                 domain->currentInspection.toEDI()  +
-                domain->currentInspection.toHumanString() ;
+                domain->currentInspection.toHumanString() 
+                + "\n";
 
             saveInspectionToDisk( filingRecord );
 
@@ -1494,7 +1495,8 @@ public:
             // save it
             String filingRecord = 
                 domain->currentInspection.toEDI()  +
-                domain->currentInspection.toHumanString() ;
+                domain->currentInspection.toHumanString() 
+                + "\n";
             saveInspectionToDisk( filingRecord );
 
             spinnerEnd();       
@@ -1541,7 +1543,8 @@ public:
             // save it
             String filingRecord = 
                 domain->currentInspection.toEDI()  +
-                domain->currentInspection.toHumanString() ;
+                domain->currentInspection.toHumanString() 
+                + "\n";
 
             saveInspectionToDisk( filingRecord );
 

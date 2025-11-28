@@ -434,7 +434,7 @@ Serial.print("max (20): "); Serial.print(maxSeen);
 Serial.print(" | Bat(V): "); Serial.print(v_batt, 2);
 Serial.println(" | Bat %: "); Serial.print(percent, 1); Serial.println("%");
 
-stateManager->batteryInfo( "\uF242 " + String(percent) + "%");
+stateManager->batteryInfo( "\uF242 " + String(maxSeen) + " "+ String(percent) + "%");
 
   //-----
 

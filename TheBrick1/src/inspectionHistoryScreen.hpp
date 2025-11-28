@@ -272,6 +272,9 @@ public:
                             if (i < row.size() - 1) inspectionTEXT += "\n";                             
                         }
                     }
+
+                    inspectionTEXT += "\n";
+
                     Serial.println(inspectionTEXT.c_str());
                     lv_textarea_set_text(objects.inspection_view, inspectionTEXT.c_str());
 
@@ -310,7 +313,7 @@ public:
                 inspectionEDI
                 );
             
-            String filingRecord = inspectionEDI + inspectionTEXT + result;
+            String filingRecord = inspectionEDI + inspectionTEXT + result +"\n";
             Serial.println("Update ... " + currentEDIPath);
             Serial.println("With ... " + filingRecord);
             saveToKVStore( currentEDIPath,  filingRecord);                
@@ -327,7 +330,7 @@ public:
             String chainedError = String( "ERROR: Inspection possibly not sent." ) + error.what();           
             showDialog( chainedError.c_str() );
 
-            String filingRecord = inspectionEDI + inspectionTEXT + error.what();
+            String filingRecord = inspectionEDI + inspectionTEXT + error.what() +"\n";
             Serial.println("Update ... " + currentEDIPath);
             Serial.println("With ... " + filingRecord);
             saveToKVStore( currentEDIPath,  filingRecord);            
