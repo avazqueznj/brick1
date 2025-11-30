@@ -250,9 +250,9 @@ const int VOLTAGE_PIN = A2;
 // Divider resistors: R1 = 30k (high side), R2 = 7.5k (low side)
 const float R1 = 30000.0;
 const float R2 = 7500.0;
-const float VREF = 3.3;
-const int maxRaw = 260;  // 
-const int minRaw = 180;  // 
+const float VREF = 3.3; // volts
+const int maxRaw = 250;  // 
+const int minRaw = 195;  // 
 const int battSamples = 60;
 
 // ---- tunable cadences (ms) ----
@@ -405,6 +405,7 @@ void loop() {
     lastSerialPollAt = now;
 
 
+//=============================================================
 // battery moni
 static int samples[battSamples] = {0};
 static int idx = 0;
@@ -430,13 +431,19 @@ float percent = 100.0 * (maxSeen - minRaw) / (maxRaw - minRaw);
 if (percent > 100.0) percent = 100.0;
 if (percent < 0.0) percent = 0.0;
 
+// Quantize percent to nearest lower 10 for UI
+int percent10 = ((int)percent / 10) * 10;
+
+// Debug output
 Serial.print("max (20): "); Serial.print(maxSeen);
 Serial.print(" | Bat(V): "); Serial.print(v_batt, 2);
-Serial.println(" | Bat %: "); Serial.print(percent, 1); Serial.println("%");
+Serial.print(" | Bat % (raw): "); Serial.print(percent, 2);
+Serial.print(" | Bat % (UI): "); Serial.print(percent10); Serial.println("%");
 
-stateManager->batteryInfo( "\uF242 " + String(maxSeen) + " "+ String(percent) + "%");
+stateManager->batteryInfo( String(v_batt) + "v \uF242  "+ String(percent10) + "%");
+//=============================================================
 
-  //-----
+
 
       if (Serial.available()) {
 
