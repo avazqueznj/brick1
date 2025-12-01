@@ -172,13 +172,13 @@ public:
   void clockTic( DateTime dttime ){
     try{
 
-      char buffer[30];
+      char timeString[30];
       DateTime local = dttime + TimeSpan(domainManagerClass::getInstance()->timeOffsetFromUTC * 60);
-      snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d",
+      snprintf(timeString, sizeof(timeString), "%04d-%02d-%02d %02d:%02d:%02d",
               local.year(), local.month(), local.day(), local.hour(), local.minute(), local.second());
 
       if( currentScreenState !=  NULL ){
-        currentScreenState->clockTic(  String( buffer ) );
+        currentScreenState->clockTic(  String( timeString ) );
       }
 
     }catch( const std::runtime_error& error ){

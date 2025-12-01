@@ -1447,68 +1447,6 @@ public:
         return;
     }
 
-    void doSubmitInspection(){
-
-        Serial.println("Submit ...");
-        spinnerStart();
-
-        domainManagerClass* domain = domainManagerClass::getInstance(); 
-
-        try{        
-                
-            // guard            
-            if (domain->currentInspection.defects.size() == 0) {
-                spinnerEnd(); 
-                Serial.println("ERROR: Cannot submit empty inspection.");
-                showDialog("ERROR: Cannot submit empty inspection.");
-                return;
-            } 
-
-            // for the record                        
-            domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));               
-            Serial.println( domain->currentInspection.toEDI() );                                      
-
-            String result = "<<TEST NO SUBMIT>>";                
-            result =  domain->comms->POST( domain->serverURL, domain->postInspectionsPath + "?company=" + domain->company,  domain->currentInspection.toEDI() );
-
-            domainManagerClass::getInstance()->currentInspection.submitted = true;
-            domainManagerClass::getInstance()->currentInspection.serverReply = result;
-
-            // save it
-            String filingRecord = 
-                domain->currentInspection.toEDI()  +
-                domain->currentInspection.toHumanString() 
-                + "\n";
-
-            saveInspectionToDisk( filingRecord );
-
-            Serial.println("Submit ... done!");
-            spinnerEnd();      
-
-            showDialog( "Submitted!" );
-
-            navigateTo( SCREEN_ID_MAIN );
-            
-        }catch( const std::runtime_error& error ){
-
-            domainManagerClass::getInstance()->currentInspection.serverReply =error.what();          
-
-            // save it
-            String filingRecord = 
-                domain->currentInspection.toEDI()  +
-                domain->currentInspection.toHumanString() 
-                + "\n";
-            saveInspectionToDisk( filingRecord );
-
-            spinnerEnd();       
-            String chainedError = String( "ERROR: Inspection saved, but possibly not sent:" ) + error.what();           
-            showDialog( chainedError.c_str() );
-
-            navigateTo( SCREEN_ID_MAIN );
-        }
-                       
-    }
-
     void saveInspection() {
         
         if (!isInspectionComplete()) {
@@ -1522,108 +1460,75 @@ public:
         return;
     }
 
-    void doSaveInspection(){
 
-        Serial.println("Save ...");
+//====================+++=======================
+
+    void doSubmitInspection(){
+
+        // guard            
+        if (domainManagerClass::getInstance()->currentInspection.defects.size() == 0) {
+            spinnerEnd(); 
+            Serial.println("ERROR: Cannot submit empty inspection.");
+            showDialog("ERROR: Cannot submit empty inspection.");
+            return;
+        } 
+
+        Serial.println("Submit ...");
         spinnerStart();
-
         try{
 
-            domainManagerClass* domain = domainManagerClass::getInstance(); 
-
-            // guard            
-            if (domain->currentInspection.defects.size() == 0) {
-                spinnerEnd(); 
-                Serial.println("ERROR: Cannot save empty inspection.");
-                showDialog("ERROR: Cannot save empty inspection.");
-                return;
-            } 
-
-            domain->currentInspection.submitTime = String(lv_label_get_text(objects.clock_zones));               
-
-            // save it
-            String filingRecord = 
-                domain->currentInspection.toEDI()  +
-                domain->currentInspection.toHumanString() 
-                + "\n";
-
-            saveInspectionToDisk( filingRecord );
-
-            Serial.println("Save ... done!");
+            domainManagerClass::getInstance()->currentInspection.finished(domainManagerClass::getInstance()->timeOffsetFromUTC);
+            domainManagerClass::getInstance()->doSubmitInspection(
+                domainManagerClass::getInstance()->currentInspection.toEDI(),
+                domainManagerClass::getInstance()->currentInspection.toHumanString()
+            );            
             spinnerEnd();      
-
-            showDialog( "Saved!" );
-
+            Serial.println("Submit ... done!");        
+            showDialog( "Submitted!" );
             navigateTo( SCREEN_ID_MAIN );
             
         }catch( const std::runtime_error& error ){
+
+            spinnerEnd();       
+            String chainedError = String( "ERROR: Inspection saved, but possibly not sent:" ) + error.what();                       
+            showDialog( chainedError.c_str() );
+            navigateTo( SCREEN_ID_MAIN );
+        }
+
+    }
+
+    void doSaveInspection(){
+
+
+        domainManagerClass* domain = domainManagerClass::getInstance(); 
+
+        // guard            
+        if (domain->currentInspection.defects.size() == 0) {
+            spinnerEnd(); 
+            Serial.println("ERROR: Cannot save empty inspection.");
+            showDialog("ERROR: Cannot save empty inspection.");
+            return;
+        } 
+
+        Serial.println("Save ...");
+        spinnerStart();
+        try{
+
+            domainManagerClass::getInstance()->currentInspection.finished(domainManagerClass::getInstance()->timeOffsetFromUTC);
+            domain->doSaveInspection();
+            Serial.println("Save ... done!");
+            spinnerEnd();      
+            showDialog( "Saved!" );
+            navigateTo( SCREEN_ID_MAIN );
+            
+        }catch( const std::runtime_error& error ){
+
             spinnerEnd();       
             String chainedError = String( "ERROR: Could not SAVE: " ) + error.what();           
             showDialog( chainedError.c_str() );
         }
-                       
     }
 
-
-//==============================================    
-
-    void saveInspectionToDisk(const String& edi) {
-
-        // Slot selection logic as above (find empty or oldest based on parsed DISPLAYHEADER* timestamp)
-        int oldestSlot = 1;  // the one to delete
-        uint32_t oldestTime = UINT32_MAX;  //oldest to start
-
-        // for each slot
-        Serial.println( "SAVE: find slot...." );
-        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
-
-            String path = "/kv/insp" + String(i);
-            uint32_t ts = 0;
-
-            try {
-
-                // load
-                std::vector<String> file = loadFromKVStore(path);
-
-                // parse
-                for (const String& line : file) {
-                    if (line.startsWith("DISPLAYHEADER*")) {
-                        int firstStar = line.indexOf('*');
-                        int secondStar = line.indexOf('*', firstStar + 1);
-                        if (firstStar >= 0 && secondStar > firstStar) {
-                            String tsStr = line.substring(firstStar + 1, secondStar);
-                            ts = (uint32_t)tsStr.toInt();
-                        }
-                        break;
-                    }
-                }
-
-            } catch (...) {
-                Serial.println( "ERROR!!!: Cannor parse slot ovewrite it!" );
-                ts = 0;
-            }
-
-            // checking time stamp
-
-            if (ts == 0) {
-                oldestSlot = i;
-                break;
-            }
-
-            if (ts < oldestTime) {
-                oldestTime = ts;
-                oldestSlot = i;
-            }
-        }
-
-
-        String path = "/kv/insp" + String(oldestSlot);
-        Serial.println( "SAVE: saving: " + path );
-        saveToKVStore(path, edi);
-
-        Serial.print("Saved inspection to slot ");
-        Serial.println(oldestSlot);
-    }
 
 //==============================================    
    

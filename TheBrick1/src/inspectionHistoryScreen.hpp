@@ -157,13 +157,13 @@ public:
         for ( String& pastInspectionHeader : inspectionHistory ) {  // for each layout
 
                 std::vector<String> tokens = tokenize( pastInspectionHeader, '*' );
-                if( tokens.size() < 6 ){
+                if( tokens.size() < 7 ){
                     sosBlink( "?? Corrupted inspection header ?" + pastInspectionHeader );
                 }
         
                 // Create button for this inspection type
                 lv_obj_t* btn = lv_btn_create(objects.history_list);
-                lv_obj_set_size(btn, 1000, 47);                
+                lv_obj_set_size(btn, 1500, 47);                
                 lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
                 lv_obj_set_style_bg_color(btn, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                 lv_obj_set_style_text_color(btn, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -184,11 +184,12 @@ public:
                     lv_obj_set_style_text_font(label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
                     String labelText = 
-                        "[" +
-                        tokens[ 2 ] + " " +
-                        tokens[ 3 ] + "] " +
+                        tokens[ 6 ] + " " +
+
+                        tokens[ 3 ] + " " +
                         tokens[ 4 ] + "/" +
-                        tokens[ 5 ] ;
+                        tokens[ 5 ] + 
+                        " [" + tokens[ 2 ] + "]" ;
                     
                     lv_label_set_text(label, labelText.c_str());
                 }
@@ -300,44 +301,26 @@ public:
     void doSubmitInspection(){
 
         Serial.println("Submit ...");
-
         spinnerStart();
+        try{
 
-        domainManagerClass* domain = domainManagerClass::getInstance(); 
-        String result = "";
-        try{            
-
-            result =  domain->comms->POST( 
-                domain->serverURL, 
-                domain->postInspectionsPath + "?company=" + domain->company,  
-                inspectionEDI
-                );
-            
-            String filingRecord = inspectionEDI + inspectionTEXT + result +"\n";
-            Serial.println("Update ... " + currentEDIPath);
-            Serial.println("With ... " + filingRecord);
-            saveToKVStore( currentEDIPath,  filingRecord);                
-            Serial.println("Submit ... done!");
+            domainManagerClass::getInstance()->doReSubmitInspection( 
+                currentEDIPath,
+                inspectionEDI, 
+                inspectionTEXT 
+            );            
             spinnerEnd();      
-
-            lv_obj_add_flag(  objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN);   
-            lv_textarea_set_text(objects.inspection_view, "" );            
-
-            showDialog( "Submitted!" );        
+            Serial.println("Submit ... done!");        
+            showDialog( "Submitted!" );
             
         }catch( const std::runtime_error& error ){
-            spinnerEnd();       
-            String chainedError = String( "ERROR: Inspection possibly not sent." ) + error.what();           
-            showDialog( chainedError.c_str() );
 
-            String filingRecord = inspectionEDI + inspectionTEXT + error.what() +"\n";
-            Serial.println("Update ... " + currentEDIPath);
-            Serial.println("With ... " + filingRecord);
-            saveToKVStore( currentEDIPath,  filingRecord);            
+            spinnerEnd();       
+            String chainedError = String( "ERROR: Inspection saved, but possibly not sent:" ) + error.what();                       
+            showDialog( chainedError.c_str() );
         }
 
-
-    }    
+    }
 
 };
 

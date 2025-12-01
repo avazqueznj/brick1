@@ -408,46 +408,46 @@ void loop() {
     lastSerialPollAt = now;
 
 
-//=============================================================
-// battery moni
-static int samples[battSamples] = {0};
-static int idx = 0;
-static bool filled = false;
+      //=============================================================
+      // battery moni
+      static int samples[battSamples] = {0};
+      static int idx = 0;
+      static bool filled = false;
 
-// Set the stabilization start time only once
-if (batteryStabilizeStart == 0) {  
-    batteryStabilizeStart = millis();
-}
+      // Set the stabilization start time only once
+      if (batteryStabilizeStart == 0) {  
+          batteryStabilizeStart = millis();
+      }
 
-int raw = analogRead(VOLTAGE_PIN);
-samples[idx++] = raw;
-if (idx >= battSamples) {
-  idx = 0;
-  filled = true;
-}
+      int raw = analogRead(VOLTAGE_PIN);
+      samples[idx++] = raw;
+      if (idx >= battSamples) {
+        idx = 0;
+        filled = true;
+      }
 
-// Find the highest value in the array
-int maxSeen = samples[0];
-int count = filled ? battSamples : idx;
-for (int i = 1; i < count; i++) {
-  if (samples[i] > maxSeen) maxSeen = samples[i];
-}
+      // Find the highest value in the array
+      int maxSeen = samples[0];
+      int count = filled ? battSamples : idx;
+      for (int i = 1; i < count; i++) {
+        if (samples[i] > maxSeen) maxSeen = samples[i];
+      }
 
-float v_s = maxSeen * (VREF / 1023.0);
-float v_batt = v_s * (R1 + R2) / R2;
-float percent = 100.0 * (maxSeen - minRaw) / (maxRaw - minRaw);
-if (percent > 100.0) percent = 100.0;
-if (percent < 0.0) percent = 0.0;
+      float v_s = maxSeen * (VREF / 1023.0);
+      float v_batt = v_s * (R1 + R2) / R2;
+      float percent = 100.0 * (maxSeen - minRaw) / (maxRaw - minRaw);
+      if (percent > 100.0) percent = 100.0;
+      if (percent < 0.0) percent = 0.0;
 
-// Quantize percent to nearest lower 10 for UI
-int percent10 = ((int)percent / 10) * 10;
+      // Quantize percent to nearest lower 10 for UI
+      int percent10 = ((int)percent / 10) * 10;
 
-if (millis() - batteryStabilizeStart >=  stabilizeWaitTime ) { 
-  stateManager->batteryInfo( String(v_batt) + "v \uF242  "+ String(percent10) + "%");
-}else{
-  stateManager->batteryInfo( "      ");
-}
-//=============================================================
+      if (millis() - batteryStabilizeStart >=  stabilizeWaitTime ) { 
+        stateManager->batteryInfo( String(v_batt) + "v \uF242  "+ String(percent10) + "%");
+      }else{
+        stateManager->batteryInfo( "      ");
+      }
+      //=============================================================
 
 
 

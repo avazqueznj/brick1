@@ -271,7 +271,10 @@ public:
             }
 
 
-            if (response.indexOf("\"success\":true") != -1) {
+            if (
+                response.indexOf("\"success\":true") != -1  ||
+                response.indexOf("Duplicate inspection ID") != -1
+            ) {
                 Serial.println( "Success !!!" );            
             } else {
                 Serial.println( "ERROR !!!" );            
@@ -282,15 +285,13 @@ public:
             return response;
 
         } catch (...) {
-            WiFi.end();         
+            client.stop();
+            WiFi.end();              
             throw;             
         }
     }
 
     void syncClockWithNTP() {
-
-
-        // only call from inside get with wifi on
 
         WiFiUDP ntpUDP;
         NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);

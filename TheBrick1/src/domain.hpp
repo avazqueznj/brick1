@@ -136,7 +136,6 @@ public:
     std::vector<defectClass> defects;
     std::vector<  String  > inspectionFormFieldValues; 
 
-    String submitTime;
     String startTime;
     String offset;
     String dst;
@@ -144,8 +143,14 @@ public:
     String driver_username;    
     String driver_name;
 
-    bool submitted =  false;
-    String serverReply = "";
+private:
+
+    String finishedTimeString = "";
+    DateTime finishedTime;
+
+//============================================================================
+
+public:
 
     inspectionClass(){
         id = newUUID();
@@ -159,17 +164,26 @@ public:
         assets.clear();
         defects.clear();
         inspectionFormFieldValues.clear();
-
-        submitTime = "";
         startTime = "";
         offset = "";
         dst = "";
 
         driver_username = "";        
         driver_name = "";
+    }
 
-        submitted = false;
-        serverReply = "";
+    void finished( int timeOffsetFromUTC ){     
+        
+        // set the clock
+        DateTime finishedTime =  rtc->now();  
+
+        // set the strings for humans
+        char timeString[30];
+        DateTime local = finishedTime + TimeSpan(timeOffsetFromUTC * 60);
+        snprintf(timeString, sizeof(timeString), "%04d-%02d-%02d %02d:%02d:%02d",
+                local.year(), local.month(), local.day(), local.hour(), local.minute(), local.second());        
+        finishedTimeString = timeString;
+
     }
 
     String toHumanString() const {
@@ -188,8 +202,8 @@ public:
         result += startTime;
         result += "\n";           
 
-        result += "Submit time: ";
-        result += submitTime;
+        result += "finish time: ";
+        result += finishedTimeString;
         result += "\n";           
         
 
@@ -271,9 +285,6 @@ public:
             }
         }
 
-        result += "\nServer reply:\n\n";
-        result += serverReply + "\n\n";
-
         return result;
     }   
     
@@ -288,11 +299,12 @@ public:
         // display header 
         result += 
             "DISPLAYHEADER*" 
-            + String(rtc->now().unixtime()) +
+            + String( finishedTime.unixtime() ) +
             + "*" + id.substring(id.length() - 5) + "(" + BEARER_TOKEN.substring(BEARER_TOKEN.length() - 5) + ")"
-            + "*" + submitTime 
+            + "*" + finishedTimeString 
             + "*" + driver_name 
             + "*" + assets[0].buttonName
+            + "*\uF071"
             + "\n";
 
         result += "INSPHEADER\n";
@@ -311,7 +323,7 @@ public:
         result += "\n";           
 
         result += "INSPSUBTIME*";
-        result += submitTime;
+        result += finishedTimeString;
         result += "\n";           
 
         result += "INSPTIMEOFFSET*";
@@ -404,6 +416,9 @@ public:
 //    D O M A I N   M A N A G E R 
 
 //-------------------------------------------------
+
+#define INSP_SUBMIT_ERROR  "\uF071"
+#define INSP_SUBMIT_OK     "\uF00C"
 
 class domainManagerClass {
 public:
@@ -798,6 +813,135 @@ public:
         Serial.println("-------------------");
 
     }
+
+    //==========================================================================================================================================
+    //==========================================================================================================================================
+    //==========================================================================================================================================    
+
+
+    void doSubmitInspection( String EDI, String inspectionText){
+
+        // for the record                        
+        Serial.println( EDI );                        
+        String filingRecord = EDI + inspectionText + "\n";
+        String path = saveInspectionToDisk( filingRecord );
+        String result = "<<TEST NO SUBMIT>>";              
+          
+        try{
+            result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );
+            updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
+
+        }catch( const std::runtime_error& error ){
+
+            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,result, EDI, inspectionText );
+            String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
+            throw std::runtime_error( errorMessage.c_str() );
+        }
+
+    }
+
+    void doReSubmitInspection( String path, String EDI, String inspectionText){
+
+        // for the record                        
+        Serial.println( EDI );                    
+        String filingRecord = EDI + inspectionText + "\n";
+        String result = "<<TEST NO SUBMIT>>";  
+
+        
+        try{
+            result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );
+            updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
+
+        }catch( const std::runtime_error& error ){
+            
+            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,result, EDI, inspectionText );
+            String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
+            throw std::runtime_error( errorMessage.c_str() );
+        }
+    }    
+
+    void doSaveInspection(){
+
+        // save it
+        String filingRecord = 
+            currentInspection.toEDI()  +
+            currentInspection.toHumanString() + "\n";
+        saveInspectionToDisk( filingRecord );                       
+    }
+
+
+    String saveInspectionToDisk(const String& inspectionFilingRecord) {
+
+        // Slot selection logic as above (find empty or oldest based on parsed DISPLAYHEADER* timestamp)
+
+        int oldestSlot = 1;  // the one to delete
+        uint32_t oldestTime = UINT32_MAX;  //oldest to start
+        Serial.println( "SAVE: find slot...." );
+        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
+
+            String path = "/kv/insp" + String(i);
+            uint32_t ts = 0;
+            try {
+
+                // load
+                std::vector<String> file = loadFromKVStore(path);
+                // parse
+                for (const String& line : file) {
+                    if (line.startsWith("DISPLAYHEADER*")) {
+                        int firstStar = line.indexOf('*');
+                        int secondStar = line.indexOf('*', firstStar + 1);
+                        if (firstStar >= 0 && secondStar > firstStar) {
+                            String tsStr = line.substring(firstStar + 1, secondStar);
+                            ts = (uint32_t)tsStr.toInt();
+                        }
+                        break;
+                    }
+                }
+            } catch (...) {
+                Serial.println( "ERROR!!!: Cannor parse slot ovewrite it!" );
+                ts = 0;
+            }
+
+            // checking time stamp
+            if (ts == 0) {
+                oldestSlot = i;
+                break;
+            }
+            if (ts < oldestTime) {
+                oldestTime = ts;
+                oldestSlot = i;
+            }
+        }
+
+        // DO SAVE
+        String path = "/kv/insp" + String(oldestSlot);
+        Serial.println( "SAVE: saving: " + path );
+        saveToKVStore(path, inspectionFilingRecord);
+        Serial.print("Saved inspection to slot ");
+        Serial.println(oldestSlot);
+
+        return( path );
+    }
+
+    void updateInspectionFileStatus( String path, String statusCode, String serverReply, String EDI, String inspectionText  ){
+
+        // DO SAVE
+        EDI.replace(INSP_SUBMIT_ERROR, statusCode); // not fouond , maybe resending that is ok
+
+        Serial.println( "UPDATE!!: " + path );
+        saveToKVStore(
+            path, 
+            EDI + inspectionText + "\n"
+            + serverReply + "\n"
+        );
+        Serial.print("UPDATED! inspection to slot ");
+        Serial.println(path);
+
+    }
+    
+    //==========================================================================================================================================
+    //==========================================================================================================================================
+    //==========================================================================================================================================    
 
 
 };
