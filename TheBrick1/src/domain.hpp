@@ -979,13 +979,14 @@ public:
             if (displayHeader.length() == 0) continue; // no header? skip
 
             // Find last star and last field (status)
-            int lastStar = displayHeader.lastIndexOf('*');
-            if (lastStar < 0) continue;
-            String lastField = displayHeader.substring(lastStar + 1);
-            lastField.trim();
+            std::vector<String> fields = tokenize(displayHeader, '*');
+            if (fields.empty()) continue; // Or maybe log bad header
+            if (fields.size() <= 6) continue; 
+            String status = fields[6];
+            status.trim();
 
             // Check if not submitted (pending)
-            if (lastField != INSP_SUBMIT_OK) {
+            if (status != INSP_SUBMIT_OK) {
 
                 String EDI, inspectionText;
                 bool inInspection = true;
