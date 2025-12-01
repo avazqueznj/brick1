@@ -1009,11 +1009,9 @@ public:
                     inspectionsSent++;
                     Serial.println( "RETRY >>>>>>>>>>>>>>> SUCCESS!!!" );
 
-                }catch( const std::runtime_error& error ){
+                }catch( const std::runtime_error& error ){                    
                     
                     Serial.println( "RETRY >>>>>>>>>>>>>>> FAIL!!!" );                    
-                    updateInspectionFileStatus( path, INSP_SUBMIT_ERROR , error.what(), EDI, inspectionText );
-                    String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
                     // keep going , eat it
                 }
             } 
