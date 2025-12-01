@@ -577,16 +577,17 @@ public:
 
         Serial.println( "Parsing ..." );
 
-        emptyAll();
-
         std::vector<String>::iterator iterator = config->begin();    
         while ( iterator != config->end() ) {   
 
             // HEADER ----->
-            if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");            
+            if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");        
+
             std::vector<String> tokens = tokenize( *iterator , '*' );     
             if( tokens[ 0 ] == "BRICKCONFIG" ){ 
                 Serial.println( "[BRICKCONFIG] found..." );
+
+                emptyAll();
 
                 // ASSETS ----->
                 if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
