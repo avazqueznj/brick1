@@ -19,13 +19,14 @@ typedef struct _objects_t {
     lv_obj_t *inspection_history;
     lv_obj_t *clock;
     lv_obj_t *driver_name_main;
+    lv_obj_t *battery_main;
     lv_obj_t *logo1;
     lv_obj_t *do_inspect_button;
     lv_obj_t *do_sync;
     lv_obj_t *logout;
     lv_obj_t *do_history;
-    lv_obj_t *battery_main;
     lv_obj_t *logo1_1;
+    lv_obj_t *battery_asset;
     lv_obj_t *do_select_inspection_type;
     lv_obj_t *back_from_select_asset;
     lv_obj_t *asset_list;
@@ -39,7 +40,7 @@ typedef struct _objects_t {
     lv_obj_t *obj2;
     lv_obj_t *clock_asset;
     lv_obj_t *driver_name_asset;
-    lv_obj_t *battery_asset;
+    lv_obj_t *battery_type;
     lv_obj_t *logo1_3;
     lv_obj_t *inspection_types;
     lv_obj_t *obj3;
@@ -48,7 +49,6 @@ typedef struct _objects_t {
     lv_obj_t *obj4;
     lv_obj_t *clock_insptype;
     lv_obj_t *driver_name_insptype;
-    lv_obj_t *battery_type;
     lv_obj_t *logo1_4;
     lv_obj_t *do_zones;
     lv_obj_t *back_from_form_fields;
@@ -103,6 +103,7 @@ typedef struct _objects_t {
     lv_obj_t *login_password;
     lv_obj_t *do_sync_2;
     lv_obj_t *logo1_2;
+    lv_obj_t *battery_settings;
     lv_obj_t *back_from_settings;
     lv_obj_t *obj7;
     lv_obj_t *setting_wifi_name;
@@ -115,7 +116,6 @@ typedef struct _objects_t {
     lv_obj_t *obj10;
     lv_obj_t *clock_settings;
     lv_obj_t *clock_settings_1;
-    lv_obj_t *battery_settings;
     lv_obj_t *logo1_7;
     lv_obj_t *history_list;
     lv_obj_t *obj11;

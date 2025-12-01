@@ -255,6 +255,9 @@ const int maxRaw = 250;  //
 const int minRaw = 195;  // 
 const int battSamples = 60;
 
+static unsigned long batteryStabilizeStart = 0;
+static unsigned int stabilizeWaitTime = 5000;
+
 // ---- tunable cadences (ms) ----
 const unsigned long RFID_MS = 500;     // RFID poll
 const unsigned long RTC_MS  = 250;     // clock tick 250
@@ -411,6 +414,11 @@ static int samples[battSamples] = {0};
 static int idx = 0;
 static bool filled = false;
 
+// Set the stabilization start time only once
+if (batteryStabilizeStart == 0) {  
+    batteryStabilizeStart = millis();
+}
+
 int raw = analogRead(VOLTAGE_PIN);
 samples[idx++] = raw;
 if (idx >= battSamples) {
@@ -434,13 +442,11 @@ if (percent < 0.0) percent = 0.0;
 // Quantize percent to nearest lower 10 for UI
 int percent10 = ((int)percent / 10) * 10;
 
-// Debug output
-Serial.print("max (20): "); Serial.print(maxSeen);
-Serial.print(" | Bat(V): "); Serial.print(v_batt, 2);
-Serial.print(" | Bat % (raw): "); Serial.print(percent, 2);
-Serial.print(" | Bat % (UI): "); Serial.print(percent10); Serial.println("%");
-
-stateManager->batteryInfo( String(v_batt) + "v \uF242  "+ String(percent10) + "%");
+if (millis() - batteryStabilizeStart >=  stabilizeWaitTime ) { 
+  stateManager->batteryInfo( String(v_batt) + "v \uF242  "+ String(percent10) + "%");
+}else{
+  stateManager->batteryInfo( "      ");
+}
 //=============================================================
 
 

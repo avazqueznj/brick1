@@ -1340,7 +1340,7 @@ public:
                 String defectName = (*compVec)[i];
 
                 lv_obj_t* defect_btn = lv_btn_create(objects.defect_dialog_list);
-                lv_obj_set_size(defect_btn, 230, 50);
+                lv_obj_set_size(defect_btn, 339, 50);
 
                 lv_obj_set_user_data(defect_btn, (void*)&(*compVec)[i] );
                 
@@ -1454,7 +1454,8 @@ public:
 
         domainManagerClass* domain = domainManagerClass::getInstance(); 
 
-        try{            
+        try{        
+                
             // guard            
             if (domain->currentInspection.defects.size() == 0) {
                 spinnerEnd(); 

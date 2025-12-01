@@ -126,6 +126,8 @@ public:
             lv_obj_add_flag(letterKeyboard, LV_OBJ_FLAG_HIDDEN);
             lv_keyboard_set_mode(letterKeyboard, LV_KEYBOARD_MODE_TEXT_LOWER);
 
+            lv_obj_set_style_text_font(letterKeyboard, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+
             lv_obj_add_event_cb(
                 letterKeyboard,
                 [](lv_event_t* e) {
@@ -150,6 +152,8 @@ public:
             lv_obj_align(numericKeyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
             lv_obj_add_flag(numericKeyboard, LV_OBJ_FLAG_HIDDEN);
             lv_keyboard_set_mode(numericKeyboard, LV_KEYBOARD_MODE_NUMBER);
+
+            lv_obj_set_style_text_font(numericKeyboard, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);    
 
             lv_obj_add_event_cb(
                 numericKeyboard,

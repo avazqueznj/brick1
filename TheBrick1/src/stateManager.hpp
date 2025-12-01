@@ -148,7 +148,6 @@ public:
   void batteryInfo( String info){
     try{
       if( currentScreenState !=  NULL ){
-        Serial.println( "*** battery event ***" );                    
         currentScreenState->batteryInfo( info );
       }
     }catch( const std::runtime_error& error ){
