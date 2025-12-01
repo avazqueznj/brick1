@@ -581,7 +581,7 @@ public:
         while ( iterator != config->end() ) {   
 
             // HEADER ----->
-            if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");        
+            if (++iterator == config->end()) throw std::runtime_error("Unexpected end of file");        
 
             std::vector<String> tokens = tokenize( *iterator , '*' );     
             if( tokens[ 0 ] == "BRICKCONFIG" ){ 
@@ -590,7 +590,7 @@ public:
                 emptyAll();
 
                 // ASSETS ----->
-                if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
+                if (++iterator == config->end()) throw std::runtime_error("Unexpected end of file");
                 tokens = tokenize( *iterator , '*' );
                 if( tokens[ 0 ] == "ASSETS" ){ 
                     Serial.println( "[ASSETS] found... load assets!" );
@@ -613,7 +613,7 @@ public:
                 if( tokens[ 0 ] == "LAYOUTS" ){ 
                     Serial.println( "[LAYOUTS] found... load layout!" );
                     
-                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
+                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end of file");
                     tokens = tokenize( *iterator , '*' );                                        
                     while( true ){  // get the next  layout                        
                         if( tokens[ 0 ] != "LAY" ) break; // end layouts?                        
@@ -628,7 +628,7 @@ public:
                         layoutClass layout(layoutName);
 
                         // ZONES --->
-                        if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
+                        if (++iterator == config->end()) throw std::runtime_error("Unexpected end of file");
                         tokens = tokenize( *iterator , '*' );
                         while( true ){ // read the next zone                            
                             if( tokens[ 0 ] != "LAYZONE" ) break;
@@ -643,7 +643,7 @@ public:
 
                                 // COMPONENTS ----->
                                 while( true ){ // read the next component
-                                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
+                                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end  of file");
                                     tokens = tokenize( *iterator , '*' );
                                     if( tokens[ 0 ] != "ZONECOMP" ) break;
 
@@ -673,7 +673,7 @@ public:
                 if( tokens[ 0 ] == "INSPTYPES" ){ 
                     Serial.println( "[INSPTYPES] found... load inpection types!" );
 
-                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
+                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end  of file");
                     tokens = tokenize( *iterator , '*' );                                        
                     while( true ){  // get the next inspt
                         if( tokens[ 0 ] != "INSP" ) break; // end inspts
@@ -691,7 +691,7 @@ public:
 
                         // FORM FIELDS --->                    
                         while( true ){ // read the next ff    
-                            if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
+                            if (++iterator == config->end()) throw std::runtime_error("Unexpected end  of file");
                             tokens = tokenize( *iterator , '*' );                        
                             if( tokens[ 0 ] != "INSPFF" ) break;
 
@@ -721,7 +721,7 @@ public:
                     Serial.println( "[USERS] found... " );
                     
                     while( true ){  // get the next user            
-                        if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
+                        if (++iterator == config->end()) throw std::runtime_error("Unexpected end  of file");
                         tokens = tokenize( *iterator , '*' );                                        
                         if( tokens[ 0 ] != "USER" ) break; // end users
                         Serial.println( "Found USER ..." );                        
