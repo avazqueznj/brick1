@@ -835,7 +835,7 @@ public:
         Serial.println( EDI );                        
         String filingRecord = EDI + "\n" + inspectionText + "\n";
         String path = saveInspectionToDisk( filingRecord );
-        String result = "<<TEST NO SUBMIT>>";              
+        String result = "";              
 
         try{
             result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );            
@@ -857,7 +857,7 @@ public:
         // for the record                        
         Serial.println( EDI );                    
         String filingRecord = EDI + "\n" + inspectionText + "\n";
-        String result = "<<TEST NO SUBMIT>>";  
+        String result = "";  
         
         try{
             result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );
