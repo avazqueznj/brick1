@@ -312,13 +312,15 @@ public:
             spinnerEnd();      
             Serial.println("Submit ... done!");        
             showDialog( "Submitted!" );
-            
+                        
         }catch( const std::runtime_error& error ){
 
             spinnerEnd();       
             String chainedError = String( "ERROR: Inspection saved, but possibly not sent:" ) + error.what();                       
             showDialog( chainedError.c_str() );
         }
+
+        start();        
 
     }
 

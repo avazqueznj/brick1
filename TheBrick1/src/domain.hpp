@@ -529,11 +529,16 @@ public:
 
         try{
 
+                // get config
                 comms->connectToWifi();
                 std::vector<String> config = comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company );
-
                 parse( &config );
-                saveToKVStore( "/kv/config", &config );                
+                saveToKVStore( "/kv/config", &config );         
+                
+                // sync inspes
+                int sentInspections = retryAllPendingInspections();
+
+
 
                     String syncMessage = "Sync successful. \n";
 
@@ -547,9 +552,13 @@ public:
                     syncMessage += " types, ";
 
                     syncMessage += domainManagerClass::getInstance()->users.size();
-                    syncMessage += " users. ";       
+                    syncMessage += " users, ";       
 
-                    spinnerEnd();        
+                    syncMessage += sentInspections;
+                    syncMessage += " pending inspections. ";       
+
+
+                    spinnerEnd();                           
 
                     return syncMessage;
                                 
@@ -823,13 +832,15 @@ public:
 
         // for the record                        
         Serial.println( EDI );                        
-        String filingRecord = EDI + inspectionText + "\n";
+        String filingRecord = EDI + "\n" + inspectionText + "\n";
         String path = saveInspectionToDisk( filingRecord );
         String result = "<<TEST NO SUBMIT>>";              
-          
+
         try{
-            result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );
+            result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );            
             updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
+
+            retryAllPendingInspections();
 
         }catch( const std::runtime_error& error ){
 
@@ -844,9 +855,8 @@ public:
 
         // for the record                        
         Serial.println( EDI );                    
-        String filingRecord = EDI + inspectionText + "\n";
+        String filingRecord = EDI + "\n" + inspectionText + "\n";
         String result = "<<TEST NO SUBMIT>>";  
-
         
         try{
             result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );
@@ -864,7 +874,7 @@ public:
 
         // save it
         String filingRecord = 
-            currentInspection.toEDI()  +
+            currentInspection.toEDI()  + "\n" +
             currentInspection.toHumanString() + "\n";
         saveInspectionToDisk( filingRecord );                       
     }
@@ -931,13 +941,87 @@ public:
         Serial.println( "UPDATE!!: " + path );
         saveToKVStore(
             path, 
-            EDI + inspectionText + "\n"
+            EDI + "\n" + inspectionText + "\n"
             + serverReply + "\n"
         );
         Serial.print("UPDATED! inspection to slot ");
         Serial.println(path);
 
     }
+
+    int retryAllPendingInspections() {
+
+        Serial.println( "RETRY PENDING ====================================================" );
+
+        // check slots
+        int inspectionsSent = 0;
+        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
+
+            String path = "/kv/insp" + String(i);
+            std::vector<String> file;
+            try {
+                file = loadFromKVStore(path);
+            } catch (...) {
+                continue; // skip unreadable slots
+            }
+            if (file.empty()) continue;
+
+            // Find the DISPLAYHEADER line
+            String displayHeader;
+            int displayHeaderIdx = -1;
+            for (size_t j = 0; j < file.size(); ++j) {
+                if (file[j].startsWith("DISPLAYHEADER*")) {
+                    displayHeader = file[j];
+                    displayHeaderIdx = j;
+                    break;
+                }
+            }
+            if (displayHeader.length() == 0) continue; // no header? skip
+
+            // Find last star and last field (status)
+            int lastStar = displayHeader.lastIndexOf('*');
+            if (lastStar < 0) continue;
+            String lastField = displayHeader.substring(lastStar + 1);
+            lastField.trim();
+
+            // Check if not submitted (pending)
+            if (lastField != INSP_SUBMIT_OK) {
+
+                String EDI, inspectionText;
+                bool inInspection = true;
+                for (size_t j = 0; j < file.size(); ++j) {
+                    if (inInspection) {
+                        EDI += file[j] + "\n";
+                        if (file[j].startsWith("END")) inInspection = false;
+                    } else {
+                        inspectionText += file[j] + "\n";
+                    }
+                }
+                // Remove trailing newlines if needed
+                EDI.trim();
+                inspectionText.trim();
+
+                // Try to resubmit, ignore errors 
+                try {
+
+                    Serial.println( "RETRY >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+                    doReSubmitInspection(path, EDI, inspectionText);
+                    inspectionsSent++;
+                    Serial.println( "RETRY >>>>>>>>>>>>>>> SUCCESS!!!" );
+
+                }catch( const std::runtime_error& error ){
+                    
+                    Serial.println( "RETRY >>>>>>>>>>>>>>> FAIL!!!" );                    
+                    updateInspectionFileStatus( path, INSP_SUBMIT_ERROR , error.what(), EDI, inspectionText );
+                    String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
+                    // keep going , eat it
+                }
+            } 
+
+        } // for
+
+        return inspectionsSent;
+    }    
     
     //==========================================================================================================================================
     //==========================================================================================================================================
