@@ -845,7 +845,7 @@ public:
 
         }catch( const std::runtime_error& error ){
 
-            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,result, EDI, inspectionText );
+            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,error.what(), EDI, inspectionText );
             String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
             throw std::runtime_error( errorMessage.c_str() );
         }
@@ -865,7 +865,7 @@ public:
 
         }catch( const std::runtime_error& error ){
             
-            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,result, EDI, inspectionText );
+            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,error.what(), EDI, inspectionText );
             String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
             throw std::runtime_error( errorMessage.c_str() );
         }
