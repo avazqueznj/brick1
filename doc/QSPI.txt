@@ -50,19 +50,9 @@ void setup() {
   // 2. Try to mount as filesystem
   int err = fs.mount(&qspi);
   if (err) {
-    Serial.print("Mount failed (code: "); Serial.print(err); Serial.println("), trying to format...");
-    int fmtErr = fs.reformat(&qspi);
-    if (fmtErr) {
-      Serial.print("Format failed: "); Serial.println(fmtErr);
-      while(1);
-    } else {
-      Serial.println("Format success!");
-    }
-    err = fs.mount(&qspi);
-    if (err) {
-      Serial.print("Mount failed after format: "); Serial.println(err);
-      while(1);
-    }
+    Serial.print("Mount failed (code: "); Serial.print(err); 
+while(1);
+
   }
   Serial.println("User partition mounted as /qspi/");
 

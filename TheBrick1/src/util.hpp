@@ -440,5 +440,122 @@ public:
 
 //=============================
 
+// QSPI
+
+void listFiles(const char* path) {
+  Serial.print("Listing directory: "); Serial.println(path);
+  // Use opendir/readdir/closedir (POSIX style, supported by Mbed FS)
+  DIR* dir = opendir(path);
+  if (!dir) {
+    sosBlink("  (failed to open directory)");
+  }
+  struct dirent* de;
+  int found = 0;
+  while ((de = readdir(dir)) != NULL) {
+    Serial.print("  ");
+    Serial.print(de->d_name);
+    if (de->d_type == DT_DIR) Serial.print(" [DIR]");
+    Serial.println();
+    found++;
+  }
+  closedir(dir);
+  if (!found) Serial.println("  (empty)");
+}
+
+//=============================
+
+
+
+#include <stdio.h>
+#include <stdexcept>
+#include <SDRAM.h>
+
+// QSPI FS is handled elsewhere; helpers assume it's already mounted.
+
+//--------------------------------------------------
+// Load binary file → SDRAM
+//--------------------------------------------------
+uint8_t* loadBinaryFileToSDRAM(const String& path, size_t& outLen) {
+
+    outLen = 0;
+
+    FILE* f = fopen(path.c_str(), "rb");
+    if (f == NULL) {
+        String msg = "loadBinaryFileToSDRAM: cannot open for read: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    // Get file size
+    if (fseek(f, 0, SEEK_END) != 0) {
+        fclose(f);
+        String msg = "loadBinaryFileToSDRAM: fseek end failed for: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    long fileSize = ftell(f);
+    if (fileSize < 0) {
+        fclose(f);
+        String msg = "loadBinaryFileToSDRAM: ftell failed for: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    if (fseek(f, 0, SEEK_SET) != 0) {
+        fclose(f);
+        String msg = "loadBinaryFileToSDRAM: fseek set failed for: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    // Allocate SDRAM buffer
+    uint8_t* buffer = (uint8_t*)SDRAM.malloc((size_t)fileSize);
+    if (buffer == NULL) {
+        fclose(f);
+        String msg = "loadBinaryFileToSDRAM: SDRAM.malloc failed for: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    // Read file
+    size_t totalRead = fread(buffer, 1, (size_t)fileSize, f);
+    fclose(f);
+
+    if (totalRead != (size_t)fileSize) {
+        SDRAM.free(buffer);
+        String msg = "loadBinaryFileToSDRAM: short read for: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    outLen = (size_t)fileSize;
+    return buffer;
+}
+
+//--------------------------------------------------
+// Save binary buffer → QSPI file
+//--------------------------------------------------
+void saveBinaryFileFromBuffer(const String& path, const uint8_t* data, size_t len) {
+
+    FILE* f = fopen(path.c_str(), "wb");
+    if (f == NULL) {
+        String msg = "saveBinaryFileFromBuffer: cannot open for write: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    size_t written = fwrite(data, 1, len, f);
+    fclose(f);
+
+    if (written != len) {
+        String msg = "saveBinaryFileFromBuffer: short write for: " + path;
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+}
+
+//=============================
+
 #endif
 

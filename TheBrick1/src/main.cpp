@@ -26,17 +26,13 @@
 #include "RTClib.h"
 
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#include <TJpg_Decoder.h>
-
 // JPEG / LVGL glue
+#include <TJpg_Decoder.h>
 static uint16_t* jpg_fb = NULL;
 static lv_img_dsc_t jpg_dsc;
 static lv_obj_t* jpg_obj = NULL;
 static const int JPG_W = 800;
 static const int JPG_H = 480;
-
-// TJpg_Decoder callback: copy each block into jpg_fb
 bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
     if (jpg_fb == NULL) return 0;
 
@@ -54,13 +50,17 @@ bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
         uint16_t* src = bitmap + row * w_i;
         memcpy(dst, src, (size_t)w_i * sizeof(uint16_t));
     }
-
     return 1;
 }
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//-------------------------------
 
+#include "QSPIFBlockDevice.h"
+#include "FATFileSystem.h"
+#include <cstdio> // For C file I/O
 
+QSPIFBlockDevice qspi;
+mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
 
 //-------------------------------
 
@@ -599,6 +599,37 @@ void loop() {
                 Serial.println( "B[" + BEARER_TOKEN + "]" );
               } else
 
+              if (cmd.indexOf("list qspi") == 0) {
+                Serial.println("===== list qspi =====");\
+                              
+                Serial.println("GIGA R1 QSPI USER PARTITION TEST (C I/O ONLY)");
+
+                // 1. Query partition size
+                int ret = qspi.init();
+                if (ret != 0) {
+                  Serial.println("QSPI init failed: " + ret ); 
+                  Serial.println("preloaded ??");
+                }
+                uint64_t partSize = qspi.size();
+                Serial.print("QSPI User Partition Size: ");
+                Serial.print(partSize);
+                Serial.println(" bytes");
+                qspi.deinit(); //?? ok - safe
+
+                // 2. Try to mount as filesystem
+                int err = fs.mount(&qspi);
+                if (err) {
+                  sosBlink("Mount failed (code: " + err); 
+                }
+                Serial.println("User partition mounted as /qspi/");
+
+                // 3. List directory before write
+                listFiles("/qspi/");
+
+                Serial.println("===== list qspi DONE! =====");\
+
+              } else
+
               if (cmd == "?") {
                 Serial.println("===== HELP =====");
                 
@@ -615,6 +646,9 @@ void loop() {
                 Serial.println("zap history");
 
                 Serial.println("set token{token}");
+                //Serial.println("show token"); redacted
+
+                Serial.println("list qspi");
 
               } else         
 

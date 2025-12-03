@@ -39,8 +39,10 @@ class layoutZoneClass{
 public:
     String name;
     String tag;
+    String zonePic;
     std::vector<  std::vector<String>  > components;    
-    layoutZoneClass(String nameParam, String tagParam):name(nameParam),tag(tagParam){}
+    layoutZoneClass(String nameParam, String tagParam, String zonePicParam):
+        name(nameParam),tag(tagParam),zonePic(zonePicParam){}
     virtual ~layoutZoneClass(){}
 };
 
@@ -417,8 +419,11 @@ public:
 
 //-------------------------------------------------
 
+#include <stdio.h>   
 #define INSP_SUBMIT_ERROR  "\uF071"
 #define INSP_SUBMIT_OK     "\uF00C"
+extern QSPIFBlockDevice qspi;
+extern mbed::FATFileSystem fs;
 
 class domainManagerClass {
 public:
@@ -538,6 +543,15 @@ public:
                 // sync inspes
                 int sentInspections = retryAllPendingInspections();
 
+                int loadedPics = 0;
+                try {
+                    Serial.println("syncPics .....");                    
+                    loadedPics = syncPics();
+                } catch (const std::runtime_error& e) {
+                    Serial.println("[WARN] syncPics failed, continuing without pics.");
+                    Serial.println(e.what());
+                }
+
 
 
                     String syncMessage = "Sync successful. \n";
@@ -634,12 +648,13 @@ public:
                             if( tokens[ 0 ] != "LAYZONE" ) break;
 
                             Serial.println( "Found LayoutZone ..." );                        
-                            if( tokens.size() == 3 ){
+                            if( tokens.size() == 4 ){
                                 String zoneTag = tokens[ 1 ];
                                 String zoneName = tokens[ 2 ];
+                                String zonePic = tokens[ 3 ];
 
                                 // make layout step 2
-                                layoutZoneClass zone(zoneName,zoneTag);
+                                layoutZoneClass zone(zoneName,zoneTag,zonePic);
 
                                 // COMPONENTS ----->
                                 while( true ){ // read the next component
@@ -658,7 +673,7 @@ public:
 
                                 layout.zones.push_back( zone );
 
-                            }else throw std::runtime_error( "Parse error token LAYZONE expecting 3 tokens " );
+                            }else throw std::runtime_error( "Parse error token LAYZONE expecting 4 tokens " );
                         }
 
                         // add layout
@@ -780,6 +795,7 @@ public:
             for (const layoutZoneClass& z : l.zones) {
                 Serial.print("  Zone Name: "); Serial.print(z.name);
                 Serial.print(", Tag: "); Serial.println(z.tag);
+                Serial.print(", Pic: "); Serial.println(z.zonePic);
                 for (const auto& compGroup : z.components) {
                     Serial.print("    Component Group: ");
                     for (const String& comp : compGroup) {
@@ -1026,6 +1042,269 @@ public:
     //==========================================================================================================================================
     //==========================================================================================================================================    
 
+    uint8_t* downloadImageToSDRAM(
+        const String& uuid,
+        size_t& outLen
+    ) {
+        outLen = 0;
+        String path = "/api/device/images/" + uuid;
+
+        Serial.println("==============================");
+        Serial.println("[IMG] Starting image download (allocate-once)");
+        Serial.print("[IMG] Server: "); Serial.println(domainManagerClass::getInstance()->serverURL);
+        Serial.print("[IMG] Path: "); Serial.println(path);
+        Serial.println("==============================");
+
+        WiFiSSLClient& serverConnection = domainManagerClass::getInstance()->comms->connectToServer(domainManagerClass::getInstance()->serverURL);
+        uint8_t* buffer = 0;
+        int httpStatus = 0;
+        String statusLine;
+        try{
+            Serial.println("[IMG] Sending HTTP request...");
+            serverConnection.print("GET " + path + " HTTP/1.1\r\n");
+            serverConnection.print("Host: " + domainManagerClass::getInstance()->serverURL + "\r\n");
+            serverConnection.print("Authorization: Bearer " + BEARER_TOKEN + "\r\n");
+            serverConnection.print("Accept: */*\r\n");
+            serverConnection.print("Connection: close\r\n");
+            serverConnection.print("\r\n");
+
+            int contentLength = -1;
+            String line;
+            String contentType = "";
+            bool isStatusLine = true;
+
+            Serial.println("[IMG] Reading HTTP headers...");
+
+            int headerTries = 0;
+            const int HEADER_MAX_TRIES = 100; // 100 * 100ms = 10s
+
+            Serial.println("[IMG] Reading HTTP headers...");
+            while (serverConnection.connected()) {
+                if (!serverConnection.available()) {
+                    Serial.println("wait .... "); 
+                    delay(100);
+                    headerTries++;
+                    if (headerTries >= HEADER_MAX_TRIES) {
+                        serverConnection.stop(); WiFi.end();
+                        Serial.println("[FATAL] HTTP header read timeout!");
+                        throw std::runtime_error("HTTP header read timeout");
+                    }
+                    continue;
+                }
+                headerTries = 0; // Reset on progress
+                line = serverConnection.readStringUntil('\n');
+                line.trim();
+                if (line.length() == 0) break;
+
+                Serial.print("[HDR] "); Serial.println(line);
+
+                if (isStatusLine) {
+                    statusLine = line;
+                    isStatusLine = false;
+                    int firstSpace = line.indexOf(' ');
+                    int secondSpace = line.indexOf(' ', firstSpace + 1);
+                    if (firstSpace > 0 && secondSpace > firstSpace) {
+                        httpStatus = line.substring(firstSpace + 1, secondSpace).toInt();
+                        Serial.print("[HDR] HTTP Status = "); Serial.println(httpStatus);
+                    }
+                }
+                if (line.startsWith("Content-Length:")) {
+                    contentLength = line.substring(15).toInt();
+                    Serial.print("[HDR] Content-Length = ");
+                    Serial.println(contentLength);
+                }
+                if (line.startsWith("Content-Type:")) {
+                    contentType = line.substring(13);
+                    contentType.trim();
+                    Serial.print("[HDR] Content-Type = ");
+                    Serial.println(contentType);
+                }
+                if (line.startsWith("Transfer-Encoding:") && line.indexOf("chunked") >= 0) {
+                    serverConnection.stop(); WiFi.end();
+                    Serial.println("[FATAL] Chunked transfer not allowed!");
+                    throw std::runtime_error("Image download error: chunked transfer not supported");
+                }
+            }
+
+            // --- Check HTTP Status ---
+            if (httpStatus < 200 || httpStatus >= 300) {
+                // Not OK! Read and log the body as error message
+                Serial.print("[FATAL] HTTP error code: "); Serial.println(httpStatus);
+                String errorMsg;
+                while (serverConnection.available()) {
+                    char c = serverConnection.read();
+                    errorMsg += c;
+                }
+                serverConnection.stop(); WiFi.end();
+                Serial.print("[FATAL] Server error message: ");
+                Serial.println(errorMsg);
+                String error = "Image download failed with HTTP status " +  String(httpStatus) + errorMsg;
+                throw std::runtime_error(
+                    error.c_str()
+                );
+            }
+
+            if (!contentType.startsWith("image/jpeg")) {
+                serverConnection.stop(); WiFi.end();
+                Serial.print("[FATAL] Bad Content-Type: "); Serial.println(contentType);
+                throw std::runtime_error("Image download error: not a JPEG (Content-Type mismatch)");
+            }
+
+            if (contentLength <= 0) {
+                serverConnection.stop(); WiFi.end();
+                Serial.println("[FATAL] No Content-Length!");
+                throw std::runtime_error("Image download error: missing Content-Length");
+            }
+
+            Serial.print("[IMG] Allocating SDRAM: ");
+            Serial.println(contentLength);
+            buffer = (uint8_t*)SDRAM.malloc(contentLength);
+            if (!buffer) {
+                serverConnection.stop(); WiFi.end();
+                Serial.println("[FATAL] SDRAM alloc failed!");
+                throw std::runtime_error("SDRAM allocation failed");
+            }
+
+            size_t totalRead = 0;
+            size_t tries = 0;
+            const size_t MAX_TRIES = 100; 
+            while (totalRead < (size_t)contentLength) {
+                int n = serverConnection.read(buffer + totalRead, contentLength - totalRead);
+                if (n > 0) {
+                    totalRead += n;
+                    Serial.print("[IMG] Bytes read: "); Serial.println(totalRead);
+                    tries = 0;
+                } else if (!serverConnection.connected()) {
+                    Serial.println("[FATAL] Connection closed before download complete.");
+                    break;
+                } else {
+                    delay(100);
+                    Serial.print("[IMG] No data, wait .... ");        
+                    tries++;
+                    if (tries >= MAX_TRIES) {
+                        Serial.println("[FATAL] Read timeout: no progress for 10 seconds.");
+                        throw std::runtime_error("Image download failed: network timeout (no progress for 10 seconds)");
+                        break;
+                    }
+                }
+            }
+
+            serverConnection.stop(); WiFi.end();
+
+            if (totalRead != (size_t)contentLength) {
+                SDRAM.free(buffer);
+                Serial.print("[FATAL] Only read "); Serial.print(totalRead); Serial.print(" of "); Serial.println(contentLength);
+                throw std::runtime_error("Image download incomplete (Content-Length mismatch)");
+            }
+
+            outLen = totalRead;
+            Serial.println("[IMG] Download complete");
+            Serial.print("[IMG] Total bytes: "); Serial.println(outLen);
+            Serial.println("==============================");
+
+            return buffer;
+
+        } catch(...) {
+            if (buffer) {
+                SDRAM.free(buffer);
+                buffer = nullptr;
+            }        
+            serverConnection.stop(); WiFi.end();
+            throw;
+        }
+    }    
+
+int syncPics() {
+
+    Serial.println("SYNC PICS ====================================================");
+
+    int picsLoaded = 0;
+
+    // Ensure QSPI filesystem is mounted.
+    int err = fs.mount(&qspi);
+    if (err) {
+        Serial.print("[PICS] QSPI mount failed, code: ");
+        Serial.println(err);
+        throw std::runtime_error("syncPics: QSPI mount failed");
+    }
+
+    // Walk all layouts and zones
+    for (size_t i = 0; i < layouts.size(); i++) {
+
+        layoutClass& layout = layouts[i];
+
+        for (size_t j = 0; j < layout.zones.size(); j++) {
+
+            layoutZoneClass& zone = layout.zones[j];
+
+            // Skip zones with no picture UUID
+            if (zone.zonePic.length() == 0) {
+                continue;
+            }
+
+            String uuid = zone.zonePic;
+
+            // Our images live under distinct names so we never touch WiFi files.
+            // Example: /qspi/brickimg_<uuid>.jpg
+            String path = "/qspi/brickimg_";
+            path += uuid;
+            path += ".jpg";
+
+            Serial.print("[PICS] Zone '");
+            Serial.print(zone.name);
+            Serial.print("' UUID: ");
+            Serial.println(uuid);
+
+            // Check if file already exists
+            FILE* f = fopen(path.c_str(), "rb");
+            if (f != NULL) {
+                Serial.print("[PICS] Already cached: ");
+                Serial.println(path);
+                fclose(f);
+                continue;
+            }
+
+            Serial.print("[PICS] Missing, downloading: ");
+            Serial.println(uuid);
+
+            // Download JPEG into SDRAM
+            size_t imgLen = 0;
+            uint8_t* img = downloadImageToSDRAM(uuid, imgLen);
+
+            if (img == NULL || imgLen == 0) {
+                Serial.println("[PICS] downloadImageToSDRAM returned null/0");
+                throw std::runtime_error("syncPics: downloadImageToSDRAM failed");
+            }
+
+            // Save to QSPI using the generic helper, but make sure we always free img
+            try {
+                saveBinaryFileFromBuffer(path, img, imgLen);
+            } catch (...) {
+                SDRAM.free(img);
+                throw;  // rethrow same exception
+            }
+
+            // Free SDRAM buffer
+            SDRAM.free(img);
+
+            Serial.print("[PICS] Cached ");
+            Serial.print(imgLen);
+            Serial.print(" bytes to ");
+            Serial.println(path);
+
+            picsLoaded++;
+        }
+    }
+
+    Serial.print("SYNC PICS DONE, loaded: ");
+    Serial.println(picsLoaded);
+
+    return picsLoaded;
+}
+
+    //==========================================================================================================================================
+    //==========================================================================================================================================
+    //==========================================================================================================================================    
 
 };
 
