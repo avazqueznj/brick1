@@ -600,10 +600,8 @@ void loop() {
               } else
 
               if (cmd.indexOf("list qspi") == 0) {
-                Serial.println("===== list qspi =====");\
-                              
-                Serial.println("GIGA R1 QSPI USER PARTITION TEST (C I/O ONLY)");
-
+                Serial.println("===== list qspi =====");
+                Serial.println("QSPI  PARTITION TEST (C I/O ONLY)");
                 // 1. Query partition size
                 int ret = qspi.init();
                 if (ret != 0) {
@@ -614,21 +612,28 @@ void loop() {
                 Serial.print("QSPI User Partition Size: ");
                 Serial.print(partSize);
                 Serial.println(" bytes");
-                qspi.deinit(); //?? ok - safe
 
+                qspi.deinit(); //?? ok - safe
                 // 2. Try to mount as filesystem
+
                 int err = fs.mount(&qspi);
                 if (err) {
-                  sosBlink("Mount failed (code: " + err); 
+                  //sosBlink("Mount failed (code: " + err); 
+                  Serial.println("Err mounted ?");
                 }
-                Serial.println("User partition mounted as /qspi/");
 
+                Serial.println("User partition mounted as /qspi/");
                 // 3. List directory before write
                 listFiles("/qspi/");
-
                 Serial.println("===== list qspi DONE! =====");\
-
               } else
+
+              if (cmd == "zap images") {
+                  Serial.println("===== ZAP IMAGES =====");
+                  domainManagerClass::getInstance()->zapPics();
+                  Serial.println("===== ZAP IMAGES DONE =====");
+                } else
+
 
               if (cmd == "?") {
                 Serial.println("===== HELP =====");
@@ -649,6 +654,7 @@ void loop() {
                 //Serial.println("show token"); redacted
 
                 Serial.println("list qspi");
+                Serial.println("zap images");
 
               } else         
 

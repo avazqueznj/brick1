@@ -545,11 +545,13 @@ public:
 
                 int loadedPics = 0;
                 try {
-                    Serial.println("syncPics .....");                    
+                    Serial.println("syncPics .....");                                        
                     loadedPics = syncPics();
+                    WiFi.end();                    
                 } catch (const std::runtime_error& e) {
                     Serial.println("[WARN] syncPics failed, continuing without pics.");
                     Serial.println(e.what());
+                    WiFi.end();
                 }
 
 
@@ -569,8 +571,10 @@ public:
                     syncMessage += " users, ";       
 
                     syncMessage += sentInspections;
-                    syncMessage += " pending inspections. ";       
+                    syncMessage += " pending inspections, ";       
 
+                    syncMessage += loadedPics;
+                    syncMessage += " pictures. ";       
 
                     spinnerEnd();                           
 
@@ -1043,6 +1047,7 @@ public:
     //==========================================================================================================================================    
 
     uint8_t* downloadImageToSDRAM(
+        WiFiSSLClient& serverConnection1,
         const String& uuid,
         size_t& outLen
     ) {
@@ -1054,19 +1059,18 @@ public:
         Serial.print("[IMG] Server: "); Serial.println(domainManagerClass::getInstance()->serverURL);
         Serial.print("[IMG] Path: "); Serial.println(path);
         Serial.println("==============================");
-
-        WiFiSSLClient& serverConnection = domainManagerClass::getInstance()->comms->connectToServer(domainManagerClass::getInstance()->serverURL);
+    
         uint8_t* buffer = 0;
         int httpStatus = 0;
         String statusLine;
         try{
             Serial.println("[IMG] Sending HTTP request...");
-            serverConnection.print("GET " + path + " HTTP/1.1\r\n");
-            serverConnection.print("Host: " + domainManagerClass::getInstance()->serverURL + "\r\n");
-            serverConnection.print("Authorization: Bearer " + BEARER_TOKEN + "\r\n");
-            serverConnection.print("Accept: */*\r\n");
-            serverConnection.print("Connection: close\r\n");
-            serverConnection.print("\r\n");
+            serverConnection1.print("GET " + path + " HTTP/1.1\r\n");
+            serverConnection1.print("Host: " + domainManagerClass::getInstance()->serverURL + "\r\n");
+            serverConnection1.print("Authorization: Bearer " + BEARER_TOKEN + "\r\n");
+            serverConnection1.print("Accept: */*\r\n");
+            serverConnection1.print("Connection: close\r\n");
+            serverConnection1.print("\r\n");
 
             int contentLength = -1;
             String line;
@@ -1079,20 +1083,19 @@ public:
             const int HEADER_MAX_TRIES = 100; // 100 * 100ms = 10s
 
             Serial.println("[IMG] Reading HTTP headers...");
-            while (serverConnection.connected()) {
-                if (!serverConnection.available()) {
+            while (serverConnection1.connected()) {
+                if (!serverConnection1.available()) {
                     Serial.println("wait .... "); 
                     delay(100);
                     headerTries++;
-                    if (headerTries >= HEADER_MAX_TRIES) {
-                        serverConnection.stop(); WiFi.end();
+                    if (headerTries >= HEADER_MAX_TRIES) {                        
                         Serial.println("[FATAL] HTTP header read timeout!");
                         throw std::runtime_error("HTTP header read timeout");
                     }
                     continue;
                 }
                 headerTries = 0; // Reset on progress
-                line = serverConnection.readStringUntil('\n');
+                line = serverConnection1.readStringUntil('\n');
                 line.trim();
                 if (line.length() == 0) break;
 
@@ -1120,7 +1123,6 @@ public:
                     Serial.println(contentType);
                 }
                 if (line.startsWith("Transfer-Encoding:") && line.indexOf("chunked") >= 0) {
-                    serverConnection.stop(); WiFi.end();
                     Serial.println("[FATAL] Chunked transfer not allowed!");
                     throw std::runtime_error("Image download error: chunked transfer not supported");
                 }
@@ -1131,11 +1133,10 @@ public:
                 // Not OK! Read and log the body as error message
                 Serial.print("[FATAL] HTTP error code: "); Serial.println(httpStatus);
                 String errorMsg;
-                while (serverConnection.available()) {
-                    char c = serverConnection.read();
+                while (serverConnection1.available()) {
+                    char c = serverConnection1.read();
                     errorMsg += c;
                 }
-                serverConnection.stop(); WiFi.end();
                 Serial.print("[FATAL] Server error message: ");
                 Serial.println(errorMsg);
                 String error = "Image download failed with HTTP status " +  String(httpStatus) + errorMsg;
@@ -1145,13 +1146,11 @@ public:
             }
 
             if (!contentType.startsWith("image/jpeg")) {
-                serverConnection.stop(); WiFi.end();
                 Serial.print("[FATAL] Bad Content-Type: "); Serial.println(contentType);
                 throw std::runtime_error("Image download error: not a JPEG (Content-Type mismatch)");
             }
 
             if (contentLength <= 0) {
-                serverConnection.stop(); WiFi.end();
                 Serial.println("[FATAL] No Content-Length!");
                 throw std::runtime_error("Image download error: missing Content-Length");
             }
@@ -1160,7 +1159,6 @@ public:
             Serial.println(contentLength);
             buffer = (uint8_t*)SDRAM.malloc(contentLength);
             if (!buffer) {
-                serverConnection.stop(); WiFi.end();
                 Serial.println("[FATAL] SDRAM alloc failed!");
                 throw std::runtime_error("SDRAM allocation failed");
             }
@@ -1169,12 +1167,12 @@ public:
             size_t tries = 0;
             const size_t MAX_TRIES = 100; 
             while (totalRead < (size_t)contentLength) {
-                int n = serverConnection.read(buffer + totalRead, contentLength - totalRead);
+                int n = serverConnection1.read(buffer + totalRead, contentLength - totalRead);
                 if (n > 0) {
                     totalRead += n;
                     Serial.print("[IMG] Bytes read: "); Serial.println(totalRead);
                     tries = 0;
-                } else if (!serverConnection.connected()) {
+                } else if (!serverConnection1.connected()) {
                     Serial.println("[FATAL] Connection closed before download complete.");
                     break;
                 } else {
@@ -1189,7 +1187,6 @@ public:
                 }
             }
 
-            serverConnection.stop(); WiFi.end();
 
             if (totalRead != (size_t)contentLength) {
                 SDRAM.free(buffer);
@@ -1209,82 +1206,179 @@ public:
                 SDRAM.free(buffer);
                 buffer = nullptr;
             }        
-            serverConnection.stop(); WiFi.end();
             throw;
         }
     }    
 
-int syncPics() {
 
-    Serial.println("SYNC PICS ====================================================");
+    //=========================================================
+    //=========================================================
 
-    int picsLoaded = 0;
 
-    // Ensure QSPI filesystem is mounted.
-    int err = fs.mount(&qspi);
-    if (err) {
-        Serial.print("[PICS] QSPI mount failed, code: ");
-        Serial.println(err);
-        throw std::runtime_error("syncPics: QSPI mount failed");
-    }
+    //=========================================================
 
-    // Walk all layouts and zones
-    for (size_t i = 0; i < layouts.size(); i++) {
+    int syncPics(  ) {
 
-        layoutClass& layout = layouts[i];
+        Serial.println("SYNC PICS ====================================================");
 
-        for (size_t j = 0; j < layout.zones.size(); j++) {
+        int picsLoaded  = 0;
+        int picsDeleted = 0;
 
-            layoutZoneClass& zone = layout.zones[j];
+        // 1) Ensure QSPI filesystem is accessible.
+        //    If /qspi/ can be opened, assume it's already mounted.
+        DIR* testDir = opendir("/qspi/");
+        if (testDir) {
+            Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
+            closedir(testDir);
+        } else {
+            Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
+            int err = fs.mount(&qspi);
+            if (err) {
+                Serial.print("[PICS] QSPI mount failed, code: ");
+                Serial.println(err);
+                throw std::runtime_error("syncPics: QSPI mount failed");
+            }
+            Serial.println("[PICS] fs.mount() succeeded.");
+        }
 
-            // Skip zones with no picture UUID
-            if (zone.zonePic.length() == 0) {
-                continue;
+        // 2) Build list of expected picture filenames (NO path, just "brickimg_<uuid>.jpg")
+        std::vector<String> expectedPics;
+        for (size_t i = 0; i < layouts.size(); i++) {
+
+            layoutClass& layout = layouts[i];
+            for (size_t j = 0; j < layout.zones.size(); j++) {
+
+                layoutZoneClass& zone = layout.zones[j];
+                if (zone.zonePic.length() == 0) {
+                    continue;
+                }
+
+                String fname = "brickimg_";
+                fname += zone.zonePic;
+                fname += ".jpg";
+                bool alreadyThere = false;
+                for (size_t k = 0; k < expectedPics.size(); k++) {
+                    if (expectedPics[k] == fname) {
+                        alreadyThere = true;
+                        break;
+                    }
+                }
+                if (!alreadyThere) {
+                    expectedPics.push_back(fname);
+                }
+            }
+        }
+
+        // 3) Remove orphaned brickimg_* files in /qspi/ that are NOT in expectedPics
+        DIR* dir = opendir("/qspi/");
+        if (dir == NULL) {
+            Serial.println("[PICS] Failed to open /qspi/ directory.");
+        } else {
+
+            struct dirent* de;
+            while ((de = readdir(dir)) != NULL) {
+
+                const char* name = de->d_name;
+                if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0'))) {
+                    continue;
+                }
+                if (de->d_type == DT_DIR) {
+                    continue;
+                }
+
+                // we only care about "brickimg_..."
+                const char* prefix = "brickimg_";
+                int prefixLen = 9; // strlen("brickimg_");
+                bool hasPrefix = true;
+                for (int i = 0; i < prefixLen; i++) {
+                    if (name[i] != prefix[i]) {
+                        hasPrefix = false;
+                        break;
+                    }
+                }
+                if (!hasPrefix) {
+                    continue;   // leave wifi files alone
+                }
+
+                // check if this file is in expectedPics
+                bool keep = false;
+                for (size_t k = 0; k < expectedPics.size(); k++) {
+                    if (expectedPics[k] == String(name)) {
+                        keep = true;
+                        break;
+                    }
+                }
+
+                if (!keep) {
+                    // orphan -> delete
+                    String fullPath = "/qspi/";
+                    fullPath += name;
+
+                    Serial.print("[PICS] Deleting orphan: ");
+                    Serial.println(fullPath);
+
+                    int rc = remove(fullPath.c_str());
+                    if (rc == 0) {
+                        picsDeleted++;
+                        Serial.println("[PICS]   OK (deleted)");
+                    } else {
+                        Serial.println("[PICS]   ERROR (could not delete)");
+                    }
+                }
             }
 
-            String uuid = zone.zonePic;
+            closedir(dir);
+        }
 
-            // Our images live under distinct names so we never touch WiFi files.
-            // Example: /qspi/brickimg_<uuid>.jpg
-            String path = "/qspi/brickimg_";
-            path += uuid;
-            path += ".jpg";
+        // 4) Download any expected pics that do not exist yet
+        for (size_t i = 0; i < expectedPics.size(); i++) {
 
-            Serial.print("[PICS] Zone '");
-            Serial.print(zone.name);
-            Serial.print("' UUID: ");
-            Serial.println(uuid);
+            String fname = expectedPics[i];
+            String path  = "/qspi/";
+            path += fname;
 
-            // Check if file already exists
+            // check existence
             FILE* f = fopen(path.c_str(), "rb");
             if (f != NULL) {
-                Serial.print("[PICS] Already cached: ");
-                Serial.println(path);
+                // already cached
                 fclose(f);
+                Serial.print("[PICS] Already present: ");
+                Serial.println(path);
                 continue;
             }
 
-            Serial.print("[PICS] Missing, downloading: ");
+            // we need to download; extract uuid from "brickimg_<uuid>.jpg"
+            String uuid = fname;
+            // remove "brickimg_" prefix
+            uuid.remove(0, 9);
+            // remove ".jpg" suffix if present
+            int dotPos = uuid.lastIndexOf(".jpg");
+            if (dotPos >= 0) {
+                uuid = uuid.substring(0, dotPos);
+            }
+
+            Serial.print("[PICS] Missing, downloading uuid: ");
             Serial.println(uuid);
 
-            // Download JPEG into SDRAM
             size_t imgLen = 0;
-            uint8_t* img = downloadImageToSDRAM(uuid, imgLen);
 
+            
+            uint8_t* img; 
+            WiFiSSLClient serverConnection = domainManagerClass::getInstance()->comms->connectToServer(domainManagerClass::getInstance()->serverURL);                                                                
+            img = downloadImageToSDRAM(serverConnection, uuid, imgLen);
             if (img == NULL || imgLen == 0) {
                 Serial.println("[PICS] downloadImageToSDRAM returned null/0");
                 throw std::runtime_error("syncPics: downloadImageToSDRAM failed");
             }
 
-            // Save to QSPI using the generic helper, but make sure we always free img
+            // Save to QSPI, always free img
             try {
                 saveBinaryFileFromBuffer(path, img, imgLen);
             } catch (...) {
                 SDRAM.free(img);
-                throw;  // rethrow same exception
+                throw;
             }
 
-            // Free SDRAM buffer
             SDRAM.free(img);
 
             Serial.print("[PICS] Cached ");
@@ -1294,13 +1388,93 @@ int syncPics() {
 
             picsLoaded++;
         }
+
+        Serial.print("SYNC PICS DONE, loaded: ");
+        Serial.print(picsLoaded);
+        Serial.print(", deleted orphans: ");
+        Serial.println(picsDeleted);
+
+    
+        return picsLoaded;
     }
+    //----------------
 
-    Serial.print("SYNC PICS DONE, loaded: ");
-    Serial.println(picsLoaded);
+    void zapPics() {
 
-    return picsLoaded;
-}
+        Serial.println("ZAP PICS (DIR SCAN) =========================================");
+
+        // Ensure QSPI filesystem is accessible.
+        DIR* testDir = opendir("/qspi/");
+        if (testDir) {
+            Serial.println("[ZAP PICS] /qspi/ already accessible, skipping fs.mount().");
+            closedir(testDir);
+        } else {
+            Serial.println("[ZAP PICS] /qspi/ not accessible, trying fs.mount()...");
+            int err = fs.mount(&qspi);
+            if (err) {
+                Serial.print("[ZAP PICS] QSPI mount failed, code: ");
+                Serial.println(err);
+                Serial.println("[ZAP PICS] Aborting zap; filesystem not available.");
+                return;
+            }
+            Serial.println("[ZAP PICS] fs.mount() succeeded.");
+        }
+
+        DIR* dir = opendir("/qspi/");
+        if (dir == NULL) {
+            Serial.println("[ZAP PICS] Failed to open /qspi/ directory, aborting.");
+            return;
+        }
+
+        struct dirent* de;
+        int removedCount = 0;
+
+        while ((de = readdir(dir)) != NULL) {
+            const char* name = de->d_name;
+
+            // Ignore "." and ".." and directories
+            if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0'))) {
+                continue;
+            }
+            if (de->d_type == DT_DIR) {
+                continue;
+            }
+
+            // Only delete our own files: brickimg_*.*.
+            const char* prefix = "brickimg_";
+            int prefixLen = 9; // strlen("brickimg_");
+            bool isBrickImg = true;
+            for (int i = 0; i < prefixLen; i++) {
+                if (name[i] != prefix[i]) {
+                    isBrickImg = false;
+                    break;
+                }
+            }
+            if (!isBrickImg) {
+                continue;
+            }
+
+            String fullPath = "/qspi/";
+            fullPath += name;
+
+            Serial.print("[ZAP PICS] Removing: ");
+            Serial.println(fullPath);
+
+            int rc = remove(fullPath.c_str());
+            if (rc == 0) {
+                Serial.println("[ZAP PICS]   OK (deleted)");
+                removedCount++;
+            } else {
+                Serial.println("[ZAP PICS]   ERROR (could not delete)");
+            }
+        }
+
+        closedir(dir);
+
+        Serial.print("ZAP PICS DONE, total removed: ");
+        Serial.println(removedCount);
+        Serial.println("=============================================================");
+    }
 
     //==========================================================================================================================================
     //==========================================================================================================================================
