@@ -136,7 +136,7 @@ public:
             try {
                 size_t imgLen = 0;
                 // Use your UUID that points to the test JPEG on the server
-                uint8_t* img = downloadImageToSDRAM("7f88b799-a223-471a-a1ff-964a46e43166", imgLen);
+                uint8_t* img = downloadImageToSDRAM("a80e0519-c1b3-4a02-84ec-7f52bdfc4b57", imgLen);
 
                 Serial.print("[IMG] Total bytes: ");
                 Serial.println(imgLen);
