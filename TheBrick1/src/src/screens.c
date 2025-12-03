@@ -1444,17 +1444,14 @@ void create_screen_login_screen() {
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_label_set_text(obj, "user");
-            {
-                lv_obj_t *parent_obj = obj;
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 141, 192);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "password");
-                }
-            }
+        }
+        {
+            lv_obj_t *obj = lv_label_create(parent_obj);
+            lv_obj_set_pos(obj, 145, 199);
+            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(obj, "password");
         }
         {
             // login_username
@@ -1574,14 +1571,6 @@ void create_screen_login_screen() {
                     lv_label_set_text(obj, "pic test");
                 }
             }
-        }
-        {
-            // testpic
-            lv_obj_t *obj = lv_img_create(parent_obj);
-            objects.testpic = obj;
-            lv_obj_set_pos(obj, 509, 271);
-            lv_obj_set_size(obj, 300, 300);
-            lv_img_set_src(obj, &img_brick_logo);
         }
     }
     

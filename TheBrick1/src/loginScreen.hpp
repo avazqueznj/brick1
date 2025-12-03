@@ -129,40 +129,73 @@ public:
 
 //--
 
-if (target == objects.pic_test) {
-    Serial.println("PIC TEST==============================");
+//  7f88b799-a223-471a-a1ff-964a46e43166
+  if (target == objects.pic_test) {
+            Serial.println("PIC TEST==============================");
 
-    try {
-        size_t imgLen = 0;
-        uint8_t* img = downloadImageToSDRAM("7343e03e-d632-4b36-b3e5-367b6e929e3d", imgLen);
+            try {
+                size_t imgLen = 0;
+                // Use your UUID that points to the test JPEG on the server
+                uint8_t* img = downloadImageToSDRAM("7f88b799-a223-471a-a1ff-964a46e43166", imgLen);
 
-        // Check for JPEG magic bytes
-        if (!(img[0] == 0xFF && img[1] == 0xD8)) {
-            Serial.println("[FATAL] Data is not a JPEG (bad magic bytes)");
-            SDRAM.free(img);
-            throw std::runtime_error("Downloaded data is not a JPEG file");
+                Serial.print("[IMG] Total bytes: ");
+                Serial.println(imgLen);
+
+                if (img == NULL) {
+                    Serial.println("[FATAL] downloadImageToSDRAM returned null");
+                    return;
+                }
+
+                // Validate JPEG magic bytes
+                if (!(img[0] == 0xFF && img[1] == 0xD8)) {
+                    Serial.println("[FATAL] Not a JPEG (bad magic bytes)");
+                    SDRAM.free(img);
+                    return;
+                }
+
+                if (jpg_fb == NULL) {
+                    Serial.println("[FATAL] jpg_fb not allocated");
+                    SDRAM.free(img);
+                    return;
+                }
+
+                // Optional: log JPEG size
+                uint16_t jw = 0;
+                uint16_t jh = 0;
+                if (TJpgDec.getJpgSize(&jw, &jh, img, (uint32_t)imgLen) == 1) {
+                    Serial.print("JPG size: ");
+                    Serial.print(jw);
+                    Serial.print(" x ");
+                    Serial.println(jh);
+                } else {
+                    Serial.println("Could not get JPG size");
+                }
+
+                // Clear framebuffer
+                size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
+                memset(jpg_fb, 0, jpg_bytes);
+
+                Serial.println("Drawing JPEG via TJpg_Decoder into framebuffer...");
+                TJpgDec.drawJpg(0, 0, img, imgLen);
+                Serial.println("JPEG decode complete.");
+
+                SDRAM.free(img);
+
+                // Show JPEG as LVGL image on current screen
+                if (jpg_obj == NULL) {
+                    jpg_obj = lv_img_create(lv_scr_act());
+                }
+                lv_img_set_src(jpg_obj, &jpg_dsc);
+                lv_obj_center(jpg_obj);
+
+            } catch (const std::exception& e) {
+                Serial.println("==============================");
+                Serial.println("==============  FATAL  ================");
+                Serial.println(e.what());
+            }
+
+            Serial.println("PIC TEST DONE ==============================");
         }
-
-        // LVGL will use its built-in JPEG decoder automatically
-        // Pass the raw JPEG data directly as an image source
-
-        // Make sure the image data stays alive (in RAM) while displayed!
-        lv_img_set_src(objects.testpic, img); // pointer to JPEG data in RAM
-
-        // If you want to free/replace, clear or set to NULL before freeing!
-        // lv_img_set_src(objects.testpic, NULL); // If needed, to release before freeing
-
-        // SDRAM.free(img); // Only free if image is no longer used!
-
-    } catch (const std::exception& e) {
-        Serial.println("==============================");
-        Serial.println("==============  FATAL  ================");
-        Serial.println(e.what());
-    }
-
-    Serial.println("PIC TEST DONE ==============================");
-}
-
 //--
 
 

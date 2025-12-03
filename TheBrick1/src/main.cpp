@@ -25,6 +25,43 @@
 #include <MFRC522.h>
 #include "RTClib.h"
 
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#include <TJpg_Decoder.h>
+
+// JPEG / LVGL glue
+static uint16_t* jpg_fb = NULL;
+static lv_img_dsc_t jpg_dsc;
+static lv_obj_t* jpg_obj = NULL;
+static const int JPG_W = 800;
+static const int JPG_H = 480;
+
+// TJpg_Decoder callback: copy each block into jpg_fb
+bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
+    if (jpg_fb == NULL) return 0;
+
+    if (x < 0 || y < 0) return 0;
+    if (x >= JPG_W || y >= JPG_H) return 0;
+
+    int16_t w_i = (int16_t)w;
+    int16_t h_i = (int16_t)h;
+
+    if (x + w_i > JPG_W) w_i = JPG_W - x;
+    if (y + h_i > JPG_H) h_i = JPG_H - y;
+
+    for (int16_t row = 0; row < h_i; row++) {
+        uint16_t* dst = jpg_fb + (y + row) * JPG_W + x;
+        uint16_t* src = bitmap + row * w_i;
+        memcpy(dst, src, (size_t)w_i * sizeof(uint16_t));
+    }
+
+    return 1;
+}
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
 //-------------------------------
 
   #include "util.hpp"
@@ -43,7 +80,8 @@
 
 #include "stateManager.hpp"
 
-//-------------------------------
+
+
 
 // machine to machin token
 String BEARER_TOKEN = "";
@@ -236,6 +274,37 @@ void setup() {
       Serial.println( error.what() );            
   }  
 
+  //=====================================
+
+
+  //_-------------------------------------------------------------------
+
+  // JPEG framebuffer in SDRAM
+  Serial.println("Allocating JPEG framebuffer...");
+  size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
+  jpg_fb = (uint16_t*)SDRAM.malloc(jpg_bytes);
+  if (jpg_fb == NULL) {
+    Serial.println("JPEG framebuffer alloc failed! HALT.");
+    sosBlink("JPEG framebuffer alloc failed! HALT.");
+  }
+  Serial.print("JPEG framebuffer at 0x");
+  Serial.println((uintptr_t)jpg_fb, HEX);
+
+  // LVGL descriptor pointing at that buffer
+  jpg_dsc.header.always_zero = 0;
+  jpg_dsc.header.w = JPG_W;
+  jpg_dsc.header.h = JPG_H;
+  jpg_dsc.header.cf = LV_IMG_CF_TRUE_COLOR;
+  jpg_dsc.data_size = (uint32_t)jpg_bytes;
+  jpg_dsc.data = (const uint8_t*)jpg_fb;
+
+  // TJpg_Decoder config
+  TJpgDec.setCallback(jpg_to_fb);
+  TJpgDec.setJpgScale(1);
+  TJpgDec.setSwapBytes(false);
+
+
+  //_-------------------------------------------------------------------
 
   Serial.println("Started !!!!");
 }
