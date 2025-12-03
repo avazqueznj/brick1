@@ -1,0 +1,110 @@
+#include "QSPIFBlockDevice.h"
+#include "FATFileSystem.h"
+#include <cstdio> // For C file I/O
+
+QSPIFBlockDevice qspi;
+mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
+
+const char* testFile = "/qspi/test.txt";
+const char* testContent = "Hello from the GIGA R1 QSPI user partition!";
+
+void listFiles(const char* path) {
+  Serial.print("Listing directory: "); Serial.println(path);
+  // Use opendir/readdir/closedir (POSIX style, supported by Mbed FS)
+  DIR* dir = opendir(path);
+  if (!dir) {
+    Serial.println("  (failed to open directory)");
+    return;
+  }
+  struct dirent* de;
+  int found = 0;
+  while ((de = readdir(dir)) != NULL) {
+    Serial.print("  ");
+    Serial.print(de->d_name);
+    if (de->d_type == DT_DIR) Serial.print(" [DIR]");
+    Serial.println();
+    found++;
+  }
+  closedir(dir);
+  if (!found) Serial.println("  (empty)");
+}
+
+void setup() {
+  Serial.begin(115200);
+  while(!Serial);
+
+  Serial.println("GIGA R1 QSPI USER PARTITION TEST (C I/O ONLY)");
+
+  // 1. Query partition size
+  int ret = qspi.init();
+  if (ret != 0) {
+    Serial.print("QSPI init failed: "); Serial.println(ret);
+    while(1);
+  }
+  uint64_t partSize = qspi.size();
+  Serial.print("QSPI User Partition Size: ");
+  Serial.print(partSize);
+  Serial.println(" bytes");
+  qspi.deinit();
+
+  // 2. Try to mount as filesystem
+  int err = fs.mount(&qspi);
+  if (err) {
+    Serial.print("Mount failed (code: "); Serial.print(err); Serial.println("), trying to format...");
+    int fmtErr = fs.reformat(&qspi);
+    if (fmtErr) {
+      Serial.print("Format failed: "); Serial.println(fmtErr);
+      while(1);
+    } else {
+      Serial.println("Format success!");
+    }
+    err = fs.mount(&qspi);
+    if (err) {
+      Serial.print("Mount failed after format: "); Serial.println(err);
+      while(1);
+    }
+  }
+  Serial.println("User partition mounted as /qspi/");
+
+  // 3. List directory before write
+  listFiles("/qspi/");
+
+  // 4. Write test file
+  Serial.print("Writing file: "); Serial.println(testFile);
+  FILE* f = fopen(testFile, "w");
+  if (!f) {
+    Serial.println("  (Failed to open for writing)");
+    while(1);
+  }
+  size_t written = fwrite(testContent, 1, strlen(testContent), f);
+  fclose(f);
+  Serial.print("  Wrote "); Serial.print(written); Serial.println(" bytes.");
+
+  // 5. List directory after write
+  listFiles("/qspi/");
+
+  // 6. Read test file
+  Serial.print("Reading file: "); Serial.println(testFile);
+  f = fopen(testFile, "r");
+  if (!f) {
+    Serial.println("  (Failed to open for reading)");
+    while(1);
+  }
+  char buf[128] = {0};
+  size_t read = fread(buf, 1, sizeof(buf)-1, f);
+  fclose(f);
+  Serial.print("  Read "); Serial.print(read); Serial.println(" bytes.");
+  Serial.print("  File content: "); Serial.println(buf);
+
+  // 7. Verification
+  if (strcmp(buf, testContent) == 0) {
+    Serial.println("SUCCESS: Content matches.");
+  } else {
+    Serial.println("FAIL: Content does not match!");
+  }
+  Serial.println("Done.");
+}
+
+void loop() {
+  // Nothing here.
+}

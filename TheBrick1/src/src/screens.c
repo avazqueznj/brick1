@@ -1438,6 +1438,58 @@ void create_screen_login_screen() {
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_ADV_HITTEST|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_GESTURE_BUBBLE|LV_OBJ_FLAG_PRESS_LOCK|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW|LV_OBJ_FLAG_SNAPPABLE);
         }
         {
+            lv_obj_t *obj = lv_label_create(parent_obj);
+            lv_obj_set_pos(obj, 216, 123);
+            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(obj, "user");
+            {
+                lv_obj_t *parent_obj = obj;
+                {
+                    lv_obj_t *obj = lv_label_create(parent_obj);
+                    lv_obj_set_pos(obj, 141, 192);
+                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                    lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_label_set_text(obj, "password");
+                }
+            }
+        }
+        {
+            // login_username
+            lv_obj_t *obj = lv_textarea_create(parent_obj);
+            objects.login_username = obj;
+            lv_obj_set_pos(obj, 292, 117);
+            lv_obj_set_size(obj, 217, 60);
+            lv_textarea_set_accepted_chars(obj, "0123456789");
+            lv_textarea_set_max_length(obj, 6);
+            lv_textarea_set_one_line(obj, true);
+            lv_textarea_set_password_mode(obj, false);
+            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_ON_FOCUS|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+            add_style_text_area(obj);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xff7095c8), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_border_width(obj, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_border_color(obj, lv_color_hex(0xffff0000), LV_PART_MAIN | LV_STATE_FOCUSED);
+        }
+        {
+            // login_password
+            lv_obj_t *obj = lv_textarea_create(parent_obj);
+            objects.login_password = obj;
+            lv_obj_set_pos(obj, 292, 191);
+            lv_obj_set_size(obj, 217, 60);
+            lv_textarea_set_accepted_chars(obj, "0123456789");
+            lv_textarea_set_max_length(obj, 6);
+            lv_textarea_set_one_line(obj, true);
+            lv_textarea_set_password_mode(obj, true);
+            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_ON_FOCUS|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+            add_style_text_area(obj);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xff7095c8), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_border_color(obj, lv_color_hex(0xffff0000), LV_PART_MAIN | LV_STATE_FOCUSED);
+        }
+        {
             // login
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.login = obj;
@@ -1458,31 +1510,6 @@ void create_screen_login_screen() {
                     lv_label_set_text(obj, "# Login");
                 }
             }
-        }
-        {
-            lv_obj_t *obj = lv_label_create(parent_obj);
-            lv_obj_set_pos(obj, 216, 123);
-            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "user");
-        }
-        {
-            // login_username
-            lv_obj_t *obj = lv_textarea_create(parent_obj);
-            objects.login_username = obj;
-            lv_obj_set_pos(obj, 292, 117);
-            lv_obj_set_size(obj, 217, 60);
-            lv_textarea_set_accepted_chars(obj, "0123456789");
-            lv_textarea_set_max_length(obj, 6);
-            lv_textarea_set_one_line(obj, true);
-            lv_textarea_set_password_mode(obj, false);
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_ON_FOCUS|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
-            add_style_text_area(obj);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_color(obj, lv_color_hex(0xff7095c8), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_border_width(obj, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_border_color(obj, lv_color_hex(0xffff0000), LV_PART_MAIN | LV_STATE_FOCUSED);
         }
         {
             // doSettings_2
@@ -1507,30 +1534,6 @@ void create_screen_login_screen() {
             }
         }
         {
-            lv_obj_t *obj = lv_label_create(parent_obj);
-            lv_obj_set_pos(obj, 141, 192);
-            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "password");
-        }
-        {
-            // login_password
-            lv_obj_t *obj = lv_textarea_create(parent_obj);
-            objects.login_password = obj;
-            lv_obj_set_pos(obj, 292, 191);
-            lv_obj_set_size(obj, 217, 60);
-            lv_textarea_set_accepted_chars(obj, "0123456789");
-            lv_textarea_set_max_length(obj, 6);
-            lv_textarea_set_one_line(obj, true);
-            lv_textarea_set_password_mode(obj, true);
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_ON_FOCUS|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
-            add_style_text_area(obj);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_color(obj, lv_color_hex(0xff7095c8), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_border_color(obj, lv_color_hex(0xffff0000), LV_PART_MAIN | LV_STATE_FOCUSED);
-        }
-        {
             // doSync_2
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.do_sync_2 = obj;
@@ -1551,6 +1554,34 @@ void create_screen_login_screen() {
                     lv_label_set_text(obj, "Sync  \uF079");
                 }
             }
+        }
+        {
+            // pic_test
+            lv_obj_t *obj = lv_btn_create(parent_obj);
+            objects.pic_test = obj;
+            lv_obj_set_pos(obj, 64, 371);
+            lv_obj_set_size(obj, 100, 50);
+            lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
+            add_style_button_default(obj);
+            {
+                lv_obj_t *parent_obj = obj;
+                {
+                    lv_obj_t *obj = lv_label_create(parent_obj);
+                    lv_obj_set_pos(obj, 0, 0);
+                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                    lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
+                    lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_label_set_text(obj, "pic test");
+                }
+            }
+        }
+        {
+            // testpic
+            lv_obj_t *obj = lv_img_create(parent_obj);
+            objects.testpic = obj;
+            lv_obj_set_pos(obj, 509, 271);
+            lv_obj_set_size(obj, 300, 300);
+            lv_img_set_src(obj, &img_brick_logo);
         }
     }
     

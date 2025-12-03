@@ -1,0 +1,29 @@
+ALEJANDRO’S FIRMWARE TENETS (REMEMBER!):
+
+No memory leaks, ever.
+
+Always free SDRAM or any dynamic buffer in every error/exception path.
+
+Use a try/catch with if (buffer) { free(buffer); buffer=nullptr; } throw; for cleanup.
+
+Profuse Serial logging before all failures and at every critical step.
+
+Log every allocation, every header, every read, every early exit, every exception.
+
+Clear error strings, always print the reason.
+
+Always throw on protocol errors, partial reads, impossible states, or bad content.
+
+Never allow silent fallbacks, silent corruption, or "just return nullptr" for real errors.
+
+Do not use realloc—always allocate the full buffer up front based on Content-Length.
+
+Never support chunked or partial transfers for critical binary data.
+
+Strict header/content-type/magic byte checks before using binary data.
+
+Always validate Content-Type and magic bytes for images.
+
+All outer catches log and rethrow.
+
+Never swallow exceptions; let the calling context decide the user-facing response (e.g., blink, LCD message, etc).
