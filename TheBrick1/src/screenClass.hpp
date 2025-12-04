@@ -92,12 +92,44 @@ public:
                 Serial.println("[FATAL] Not a JPEG (bad magic bytes)");
                 return;
             }
+
+                // ==================================================
+                // Center the JPEG *inside* our 800x480 framebuffer
+                // ==================================================
+                uint16_t jw = 0;
+                uint16_t jh = 0;
+                int16_t  x  = 0;
+                int16_t  y  = 0;
+
+                if (TJpgDec.getJpgSize(&jw, &jh, jpg_io_buf, imgLen) ){
+                    Serial.print("[PIC] JPG size: ");
+                    Serial.print(jw);
+                    Serial.print(" x ");
+                    Serial.println(jh);
+
+                    if (jw < JPG_W) {
+                        x = (int16_t)((JPG_W - jw) / 2);
+                    }
+                    if (jh < JPG_H) {
+                        y = (int16_t)((JPG_H - jh) / 2);
+                    }
+
+                    Serial.print("[PIC] Center offsets x=");
+                    Serial.print(x);
+                    Serial.print(" y=");
+                    Serial.println(y);
+                } else {
+                    Serial.println("[PIC] Could not get JPG size (drawing at 0,0).");
+                }
+
+
             // Clear framebuffer - before call back
             size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
             memset(jpg_fb, 0, jpg_bytes);
 
             Serial.println("Drawing JPEG via TJpg_Decoder into framebuffer...");
-            TJpgDec.drawJpg(0, 0, jpg_io_buf, imgLen); // call back to render here
+            TJpgDec.drawJpg(x, y, jpg_io_buf, imgLen); 
+            //TJpgDec.drawJpg(0, 0, jpg_io_buf, imgLen); // call back to render here
             Serial.println("JPEG decode complete.");
 
             // Show JPEG as LVGL image on current screen
