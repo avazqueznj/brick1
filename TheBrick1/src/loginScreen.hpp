@@ -127,84 +127,88 @@ public:
         }
 
 
-//--
+// //--
 
- //7f88b799-a223-471a-a1ff-964a46e43166
-  if (target == objects.pic_test) {
-            Serial.println("PIC TEST==============================");
+//  //7f88b799-a223-471a-a1ff-964a46e43166
+//   if (target == objects.pic_test) {
+//             Serial.println("PIC TEST==============================");
 
-            try {
-                size_t imgLen = 0;
-                // Use your UUID that points to the test JPEG on the server
-                //WiFiSSLClient serverConnection = domainManagerClass::getInstance()->comms->connectToServer(domainManagerClass::getInstance()->serverURL);                                                                                
-                //uint8_t* img = domainManagerClass::getInstance()->downloadImageToSDRAM(serverConnection,"a80e0519-c1b3-4a02-84ec-7f52bdfc4b57", imgLen);
+//             try {
+//                 size_t imgLen = 0;
+//                 // Use your UUID that points to the test JPEG on the server
+//                 //WiFiSSLClient serverConnection = domainManagerClass::getInstance()->comms->connectToServer(domainManagerClass::getInstance()->serverURL);                                                                                
+//                 //uint8_t* img = domainManagerClass::getInstance()->downloadImageToSDRAM(serverConnection,"a80e0519-c1b3-4a02-84ec-7f52bdfc4b57", imgLen);
 
-                //--------------
+//                 //--------------
             
-loadBinaryFileToSDRAM(
-    "/qspi/brickimg_a80e0519-c1b3-4a02-84ec-7f52bdfc4b57.jpg", imgLen );
-    uint8_t* img = jpg_io_buf;
+// loadBinaryFileToSDRAM(
+//     "/qspi/brickimg_a80e0519-c1b3-4a02-84ec-7f52bdfc4b57.jpg", imgLen );
+//     uint8_t* img = jpg_io_buf;
 
-                //-------------
+//                 //-------------
 
-                Serial.print("[IMG] Total bytes: ");
-                Serial.println(imgLen);
+//                 Serial.print("[IMG] Total bytes: ");
+//                 Serial.println(imgLen);
 
-                if (img == NULL) {
-                    Serial.println("[FATAL] downloadImageToSDRAM returned null");
-                    return;
-                }
+//                 if (img == NULL) {
+//                     Serial.println("[FATAL] downloadImageToSDRAM returned null");
+//                     return;
+//                 }
 
-                // Validate JPEG magic bytes
-                if (!(img[0] == 0xFF && img[1] == 0xD8)) {
-                    Serial.println("[FATAL] Not a JPEG (bad magic bytes)");
-                    SDRAM.free(img);
-                    return;
-                }
+//                 // Validate JPEG magic bytes
+//                 if (!(img[0] == 0xFF && img[1] == 0xD8)) {
+//                     Serial.println("[FATAL] Not a JPEG (bad magic bytes)");
+//                     SDRAM.free(img);
+//                     return;
+//                 }
 
-                if (jpg_fb == NULL) {
-                    Serial.println("[FATAL] jpg_fb not allocated");
-                    SDRAM.free(img);
-                    return;
-                }
+//                 if (jpg_fb == NULL) {
+//                     Serial.println("[FATAL] jpg_fb not allocated");
+//                     SDRAM.free(img);
+//                     return;
+//                 }
 
-                // Optional: log JPEG size
-                uint16_t jw = 0;
-                uint16_t jh = 0;
-                if (TJpgDec.getJpgSize(&jw, &jh, img, (uint32_t)imgLen) == 1) {
-                    Serial.print("JPG size: ");
-                    Serial.print(jw);
-                    Serial.print(" x ");
-                    Serial.println(jh);
-                } else {
-                    Serial.println("Could not get JPG size");
-                }
+//                 // Optional: log JPEG size
+//                 uint16_t jw = 0;
+//                 uint16_t jh = 0;
+//                 if (TJpgDec.getJpgSize(&jw, &jh, img, (uint32_t)imgLen) == 1) {
+//                     Serial.print("JPG size: ");
+//                     Serial.print(jw);
+//                     Serial.print(" x ");
+//                     Serial.println(jh);
+//                 } else {
+//                     Serial.println("Could not get JPG size");
+//                 }
 
-                // Clear framebuffer - before call back
-                size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
-                memset(jpg_fb, 0, jpg_bytes);
+//                 // Clear framebuffer - before call back
+//                 size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
+//                 memset(jpg_fb, 0, jpg_bytes);
 
-                Serial.println("Drawing JPEG via TJpg_Decoder into framebuffer...");
-                TJpgDec.drawJpg(0, 0, img, imgLen); // call back to render here
-                Serial.println("JPEG decode complete.");
+//                 Serial.println("Drawing JPEG via TJpg_Decoder into framebuffer...");
+//                 TJpgDec.drawJpg(0, 0, img, imgLen); // call back to render here
+//                 Serial.println("JPEG decode complete.");
 
-                SDRAM.free(img);
+//                 SDRAM.free(img);
 
-                // Show JPEG as LVGL image on current screen
-                if (jpg_obj == NULL) {
-                    jpg_obj = lv_img_create(lv_scr_act());
-                }
-                lv_img_set_src(jpg_obj, &jpg_dsc);
-                lv_obj_center(jpg_obj);
+//                 // Show JPEG as LVGL image on current screen
+//                 if (jpg_obj == NULL) {
+//                     jpg_obj = lv_img_create(lv_scr_act());
+//                 }
+//                 lv_img_set_src(jpg_obj, &jpg_dsc);
+//                 lv_obj_center(jpg_obj);
 
-            } catch (const std::exception& e) {
-                Serial.println("==============================");
-                Serial.println("==============  FATAL  ================");
-                Serial.println(e.what());
-            }
+//             } catch (const std::exception& e) {
+//                 Serial.println("==============================");
+//                 Serial.println("==============  FATAL  ================");
+//                 Serial.println(e.what());
+//             }
 
-            Serial.println("PIC TEST DONE ==============================");
-        }
+        //     Serial.println("PIC TEST DONE ==============================");
+        // }
+
+
+
+        
     } //-- handle touche event
 
 //===================================================    
