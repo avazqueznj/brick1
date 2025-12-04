@@ -52,6 +52,8 @@ bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
     }
     return 1;
 }
+static const size_t JPG_IO_BUF_SIZE = 400000; // ~400 KB
+static uint8_t* jpg_io_buf = NULL;
 
 //-------------------------------
 
@@ -245,6 +247,14 @@ void setup() {
   for (byte i = 0; i < COLS; i++) {
     pinMode(colPins[i], INPUT);
   }
+
+  // JPEG decoder memory
+  jpg_io_buf = (uint8_t*) SDRAM.malloc(JPG_IO_BUF_SIZE);
+  if (!jpg_io_buf) {
+      sosBlink("[PIC] FATAL: cannot allocate jpg_io_buf in SDRAM");      
+  }
+  Serial.print("[PIC] Allocated jpg_io_buf, size = ");
+  Serial.println(JPG_IO_BUF_SIZE);
 
   // done!!!!
   startedUp = true;
@@ -601,6 +611,8 @@ void loop() {
 
               if (cmd.indexOf("list qspi") == 0) {
                 Serial.println("===== list qspi =====");
+                
+                // PART SIZE -----------------------------------
                 Serial.println("QSPI  PARTITION TEST (C I/O ONLY)");
                 // 1. Query partition size
                 int ret = qspi.init();
@@ -612,22 +624,22 @@ void loop() {
                 Serial.print("QSPI User Partition Size: ");
                 Serial.print(partSize);
                 Serial.println(" bytes");
-
                 qspi.deinit(); //?? ok - safe
                 // 2. Try to mount as filesystem
 
+                // LIST-----------------------------------                
                 int err = fs.mount(&qspi);
                 if (err) {
                   //sosBlink("Mount failed (code: " + err); 
                   Serial.println("Err mounted ?");
                 }
-
                 Serial.println("User partition mounted as /qspi/");
                 // 3. List directory before write
                 listFiles("/qspi/");
                 Serial.println("===== list qspi DONE! =====");\
               } else
 
+              
               if (cmd == "zap images") {
                   Serial.println("===== ZAP IMAGES =====");
                   domainManagerClass::getInstance()->zapPics();

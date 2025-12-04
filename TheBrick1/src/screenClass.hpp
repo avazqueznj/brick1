@@ -9,6 +9,7 @@
  *
  ********************************************************************************************/
 
+static lv_obj_t* jpg_overlay = NULL;  // full-screen click absorber
 
 //***************************************************** */
 
@@ -17,9 +18,7 @@
 //***************************************************** */
 
 LV_FONT_DECLARE(lv_font_montserrat_28);
-
-void fireModalDialogEvent( String action, String button );
-
+void fireModalDialogEvent( String action, String button );\
 static lv_style_t style_font;
 static bool style_ready = false;
 class screenClass{
@@ -69,10 +68,81 @@ public:
         handleSystemKeys( key );
     }
 
-    virtual void handleTouchEvent( lv_event_t* e ) {
+    virtual void handleTouchEvent( lv_event_t* e ) {        
     }    
 
     // -------------------------------------------------------------------
+
+    void showJpegFromQSPI(const String& path) {
+
+        Serial.print("[PIC] showJpegFromQSPI: ");
+        Serial.println(path);
+        try {
+
+            Serial.print("[PIC] load ... ");                
+            size_t imgLen = 0;
+            loadBinaryFileToSDRAM( path, imgLen );
+            // jpg_io_buf
+            Serial.print("Loaded .... Total bytes: ");
+            Serial.println(imgLen);
+
+
+            // Validate JPEG magic bytes
+            if (!(jpg_io_buf[0] == 0xFF && jpg_io_buf[1] == 0xD8)) {
+                Serial.println("[FATAL] Not a JPEG (bad magic bytes)");
+                return;
+            }
+            // Clear framebuffer - before call back
+            size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
+            memset(jpg_fb, 0, jpg_bytes);
+
+            Serial.println("Drawing JPEG via TJpg_Decoder into framebuffer...");
+            TJpgDec.drawJpg(0, 0, jpg_io_buf, imgLen); // call back to render here
+            Serial.println("JPEG decode complete.");
+
+            // Show JPEG as LVGL image on current screen
+            // if (jpg_obj == NULL) {
+            //     jpg_obj = lv_img_create(lv_scr_act());
+            // }
+            // lv_img_set_src(jpg_obj, &jpg_dsc);
+            // lv_obj_center(jpg_obj);
+
+            if (jpg_obj == NULL) {
+                jpg_obj = lv_img_create(lv_scr_act());
+
+                // Make it clickable so it eats the click
+                lv_obj_add_flag(jpg_obj, LV_OBJ_FLAG_CLICKABLE);
+
+                // Click on the image = hide (no delete)
+                lv_obj_add_event_cb(
+                    jpg_obj,
+                    [](lv_event_t* e) {
+                        lv_obj_t* obj = lv_event_get_target(e);
+                        // Just hide it; no lv_obj_del, no free
+                        lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+                    },
+                    LV_EVENT_CLICKED,
+                    NULL
+                );
+
+            }
+
+            lv_img_set_src(jpg_obj, &jpg_dsc);
+            lv_obj_center(jpg_obj);
+            lv_obj_clear_flag(jpg_obj, LV_OBJ_FLAG_HIDDEN);
+
+
+        } catch (const std::exception& e) {
+            Serial.println("==============================");
+            Serial.println("==============  FATAL  ================");
+            Serial.println(e.what());
+        }
+
+        Serial.println("Show pic DONE ==============================");            
+    }
+        
+
+    // --------------------------------------------------------------------
 
     // base screen class key nav
     void handleSystemKeys(String key) {

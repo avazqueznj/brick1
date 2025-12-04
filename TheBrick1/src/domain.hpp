@@ -1372,6 +1372,7 @@ public:
             }
 
             // Save to QSPI, always free img
+            Serial.println("Save to disk!!!");
             try {
                 saveBinaryFileFromBuffer(path, img, imgLen);
             } catch (...) {

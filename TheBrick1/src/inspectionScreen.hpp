@@ -446,6 +446,46 @@ public:
         }
 
 
+        // zone pic
+        if ( target == objects.zone_pic ) {
+
+            // Find selected zone safely (don’t trust the list 100%)
+            lv_obj_t* selected_zone_item = get_checked_child(objects.zone_list);
+            if (!selected_zone_item) {
+                showDialog("No zone selected.");
+                return;
+            }
+
+            layoutZoneClass* selected_zone = static_cast<layoutZoneClass*>(lv_obj_get_user_data(selected_zone_item));
+            if (!selected_zone) {
+                showDialog("Failed to resolve selected zone.");
+                return;
+            }
+
+            if (selected_zone->zonePic.length() == 0) {
+                showDialog("No picture for this zone.");
+                return;
+            }
+
+            String picPath = "/qspi/brickimg_";
+            picPath += selected_zone->zonePic;
+            picPath += ".jpg";
+
+            Serial.print("[PIC] Request show: ");
+            Serial.println(picPath);
+
+            try {
+                showJpegFromQSPI(picPath);
+            } catch (const std::exception& e) {
+                Serial.print("[PIC] ERROR: ");
+                Serial.println(e.what());
+                showDialog(e.what());
+            }
+
+            return;
+        }
+
+
         // =====================================================
         // DEFECTO dialog ---
 

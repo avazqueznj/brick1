@@ -472,13 +472,25 @@ void listFiles(const char* path) {
 
 // QSPI FS is handled elsewhere; helpers assume it's already mounted.
 
-//--------------------------------------------------
-// Load binary file → SDRAM
-//--------------------------------------------------
-uint8_t* loadBinaryFileToSDRAM(const String& path, size_t& outLen) {
+void loadBinaryFileToSDRAM(const String& path, size_t& outLen) {
 
     outLen = 0;
 
+    // Hard fail if someone forgot to allocate in setup()
+    if (jpg_io_buf == NULL) {
+        String msg = "loadBinaryFileToSDRAM: jpg_io_buf is NULL (not allocated in setup)";
+        Serial.println(msg);
+        throw std::runtime_error(msg.c_str());
+    }
+
+    Serial.println("Try mount FS" );
+    int err = fs.mount(&qspi);
+    if (err) {
+        //sosBlink("Mount failed (code: " + err); 
+        Serial.println("Err mounted ?");
+    }
+
+    // open the file
     FILE* f = fopen(path.c_str(), "rb");
     if (f == NULL) {
         String msg = "loadBinaryFileToSDRAM: cannot open for read: " + path;
@@ -493,7 +505,6 @@ uint8_t* loadBinaryFileToSDRAM(const String& path, size_t& outLen) {
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
-
     long fileSize = ftell(f);
     if (fileSize < 0) {
         fclose(f);
@@ -502,6 +513,7 @@ uint8_t* loadBinaryFileToSDRAM(const String& path, size_t& outLen) {
         throw std::runtime_error(msg.c_str());
     }
 
+    // rewind
     if (fseek(f, 0, SEEK_SET) != 0) {
         fclose(f);
         String msg = "loadBinaryFileToSDRAM: fseek set failed for: " + path;
@@ -509,34 +521,42 @@ uint8_t* loadBinaryFileToSDRAM(const String& path, size_t& outLen) {
         throw std::runtime_error(msg.c_str());
     }
 
-    // Allocate SDRAM buffer
-    uint8_t* buffer = (uint8_t*)SDRAM.malloc((size_t)fileSize);
-    if (buffer == NULL) {
+    // Check capacity vs JPG_IO_BUF_SIZE
+    if ((size_t)fileSize > JPG_IO_BUF_SIZE) {
         fclose(f);
-        String msg = "loadBinaryFileToSDRAM: SDRAM.malloc failed for: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
+        Serial.print("loadBinaryFileToSDRAM: file too big for jpg_io_buf. size=");
+        Serial.print((size_t)fileSize);
+        Serial.print(" > cap=");
+        Serial.println(JPG_IO_BUF_SIZE);
+        throw std::runtime_error("loadBinaryFileToSDRAM: file too big for jpg_io_buf");
     }
 
-    // Read file
-    size_t totalRead = fread(buffer, 1, (size_t)fileSize, f);
+    // Read file into the static jpg_io_buf
+    size_t totalRead = fread(jpg_io_buf, 1, (size_t)fileSize, f);
     fclose(f);
 
     if (totalRead != (size_t)fileSize) {
-        SDRAM.free(buffer);
         String msg = "loadBinaryFileToSDRAM: short read for: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
 
     outLen = (size_t)fileSize;
-    return buffer;
+
+    Serial.print("loadBinaryFileToSDRAM: loaded ");
+    Serial.print(outLen);
+    Serial.print(" bytes from ");
+    Serial.println(path);
+
+    // No return; caller knows to use jpg_io_buf.
 }
 
 //--------------------------------------------------
 // Save binary buffer → QSPI file
 //--------------------------------------------------
 void saveBinaryFileFromBuffer(const String& path, const uint8_t* data, size_t len) {
+
+    Serial.println("Saving file " + path);
 
     FILE* f = fopen(path.c_str(), "wb");
     if (f == NULL) {
@@ -553,6 +573,8 @@ void saveBinaryFileFromBuffer(const String& path, const uint8_t* data, size_t le
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
+
+    Serial.println("Saving file " + path + "Done!!" );    
 }
 
 //=============================
