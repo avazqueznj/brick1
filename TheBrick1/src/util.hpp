@@ -90,8 +90,6 @@ void sosBlink( String fatal ) {
 
 std::vector<String> tokenize(String input, char delimiter) {
 
-    Serial.println( input );
-
     std::vector<String> result;
     int start = 0;
     int end = input.indexOf(delimiter);
