@@ -260,7 +260,7 @@ void saveToKVStore(const String path, const String &kvFile) {
     int ret = kv_set(path.c_str(), kvFile.c_str(), data_len, 0);
 
     if (ret != MBED_SUCCESS) {
-        Serial.println("ERROR: kv_set failed.");
+        Serial.println( String("ERROR: kv_set failed ->")+ ret );
         throw std::runtime_error("Failed to save to KVStore!");
     }
 
