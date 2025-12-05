@@ -102,19 +102,19 @@ public:
 
     defectClass(
         assetClass assetParam,
-        const String& zoneName,
-        const String& componentName,
-        const String& defectType,
-        int severity,
-        const String& notes,
-        const String& time)
+        const String& zoneNameParam,
+        const String& componentNameParam,
+        const String& defectTypeParam,
+        int severityParam,
+        const String& notesParam,
+        const String& timeParam)
     : asset(assetParam),
-      zoneName(zoneName),
-      componentName(componentName),
-      defectType(defectType),
-      severity(severity),
-      notes(notes),
-      time(time)
+      zoneName(zoneNameParam),
+      componentName(componentNameParam),
+      defectType(defectTypeParam),
+      severity(severityParam),
+      notes(notesParam),
+      time(timeParam)
     {}
 
     bool isSameComponent(const defectClass& other) const {
