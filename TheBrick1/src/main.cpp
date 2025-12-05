@@ -586,6 +586,7 @@ void loop() {
             if (cmd == "show history") {
                 Serial.println("===== HISTORY  =====");
                 getInspectionHistory();
+                Serial.println("===== HISTORY  =====");
               } else
             if (cmd == "zap history") {
                 Serial.println("===== ZAP HISTORY  =====");

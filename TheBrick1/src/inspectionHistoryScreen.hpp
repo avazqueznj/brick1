@@ -140,63 +140,109 @@ public:
         }
     }
 
-    void start() override{
-    
-        lv_obj_add_flag(  objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN);   
+    void start() override {
 
+        lv_obj_add_flag(objects.inspection_detail_dialog, LV_OBJ_FLAG_HIDDEN);
         lv_group_focus_obj(objects.history_list);
-        //domainManagerClass* domain = domainManagerClass::getInstance();
 
+        // 1) Get headers in slot order (1..NUM_INSPECTION_SLOTS)
         inspectionHistory = getInspectionHistory();
-       
 
-        // reset
-        lv_obj_clean(objects.history_list);
-        
-        
-        for ( String& pastInspectionHeader : inspectionHistory ) {  // for each layout
-
-                std::vector<String> tokens = tokenize( pastInspectionHeader, '*' );
-                if( tokens.size() < 7 ){
-                    sosBlink( "?? Corrupted inspection header ?" + pastInspectionHeader );
-                }
-        
-                // Create button for this inspection type
-                lv_obj_t* btn = lv_btn_create(objects.history_list);
-                lv_obj_set_size(btn, 1500, 47);                
-                lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
-                lv_obj_set_style_bg_color(btn, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-                lv_obj_set_style_text_color(btn, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-                lv_obj_set_style_layout(btn, LV_LAYOUT_FLEX, LV_PART_MAIN | LV_STATE_DEFAULT);
-                lv_obj_set_style_flex_track_place(btn, LV_FLEX_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-                lv_obj_add_event_cb(btn, action_main_event_dispatcher, LV_EVENT_PRESSED,  &pastInspectionHeader );                
-                lv_obj_set_user_data(btn, &pastInspectionHeader  );
-
-                // if (domain->currentInspection.type == &type) {
-                //     lv_obj_add_state(btn, LV_STATE_CHECKED);
-                // }
-
-                // Add label with inspection type name
-                {
-                    lv_obj_t* label = lv_label_create(btn);
-                    lv_obj_set_style_align(label, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_obj_set_style_text_font(label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-                    String labelText = 
-                        tokens[ 6 ] + " " +
-
-                        tokens[ 3 ] + " " +
-                        tokens[ 4 ] + "/" +
-                        tokens[ 5 ] + 
-                        " [" + tokens[ 2 ] + "]" ;
-                    
-                    lv_label_set_text(label, labelText.c_str());
-                }
-        
+        // 2) Build a small struct array with slot + header + unixTime
+        struct HistoryRow {
+            int slot;
+            String header;
+            long unixTime;
+        };
+        // build list for sorting
+        std::vector<HistoryRow> rows;
+        rows.reserve(inspectionHistory.size());
+        for (size_t index = 0; index < inspectionHistory.size(); index++) {
+            HistoryRow row;
+            row.slot = (int)(index + 1);          // slot = index + 1 (slot order)
+            row.header = inspectionHistory[index];
+            std::vector<String> tokens = tokenize(row.header, '*');
+            if (tokens.size() < 2) {
+                sosBlink("Bad DISPLAYHEADER (no time): " + row.header);
+            }
+            long t = tokens[1].toInt();           // Unix time from header
+            row.unixTime = t;
+            rows.push_back(row);
         }
 
+        // 3) Sort rows by time (newest first)
+        if (rows.size() > 1) {
+            std::sort(
+                rows.begin(),
+                rows.end(),
+                [](const HistoryRow& a, const HistoryRow& b) {
+                    if (a.unixTime != b.unixTime) {
+                        return a.unixTime > b.unixTime; // newer first
+                    }
+                    // tie-breaker: lower slot first (arbitrary but stable)
+                    return a.slot < b.slot;
+                }
+            );
+        }
 
+        // 4) Rebuild inspectionHistory to match UI order (optional but nice)
+        inspectionHistory.clear();
+        inspectionHistory.reserve(rows.size());
+        for (size_t i = 0; i < rows.size(); i++) {
+            inspectionHistory.push_back(rows[i].header);
+        }
+
+        // 5) Reset LVGL list and build buttons in sorted order
+        lv_obj_clean(objects.history_list);
+
+        for (size_t i = 0; i < rows.size(); i++) {
+
+            HistoryRow& row = rows[i];
+            String& pastInspectionHeader = inspectionHistory[i];
+
+            std::vector<String> tokens = tokenize(pastInspectionHeader, '*');
+            if (tokens.size() < 7) {
+                sosBlink("?? Corrupted inspection header ?" + pastInspectionHeader);
+            }
+
+            // Create button for this inspection
+            lv_obj_t* btn = lv_btn_create(objects.history_list);
+            lv_obj_set_size(btn, 1500, 47);
+            lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
+            lv_obj_set_style_bg_color(btn, lv_color_hex(0xffffffff),
+                                    LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_color(btn, lv_color_hex(0xff000000),
+                                        LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_layout(btn, LV_LAYOUT_FLEX,
+                                    LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_flex_track_place(btn, LV_FLEX_ALIGN_CENTER,
+                                            LV_PART_MAIN | LV_STATE_DEFAULT);
+
+            // Keep your dispatcher user data (header pointer) if you need it
+            lv_obj_add_event_cb(btn, action_main_event_dispatcher,
+                                LV_EVENT_PRESSED, &pastInspectionHeader);
+
+            // *** IMPORTANT: store the KV slot number in the button's user_data ***
+            // Need <stdint.h> for intptr_t
+            intptr_t slotValue = (intptr_t)row.slot;
+            lv_obj_set_user_data(btn, (void*)slotValue);
+
+            // Label with formatted info
+            lv_obj_t* label = lv_label_create(btn);
+            lv_obj_set_style_align(label, LV_ALIGN_CENTER,
+                                LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_font(label, &lv_font_montserrat_28,
+                                    LV_PART_MAIN | LV_STATE_DEFAULT);
+
+            String labelText =
+                tokens[6] + " " +
+                tokens[3] + " " +
+                tokens[4] + "/" +
+                tokens[5] +
+                " [" + tokens[2] + "]";
+
+            lv_label_set_text(label, labelText.c_str());
+        }
     }
 
    
@@ -245,10 +291,20 @@ public:
 
                 // find selected, load it
                 if (lv_obj_has_state(btn, LV_STATE_CHECKED)) {
+          
+                    // load file: slot is stored in button user_data
+                    intptr_t rawSlot = (intptr_t)lv_obj_get_user_data(btn);
+                    int slot = (int)rawSlot;
+                    if (slot <= 0) {
+                        sosBlink("Invalid slot in openInspectionDetail");
+                    }
 
-                    // load file
-                    String path = "/kv/insp" + String(i + 1);
-                    Serial.println(" Try read"  + path + " -> " );
+                    String path = "/kv/insp";
+                    path += String(slot);
+
+                    Serial.print(" Try read ");
+                    Serial.print(path);
+                    Serial.println(" -> ");
 
                     std::vector<String> row = loadFromKVStore(path);    
 
