@@ -30,7 +30,7 @@
 #include <TJpg_Decoder.h>
 static uint16_t* jpg_fb = NULL;
 static lv_img_dsc_t jpg_dsc;
-static lv_obj_t* jpg_obj = NULL;
+static lv_obj_t* jpg_holder = NULL;
 static const int JPG_W = 800;
 static const int JPG_H = 480;
 bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {

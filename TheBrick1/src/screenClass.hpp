@@ -137,15 +137,15 @@ public:
             // lv_img_set_src(jpg_obj, &jpg_dsc);
             // lv_obj_center(jpg_obj);
 
-            if (jpg_obj == NULL) {
-                jpg_obj = lv_img_create(lv_scr_act());
+            if (jpg_holder == NULL) {
+                jpg_holder = lv_img_create(lv_scr_act());
 
                 // Make it clickable so it eats the click
-                lv_obj_add_flag(jpg_obj, LV_OBJ_FLAG_CLICKABLE);
+                lv_obj_add_flag(jpg_holder, LV_OBJ_FLAG_CLICKABLE);
 
                 // Click on the image = hide (no delete)
                 lv_obj_add_event_cb(
-                    jpg_obj,
+                    jpg_holder,
                     [](lv_event_t* e) {
                         lv_obj_t* obj = lv_event_get_target(e);
                         // Just hide it; no lv_obj_del, no free
@@ -157,9 +157,9 @@ public:
 
             }
 
-            lv_img_set_src(jpg_obj, &jpg_dsc);
-            lv_obj_center(jpg_obj);
-            lv_obj_clear_flag(jpg_obj, LV_OBJ_FLAG_HIDDEN);
+            lv_img_set_src(jpg_holder, &jpg_dsc);
+            lv_obj_center(jpg_holder);
+            lv_obj_clear_flag(jpg_holder, LV_OBJ_FLAG_HIDDEN);
 
 
         } catch (const std::exception& e) {
