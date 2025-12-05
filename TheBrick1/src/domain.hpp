@@ -177,7 +177,7 @@ public:
     void finished( int timeOffsetFromUTC ){     
         
         // set the clock
-        DateTime finishedTime =  rtc->now();  
+        finishedTime =  rtc->now();  
 
         // set the strings for humans
         char timeString[30];
@@ -920,18 +920,17 @@ public:
                 // parse
                 for (const String& line : file) {
                     if (line.startsWith("DISPLAYHEADER*")) {
-                        int firstStar = line.indexOf('*');
-                        int secondStar = line.indexOf('*', firstStar + 1);
-                        if (firstStar >= 0 && secondStar > firstStar) {
-                            String tsStr = line.substring(firstStar + 1, secondStar);
-                            ts = (uint32_t)tsStr.toInt();
-                        }
+                        std::vector<String> tokens = tokenize( line, '*' );
+                        ts = (uint32_t)( tokens[1] ).toInt();
                         break;
                     }
                 }
             } catch (...) {
                 Serial.println( "ERROR!!!: Cannor parse slot ovewrite it!" );
                 ts = 0;
+                oldestSlot = i;
+                break;
+
             }
 
             // checking time stamp
