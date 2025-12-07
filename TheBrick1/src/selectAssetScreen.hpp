@@ -20,7 +20,7 @@ public:
     //----------------------------------
 
 
-    selectAssetScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_SELECT_ASSET_SCREEN ){    
+    selectAssetScreenClass( settingsClass* settingsParam ): screenClass( settingsParam, SCREEN_ID_SELECT_ASSET_SCREEN ){    
     }
 
     virtual ~selectAssetScreenClass(){};    

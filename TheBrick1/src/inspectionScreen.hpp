@@ -17,7 +17,7 @@ public:
 
     assetClass* lastSelectedAsset = nullptr; // its the current asset not last!!
 
-    inspectionZonesScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_INSPECTION_ZONES ){    
+    inspectionZonesScreenClass( settingsClass* settingsParam ): screenClass( settingsParam, SCREEN_ID_INSPECTION_ZONES ){    
     }
 
     //-------------------------------------------------

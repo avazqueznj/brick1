@@ -18,7 +18,7 @@ class mainScreenClass:public screenClass{
 public:
     
 
-    mainScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_SETTINGS ){    
+    mainScreenClass( settingsClass* settingsParam ): screenClass( settingsParam, SCREEN_ID_SETTINGS ){    
     }
 
     void clockTic( String time ) override {

@@ -16,7 +16,7 @@ public:
 
     std::vector<lv_obj_t*> textareas;     
 
-    formFieldsScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_INSPECTION_FORM ){    
+    formFieldsScreenClass( settingsClass* settingsParam ): screenClass( settingsParam, SCREEN_ID_INSPECTION_FORM ){    
     }
 
     void clockTic( String time ) override {

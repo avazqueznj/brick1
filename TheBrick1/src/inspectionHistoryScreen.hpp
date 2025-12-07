@@ -19,7 +19,7 @@ public:
     String inspectionTEXT = "";
     String currentEDIPath = "";
 
-    inspectionHistoryScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_INSPECTION_HISTORY ){    
+    inspectionHistoryScreenClass( settingsClass* settingsParam ): screenClass( settingsParam, SCREEN_ID_INSPECTION_HISTORY ){    
     }
 
 

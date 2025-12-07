@@ -14,7 +14,7 @@
 class selectInspectionTypeScreenClass:public screenClass{
 public:
 
-    selectInspectionTypeScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_SELECT_INSPECTION_TYPE ){    
+    selectInspectionTypeScreenClass( settingsClass* settingsParam ): screenClass( settingsParam, SCREEN_ID_SELECT_INSPECTION_TYPE ){    
     }
 
 

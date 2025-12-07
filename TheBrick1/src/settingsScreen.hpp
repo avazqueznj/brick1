@@ -45,7 +45,7 @@ const int tz_count = sizeof(tz_offset_minutes) / sizeof(tz_offset_minutes[0]);
 class settingsScreenClass:public screenClass{
 public:
 
-    settingsScreenClass( settingsClass* settings ): screenClass( settings, SCREEN_ID_SETTINGS ){    
+    settingsScreenClass( settingsClass* settingsParam ): screenClass( settingsParam, SCREEN_ID_SETTINGS ){    
     }
     
     void batteryInfo( String info ) override {

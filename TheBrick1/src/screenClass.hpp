@@ -563,15 +563,22 @@ public:
         }
 
         lv_obj_set_size(overlay, LV_PCT(100), LV_PCT(100));
+
+        // Style: pure fullscreen dim, no border, no rounding, no padding
         lv_obj_set_style_bg_color(overlay, lv_color_black(), 0);
         lv_obj_set_style_bg_opa(overlay, LV_OPA_50, 0);
+        lv_obj_set_style_border_width(overlay, 0, 0);
+        lv_obj_set_style_outline_width(overlay, 0, 0);
+        lv_obj_set_style_shadow_width(overlay, 0, 0);
+        lv_obj_set_style_pad_all(overlay, 0, 0);
+        lv_obj_set_style_radius(overlay, 0, 0);
         lv_obj_clear_flag(overlay, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_add_flag(overlay, LV_OBJ_FLAG_CLICKABLE);
 
         mbox = lv_msgbox_create(overlay, "", message.c_str(), btns, false);
         lv_obj_center(mbox);
 
-        lv_obj_set_size(mbox, 400, 250);  // *******************
+        lv_obj_set_size(mbox, 500, 250);  // *******************
 
         // One-time style init
         if (!style_ready) {
@@ -585,7 +592,7 @@ public:
         lv_obj_t* btnm = lv_msgbox_get_btns(mbox);
         lv_obj_add_style(btnm, &style_font, 0);
 
-        lv_obj_set_size(btnm, 400 , 100 );
+        lv_obj_set_size(btnm, 500 , 100 );
 
         // --------- NEW: Make buttons larger ---------
         lv_obj_set_style_min_width(btnm, 180, 0);
