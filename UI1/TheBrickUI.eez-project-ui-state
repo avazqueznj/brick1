@@ -122,7 +122,7 @@
                 {
                   "type": "tabset",
                   "id": "#20d204f2-bdde-46f3-a5d4-70bb6c608c21",
-                  "weight": 37.54346066097826,
+                  "weight": 21.238551529787074,
                   "selected": 1,
                   "enableClose": false,
                   "children": [
@@ -155,7 +155,7 @@
                 {
                   "type": "tabset",
                   "id": "#361be082-dd9d-4f88-9e68-f69a7895f328",
-                  "weight": 24.99227439895034,
+                  "weight": 41.29718353014154,
                   "children": [
                     {
                       "type": "tab",
@@ -187,7 +187,7 @@
             {
               "type": "tabset",
               "id": "EDITORS",
-              "weight": 38.380722704271754,
+              "weight": 36.290508696324515,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
@@ -207,7 +207,7 @@
             {
               "type": "tabset",
               "id": "#cdf4dea9-5043-49e7-8ec6-80f7c45964f4",
-              "weight": 19.533046376281167,
+              "weight": 21.62326038422841,
               "children": [
                 {
                   "type": "tab",
@@ -1278,9 +1278,7 @@
           "2": {},
           "4": {},
           "6": {},
-          "7": {},
-          "9": {},
-          "10": {}
+          "7": {}
         }
       },
       "transform": {
@@ -1406,15 +1404,13 @@
       "selection": {
         "0": {
           "0": {},
-          "2": {
-            "$selected": true
-          }
+          "2": {}
         }
       },
       "transform": {
         "translate": {
-          "x": -244,
-          "y": -231
+          "x": -255.07,
+          "y": -194.48000000000002
         },
         "scale": 0.67
       },
