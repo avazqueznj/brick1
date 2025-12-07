@@ -294,6 +294,14 @@ public:
     //============
     //====================================
 
+    static String sanitizeEDIValue(const String &in) {
+        String s = in;  // make a copy so we don't mutate the original        
+        s.replace('*', '_');      
+        s.replace('\n', ' ');
+        s.replace('\r', ' ');
+        return s;
+    }
+
     String toEDI() const {
 
         String result = "BRICKINSPECTION*1\n";
@@ -361,7 +369,7 @@ public:
             // value
             if (rowIndex < inspectionFormFieldValues.size()) {
                 result += "*";
-                result += inspectionFormFieldValues[rowIndex];
+                result += sanitizeEDIValue(inspectionFormFieldValues[rowIndex]);
             } else {
                 result += "*NULL";
             }
@@ -381,7 +389,7 @@ public:
                 result += "*" + defect.defectType;
                 result += "*" + String(defect.severity);
                 result += "*" + defect.time;
-                result += "*" + defect.notes;
+                result += "*" + sanitizeEDIValue(defect.notes);
                 result += "\n";
             }
         }
@@ -397,7 +405,7 @@ public:
                 result += "*" + defect.defectType;
                 result += "*" + String(defect.severity);
                 result += "*" + defect.time;
-                result += "*" + defect.notes;
+                result += "*" + sanitizeEDIValue(defect.notes);
                 result += "\n";
             }
         }
