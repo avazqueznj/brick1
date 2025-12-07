@@ -50,7 +50,7 @@ void delayBlink() {
     thread_sleep_for( 25 );    
 }
 
-void sosBlink( String fatal ) {
+void sosHALT( String fatal ) {
     const int dot = 100;    // ms
     const int dash = 500;
     const int gap = 300;
@@ -445,7 +445,7 @@ void listFiles(const char* path) {
   // Use opendir/readdir/closedir (POSIX style, supported by Mbed FS)
   DIR* dir = opendir(path);
   if (!dir) {
-    sosBlink("  (failed to open directory)");
+    sosHALT("  (failed to open directory)");
   }
   struct dirent* de;
   int found = 0;

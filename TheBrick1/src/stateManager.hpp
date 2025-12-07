@@ -337,7 +337,7 @@ public:
       } catch (const std::runtime_error& error) {
           Serial.println("*** Screen transition error ***");
           Serial.println(error.what());
-          sosBlink(error.what());
+          sosHALT(error.what());
       }
   }
 

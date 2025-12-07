@@ -166,7 +166,7 @@ void setup() {
   Serial.println(sdram_ok ? "OK" : "FAIL");
   if (!sdram_ok) {
     Serial.println("SDRAM init failed! Will halt.");
-    sosBlink("SDRAM init failed! Will halt.");
+    sosHALT("SDRAM init failed! Will halt.");
   }
 
   // Let SDRAM settle
@@ -185,7 +185,7 @@ void setup() {
   }
   if (!lvgl_sdram_pool) {
     Serial.println("SDRAM.malloc failed after retries! HALT.");
-    sosBlink("SDRAM.malloc failed after retries! HALT.");
+    sosHALT("SDRAM.malloc failed after retries! HALT.");
   }
   Serial.print("LVGL pool at 0x");
   Serial.println((uintptr_t)lvgl_sdram_pool, HEX);
@@ -196,14 +196,14 @@ void setup() {
   Serial.println("Disp");
   Display = new Arduino_H7_Video(800, 480, GigaDisplayShield);
   if( Display->begin() != 0 ){
-    sosBlink( "Display did not initialize!!!" );
+    sosHALT( "Display did not initialize!!!" );
   };
 
   // touch sensor setup
   Serial.println("Touch");
   TouchDetector = new Arduino_GigaDisplayTouch();  
   if( !TouchDetector->begin() ){
-    sosBlink( "Touch sensor did not initialize!!!" );
+    sosHALT( "Touch sensor did not initialize!!!" );
   };
 
 
@@ -251,7 +251,7 @@ void setup() {
   // JPEG decoder memory
   jpg_io_buf = (uint8_t*) SDRAM.malloc(JPG_IO_BUF_SIZE);
   if (!jpg_io_buf) {
-      sosBlink("[PIC] FATAL: cannot allocate jpg_io_buf in SDRAM");      
+      sosHALT("[PIC] FATAL: cannot allocate jpg_io_buf in SDRAM");      
   }
   Serial.print("[PIC] Allocated jpg_io_buf, size = ");
   Serial.println(JPG_IO_BUF_SIZE);
@@ -295,7 +295,7 @@ void setup() {
   jpg_fb = (uint16_t*)SDRAM.malloc(jpg_bytes);
   if (jpg_fb == NULL) {
     Serial.println("JPEG framebuffer alloc failed! HALT.");
-    sosBlink("JPEG framebuffer alloc failed! HALT.");
+    sosHALT("JPEG framebuffer alloc failed! HALT.");
   }
   Serial.print("JPEG framebuffer at 0x");
   Serial.println((uintptr_t)jpg_fb, HEX);
@@ -682,7 +682,7 @@ void loop() {
 
   }catch(const std::exception& e) {  
     while(true){
-      sosBlink(  "FATAL: " + String( e.what() )  );
+      sosHALT(  "FATAL: " + String( e.what() )  );
     }
   }
       

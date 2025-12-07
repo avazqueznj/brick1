@@ -163,7 +163,7 @@ public:
             row.header = inspectionHistory[index];
             std::vector<String> tokens = tokenize(row.header, '*');
             if (tokens.size() < 2) {
-                sosBlink("Bad DISPLAYHEADER (no time): " + row.header);
+                sosHALT("Bad DISPLAYHEADER (no time): " + row.header);
             }
             long t = tokens[1].toInt();           // Unix time from header
             row.unixTime = t;
@@ -202,7 +202,7 @@ public:
 
             std::vector<String> tokens = tokenize(pastInspectionHeader, '*');
             if (tokens.size() < 7) {
-                sosBlink("?? Corrupted inspection header ?" + pastInspectionHeader);
+                sosHALT("?? Corrupted inspection header ?" + pastInspectionHeader);
             }
 
             // Create button for this inspection
@@ -296,7 +296,7 @@ public:
                     intptr_t rawSlot = (intptr_t)lv_obj_get_user_data(btn);
                     int slot = (int)rawSlot;
                     if (slot <= 0) {
-                        sosBlink("Invalid slot in openInspectionDetail");
+                        sosHALT("Invalid slot in openInspectionDetail");
                     }
 
                     String path = "/kv/insp";

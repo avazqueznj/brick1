@@ -84,7 +84,14 @@ public:
                 return;
             }
 
-
+            // *** NEW GUARD: layout must exist in synced layouts ***
+            if (!isLayoutSynced(matchedAsset->layoutName)) {
+                String msg = "Layout ";
+                msg += matchedAsset->layoutName;
+                msg += " was not sync, contact the administrator";
+                showDialog(msg);
+                return;
+            }
 
             // 3) Mark button visually selected, unselect others
             count = lv_obj_get_child_cnt(objects.asset_list);
@@ -342,6 +349,15 @@ public:
             // get selected asset
             assetClass* asset = (assetClass*) lv_obj_get_user_data(selectedButton);
             if (!asset) return;
+
+            // *** NEW GUARD: layout must exist in synced layouts ***
+            if (!isLayoutSynced(asset->layoutName)) {
+                String msg = "Layout ";
+                msg += asset->layoutName;
+                msg += " was not sync, contact the administrator";
+                showDialog(msg);
+                return;
+            }            
             
             // Check if asset is already in selected_asset_list
             uint32_t child_count = lv_obj_get_child_cnt(objects.selected_asset_list);
@@ -547,5 +563,19 @@ public:
 
         return false;  // No valid type found
     }
+
+    bool isLayoutSynced(const String& layoutName) {
+        domainManagerClass* domain = domainManagerClass::getInstance();
+        const std::vector<layoutClass>* layouts = domain->getLayouts();
+
+        for (size_t i = 0; i < layouts->size(); i++) {
+            const layoutClass& layout = (*layouts)[i];
+            if (layout.name == layoutName) {
+                return true;
+            }
+        }
+
+        return false;
+    }    
 
 };
