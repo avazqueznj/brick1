@@ -320,7 +320,7 @@ void setup() {
 //================================================================================================================================================
 
 // voltaje check
-const int VOLTAGE_PIN = A2;
+#define VOLTAGE_PIN A10
 // Divider resistors: R1 = 30k (high side), R2 = 7.5k (low side)
 const float R1 = 30000.0;
 const float R2 = 7500.0;
