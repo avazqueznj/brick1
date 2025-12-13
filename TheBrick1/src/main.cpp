@@ -256,6 +256,30 @@ void setup() {
   Serial.print("[PIC] Allocated jpg_io_buf, size = ");
   Serial.println(JPG_IO_BUF_SIZE);
 
+  // JPEG framebuffer in SDRAM
+  Serial.println("Allocating JPEG framebuffer...");
+  size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
+  jpg_fb = (uint16_t*)SDRAM.malloc(jpg_bytes);
+  if (jpg_fb == NULL) {
+    Serial.println("JPEG framebuffer alloc failed! HALT.");
+    sosHALT("JPEG framebuffer alloc failed! HALT.");
+  }
+  Serial.print("JPEG framebuffer at 0x");
+  Serial.println((uintptr_t)jpg_fb, HEX);
+
+  // LVGL descriptor pointing at that buffer
+  jpg_dsc.header.always_zero = 0;
+  jpg_dsc.header.w = JPG_W;
+  jpg_dsc.header.h = JPG_H;
+  jpg_dsc.header.cf = LV_IMG_CF_TRUE_COLOR;
+  jpg_dsc.data_size = (uint32_t)jpg_bytes;
+  jpg_dsc.data = (const uint8_t*)jpg_fb;
+
+  // TJpg_Decoder config
+  TJpgDec.setCallback(jpg_to_fb);
+  TJpgDec.setJpgScale(1);
+  TJpgDec.setSwapBytes(false);
+
   // done!!!!
   startedUp = true;
   Serial.println("Coming UP-----------------> Done!");
@@ -283,35 +307,6 @@ void setup() {
   }catch( const std::runtime_error& error ){
       Serial.println( error.what() );            
   }  
-
-  //=====================================
-
-
-  //_-------------------------------------------------------------------
-
-  // JPEG framebuffer in SDRAM
-  Serial.println("Allocating JPEG framebuffer...");
-  size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
-  jpg_fb = (uint16_t*)SDRAM.malloc(jpg_bytes);
-  if (jpg_fb == NULL) {
-    Serial.println("JPEG framebuffer alloc failed! HALT.");
-    sosHALT("JPEG framebuffer alloc failed! HALT.");
-  }
-  Serial.print("JPEG framebuffer at 0x");
-  Serial.println((uintptr_t)jpg_fb, HEX);
-
-  // LVGL descriptor pointing at that buffer
-  jpg_dsc.header.always_zero = 0;
-  jpg_dsc.header.w = JPG_W;
-  jpg_dsc.header.h = JPG_H;
-  jpg_dsc.header.cf = LV_IMG_CF_TRUE_COLOR;
-  jpg_dsc.data_size = (uint32_t)jpg_bytes;
-  jpg_dsc.data = (const uint8_t*)jpg_fb;
-
-  // TJpg_Decoder config
-  TJpgDec.setCallback(jpg_to_fb);
-  TJpgDec.setJpgScale(1);
-  TJpgDec.setSwapBytes(false);
 
 
   //_-------------------------------------------------------------------
@@ -667,7 +662,7 @@ void loop() {
                 //Serial.println("show token"); redacted
 
                 Serial.println("list qspi");
-                Serial.println("zap images");
+                Serial.println("zap images"); // from qspi
 
               } else         
 
