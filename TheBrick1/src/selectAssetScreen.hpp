@@ -566,7 +566,7 @@ public:
 
     bool isLayoutSynced(const String& layoutName) {
         domainManagerClass* domain = domainManagerClass::getInstance();
-        const std::vector<layoutClass>* layouts = domain->getLayouts();
+        const std::vector<layoutClass, SDRAMAllocator<layoutClass>>* layouts = domain->getLayouts();
 
         for (size_t i = 0; i < layouts->size(); i++) {
             const layoutClass& layout = (*layouts)[i];

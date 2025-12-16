@@ -98,10 +98,10 @@ public:
         Serial.print("Connecting to server... ");        
         Serial.println(serverURL);     
 
-        for( int i = 0 ; i < 3; i++){
+        for( int i = 0 ; i < 10; i++){
             if( !client.connect( serverURL.c_str(), 443 ) ){
                 Serial.println("Cannto connect, retrying...");                
-                delay( 3000 );  
+                delay( 2000 );  
                 delayBlink();
             }else{
                 serverConnected = true; 

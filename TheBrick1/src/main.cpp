@@ -143,6 +143,15 @@ void getInternalHeapFreeBytes() {
 }
 
 
+// SDRAM
+void* sdram_malloc(size_t size) {
+    return SDRAM.malloc(size);
+}
+
+void sdram_free(void* ptr) {
+    SDRAM.free(ptr);
+}
+
 void setup() {
 
   

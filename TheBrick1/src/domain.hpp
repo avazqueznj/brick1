@@ -8,6 +8,8 @@
 
 void navigateTo(int screenId);
 extern String BEARER_TOKEN;
+extern void getInternalHeapFreeBytes();
+
 
                                 // P R O B L E M  ***  D O M A I N 
 
@@ -420,7 +422,6 @@ public:
 
 
 
-
 //-------------------------------------------------
 
 //    D O M A I N   M A N A G E R 
@@ -430,8 +431,30 @@ public:
 #include <stdio.h>   
 #define INSP_SUBMIT_ERROR  "\uF071"
 #define INSP_SUBMIT_OK     "\uF00C"
+extern "C" void* sdram_malloc(size_t size);
+extern "C" void  sdram_free(void* ptr);
+template <typename T>
+struct SDRAMAllocator {
+    using value_type = T;
+
+    SDRAMAllocator() noexcept {}
+    template <class U> SDRAMAllocator(const SDRAMAllocator<U>&) noexcept {}
+
+    T* allocate(std::size_t n) {
+        void* p = sdram_malloc(n * sizeof(T));
+        if (!p) {
+            throw std::runtime_error("Vector SDRAM allocator failed!!!");
+        }
+        return static_cast<T*>(p);
+    }
+
+    void deallocate(T* p, std::size_t) noexcept {
+        sdram_free(p);
+    }
+};
 extern QSPIFBlockDevice qspi;
 extern mbed::FATFileSystem fs;
+
 
 class domainManagerClass {
 public:
@@ -449,22 +472,30 @@ public:
     String postInspectionsPath = "NOT SET";
 
 private:
-    // database
-    std::vector<userClass> users;    
-    std::vector<assetClass> assets;
-    std::vector<layoutClass> layouts;
-    std::vector<inspectionTypeClass> inspectionTypes;    
 
+    // database
+    std::vector<userClass, SDRAMAllocator<userClass>> users;
+    std::vector<assetClass, SDRAMAllocator<assetClass>> assets;
+    std::vector<layoutClass, SDRAMAllocator<layoutClass>> layouts;
+    std::vector<inspectionTypeClass, SDRAMAllocator<inspectionTypeClass>> inspectionTypes;
 
 //----------------------------
 
 public:
 
-    // Const reference getters
-    const std::vector<userClass>* getUsers() const { return &users; }
-    const std::vector<assetClass>* getAssets() const { return &assets; }
-    const std::vector<layoutClass>* getLayouts() const { return &layouts; }
-    const std::vector<inspectionTypeClass>* getInspectionTypes() const { return &inspectionTypes; }
+
+    // Const getters
+    const std::vector<userClass, SDRAMAllocator<userClass>>*
+    getUsers() const { return &users; }
+
+    const std::vector<assetClass, SDRAMAllocator<assetClass>>*
+    getAssets() const { return &assets; }
+
+    const std::vector<layoutClass, SDRAMAllocator<layoutClass>>*
+    getLayouts() const { return &layouts; }
+
+    const std::vector<inspectionTypeClass, SDRAMAllocator<inspectionTypeClass>>*
+    getInspectionTypes() const { return &inspectionTypes; }
 
     // has
     bool isLoaded = false;
@@ -542,16 +573,26 @@ public:
 
         try{
 
+                getInternalHeapFreeBytes();
+
                 // get config
                 comms->connectToWifi();
-                std::vector<String> config;
-                comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company, config );
-                parse( &config );
-                saveTextVecToQSPI( "/qspi/brickconfig.txt" , &config  );
-                
-                // sync inspes
-                int sentInspections = retryAllPendingInspections();
 
+                {                    
+                    std::vector<String> config;
+                    getInternalHeapFreeBytes();
+                    comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company, config );
+                    getInternalHeapFreeBytes();
+                    parse( &config );
+                    saveTextVecToQSPI( "/qspi/brickconfig.txt" , &config  );
+                    getInternalHeapFreeBytes();
+                }
+                    
+                // sync inspes
+                getInternalHeapFreeBytes();
+                int sentInspections = retryAllPendingInspections();
+                
+                getInternalHeapFreeBytes();
                 int loadedPics = 0;
                 try {
                     Serial.println("syncPics .....");                                        
