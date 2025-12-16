@@ -1222,8 +1222,6 @@ public:
     //=========================================================
 
 
-    //=========================================================
-
     int syncPics(  ) {
 
         Serial.println("SYNC PICS ====================================================");
@@ -1231,22 +1229,7 @@ public:
         int picsLoaded  = 0;
         int picsDeleted = 0;
 
-        // 1) Ensure QSPI filesystem is accessible.
-        //    If /qspi/ can be opened, assume it's already mounted.
-        DIR* testDir = opendir("/qspi/");
-        if (testDir) {
-            Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
-            closedir(testDir);
-        } else {
-            Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
-            int err = fs.mount(&qspi);
-            if (err) {
-                Serial.print("[PICS] QSPI mount failed, code: ");
-                Serial.println(err);
-                throw std::runtime_error("syncPics: QSPI mount failed");
-            }
-            Serial.println("[PICS] fs.mount() succeeded.");
-        }
+        openQSPI();
 
         // 2) Build list of expected picture filenames (NO path, just "brickimg_<uuid>.jpg")
         std::vector<String> expectedPics;
@@ -1324,13 +1307,8 @@ public:
                     Serial.print("[PICS] Deleting orphan: ");
                     Serial.println(fullPath);
 
-                    int rc = remove(fullPath.c_str());
-                    if (rc == 0) {
-                        picsDeleted++;
-                        Serial.println("[PICS]   OK (deleted)");
-                    } else {
-                        Serial.println("[PICS]   ERROR (could not delete)");
-                    }
+                    deleteFileFromQSPI( fullPath );
+                    picsDeleted++;
                 }
             }
 
@@ -1345,10 +1323,10 @@ public:
             path += fname;
 
             // check existence
-            FILE* f = fopen(path.c_str(), "rb");
+            FILE* f = openFileFromQSPI(path);
             if (f != NULL) {
                 // already cached
-                fclose(f);
+                closeFileFromQSPI(f);
                 Serial.print("[PICS] Already present: ");
                 Serial.println(path);
                 continue;
@@ -1412,27 +1390,8 @@ public:
         Serial.println("ZAP PICS (DIR SCAN) =========================================");
 
         // Ensure QSPI filesystem is accessible.
-        DIR* testDir = opendir("/qspi/");
-        if (testDir) {
-            Serial.println("[ZAP PICS] /qspi/ already accessible, skipping fs.mount().");
-            closedir(testDir);
-        } else {
-            Serial.println("[ZAP PICS] /qspi/ not accessible, trying fs.mount()...");
-            int err = fs.mount(&qspi);
-            if (err) {
-                Serial.print("[ZAP PICS] QSPI mount failed, code: ");
-                Serial.println(err);
-                Serial.println("[ZAP PICS] Aborting zap; filesystem not available.");
-                return;
-            }
-            Serial.println("[ZAP PICS] fs.mount() succeeded.");
-        }
-
-        DIR* dir = opendir("/qspi/");
-        if (dir == NULL) {
-            Serial.println("[ZAP PICS] Failed to open /qspi/ directory, aborting.");
-            return;
-        }
+        openQSPI();
+        DIR* dir = openDirFromQSPI();
 
         struct dirent* de;
         int removedCount = 0;
@@ -1477,7 +1436,8 @@ public:
             }
         }
 
-        closedir(dir);
+        
+        closeDirFromQSPI( dir );
 
         Serial.print("ZAP PICS DONE, total removed: ");
         Serial.println(removedCount);

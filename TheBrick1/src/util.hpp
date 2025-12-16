@@ -440,6 +440,57 @@ public:
 
 // QSPI
 
+    void openQSPI(){
+        // 1) Ensure QSPI filesystem is accessible.
+        //    If /qspi/ can be opened, assume it's already mounted.
+        DIR* qspiDir = opendir("/qspi/");
+        if (qspiDir) {
+            Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
+            closedir(qspiDir);
+        } else {
+            Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
+            int err = fs.mount(&qspi);
+            if (err) {
+                Serial.print("[PICS] QSPI mount failed, code: ");
+                Serial.println(err);
+                throw std::runtime_error("syncPics: QSPI mount failed");
+            }
+            Serial.println("[PICS] fs.mount() succeeded.");
+        }
+    }
+
+    DIR* openDirFromQSPI(){
+        DIR* dir = opendir("/qspi/");
+        if (dir == NULL) {
+            sosHALT("[ZAP PICS] Failed to open /qspi/ directory, aborting.");
+        }
+
+        return( dir );
+    }
+
+    void closeDirFromQSPI( DIR* dir ){
+        closedir(dir);        
+    }    
+
+    void deleteFileFromQSPI( String fullPath ){
+        int rc = remove(fullPath.c_str());
+        if (rc == 0) {
+            Serial.println("[PICS]   OK (deleted)");
+        } else {
+            sosHALT("[PICS]   ERROR (could not delete)");
+        }        
+    }
+
+    FILE* openFileFromQSPI( String path ){
+        return fopen(path.c_str(), "rb");
+    }
+
+    void closeFileFromQSPI( FILE* f ){
+        fclose(f);
+    }
+
+    //-=-=-=-=
+
 void listFiles(const char* path) {
   Serial.print("Listing directory: "); Serial.println(path);
   // Use opendir/readdir/closedir (POSIX style, supported by Mbed FS)
@@ -459,10 +510,6 @@ void listFiles(const char* path) {
   closedir(dir);
   if (!found) Serial.println("  (empty)");
 }
-
-//=============================
-
-
 
 #include <stdio.h>
 #include <stdexcept>
