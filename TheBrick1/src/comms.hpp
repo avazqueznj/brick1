@@ -71,7 +71,7 @@ public:
         for( int i = 0 ; i < SSL_CLIENT_RET_COUNT; i++){
 
             client.stop();       
-            delay(100);         
+            delay(200);         
 
             if( !client.connect( serverURL.c_str(), 443 ) ){
                 Serial.println("Cannto connect 2, retrying...");                
@@ -292,7 +292,7 @@ public:
 
         SSLClient client;
         client.connect( serverURL, ssid, pass );
-        
+
         // Compose HTTP POST request
         String request = "";
         request += "POST " + path + " HTTP/1.1\r\n";
