@@ -19,7 +19,7 @@
 
 extern RTC_DS3231* rtc;
 extern String BEARER_TOKEN;
-#define BRICK_HTTP_READ_TIMEOUT 30000
+#define BRICK_HTTP_READ_TIMEOUT 90000
 class commsClass{
 public:
 
