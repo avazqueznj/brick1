@@ -575,13 +575,10 @@ public:
 
                 getInternalHeapFreeBytes();
 
-                // get config
-                comms->connectToWifi();
-
                 {                    
                     std::vector<String> config;
                     getInternalHeapFreeBytes();
-                    comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company, config );
+                    comms->GET( serverURL , comms->ssid, comms->pass, getConfigPath + "?company=" + domainManagerClass::getInstance()->company, config );
                     getInternalHeapFreeBytes();
                     parse( &config );
                     saveTextVecToQSPI( "/qspi/brickconfig.txt" , &config  );
@@ -909,7 +906,7 @@ public:
         String result = "";              
 
         try{
-            result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );            
+            result =  comms->POST( serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company,  EDI );            
             updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
 
             retryAllPendingInspections();
@@ -931,7 +928,7 @@ public:
         String result = "";  
         
         try{
-            result =  comms->POST( serverURL, postInspectionsPath + "?company=" + company,  EDI );
+            result =  comms->POST( serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company,  EDI );
             updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
 
         }catch( const std::runtime_error& error ){
@@ -1096,10 +1093,13 @@ public:
     //==========================================================================================================================================    
 
     uint8_t* downloadImageToSDRAM(
-        WiFiSSLClient& serverConnection1,
         const String& uuid,
         size_t& outLen
     ) {
+
+        SSLClient client;
+        client.connect( serverURL, comms->ssid, comms->pass );
+
         outLen = 0;
         String path = "/api/device/images/" + uuid;
 
@@ -1114,12 +1114,12 @@ public:
         String statusLine;
         try{
             Serial.println("[IMG] Sending HTTP request...");
-            serverConnection1.print("GET " + path + " HTTP/1.1\r\n");
-            serverConnection1.print("Host: " + domainManagerClass::getInstance()->serverURL + "\r\n");
-            serverConnection1.print("Authorization: Bearer " + BEARER_TOKEN + "\r\n");
-            serverConnection1.print("Accept: */*\r\n");
-            serverConnection1.print("Connection: close\r\n");
-            serverConnection1.print("\r\n");
+            client.print("GET " + path + " HTTP/1.1\r\n");
+            client.print("Host: " + domainManagerClass::getInstance()->serverURL + "\r\n");
+            client.print("Authorization: Bearer " + BEARER_TOKEN + "\r\n");
+            client.print("Accept: */*\r\n");
+            client.print("Connection: close\r\n");
+            client.print("\r\n");
 
             int contentLength = -1;
             String line;
@@ -1132,8 +1132,8 @@ public:
             const int HEADER_MAX_TRIES = 100; // 100 * 100ms = 10s
 
             Serial.println("[IMG] Reading HTTP headers...");
-            while (serverConnection1.connected()) {
-                if (!serverConnection1.available()) {
+            while (client.connected()) {
+                if (!client.available()) {
                     Serial.println("wait .... "); 
                     delay(100);
                     headerTries++;
@@ -1144,7 +1144,7 @@ public:
                     continue;
                 }
                 headerTries = 0; // Reset on progress
-                line = serverConnection1.readStringUntil('\n');
+                line = client.readStringUntil('\n');
                 line.trim();
                 if (line.length() == 0) break;
 
@@ -1182,8 +1182,8 @@ public:
                 // Not OK! Read and log the body as error message
                 Serial.print("[FATAL] HTTP error code: "); Serial.println(httpStatus);
                 String errorMsg;
-                while (serverConnection1.available()) {
-                    char c = serverConnection1.read();
+                while (client.available()) {
+                    char c = client.read();
                     errorMsg += c;
                 }
                 Serial.print("[FATAL] Server error message: ");
@@ -1216,12 +1216,12 @@ public:
             size_t tries = 0;
             const size_t MAX_TRIES = 100; 
             while (totalRead < (size_t)contentLength) {
-                int n = serverConnection1.read(buffer + totalRead, contentLength - totalRead);
+                int n = client.read(buffer + totalRead, contentLength - totalRead);
                 if (n > 0) {
                     totalRead += n;
                     Serial.print("[IMG] Bytes read: "); Serial.println(totalRead);
                     tries = 0;
-                } else if (!serverConnection1.connected()) {
+                } else if (!client.connected()) {
                     Serial.println("[FATAL] Connection closed before download complete.");
                     break;
                 } else {
@@ -1390,9 +1390,13 @@ public:
             size_t imgLen = 0;
 
             
+            //===============================================
+            //===============================================
+            //===============================================
+    
             uint8_t* img; 
-            WiFiSSLClient serverConnection = domainManagerClass::getInstance()->comms->connectToServer(domainManagerClass::getInstance()->serverURL);                                                                
-            img = downloadImageToSDRAM(serverConnection, uuid, imgLen);
+
+            img = downloadImageToSDRAM(uuid, imgLen);
             if (img == NULL || imgLen == 0) {
                 Serial.println("[PICS] downloadImageToSDRAM returned null/0");
                 throw std::runtime_error("syncPics: downloadImageToSDRAM failed");
