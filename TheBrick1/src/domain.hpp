@@ -544,7 +544,8 @@ public:
 
                 // get config
                 comms->connectToWifi();
-                std::vector<String> config = comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company );
+                std::vector<String> config;
+                comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company, config );
                 parse( &config );
                 saveTextVecToQSPI( "/qspi/brickconfig.txt" , &config  );
                 

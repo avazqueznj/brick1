@@ -117,7 +117,7 @@ public:
         return client;
     }
 
-    std::vector<String> GET( String serverURL, String path ){
+    void GET( String serverURL, String path, std::vector<String>& response ){
 
         try{
                  
@@ -142,7 +142,6 @@ public:
             
             // read the response ...
             int wait = 0;
-            std::vector<String> response;        
             String currentRow;
             while (true) {            
 
@@ -199,7 +198,6 @@ public:
             client.stop();  
             WiFi.end();                               
 
-            return response;
 
         } catch (...) { 
             WiFi.end();         
