@@ -546,7 +546,7 @@ public:
                 comms->connectToWifi();
                 std::vector<String> config = comms->GET( serverURL , getConfigPath + "?company=" + domainManagerClass::getInstance()->company );
                 parse( &config );
-                saveToKVStore( "/kv/config", &config );         
+                saveTextVecToQSPI( "/qspi/brickconfig.txt" , &config  );
                 
                 // sync inspes
                 int sentInspections = retryAllPendingInspections();

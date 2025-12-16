@@ -302,7 +302,7 @@ void setup() {
   stateManager->setOrGetPendingScreenId( SCREEN_ID_LOGIN_SCREEN );
 
   try{
-      std::vector<String> config = loadFromKVStore( "/kv/config" );
+      std::vector<String> config = readTextVecFromQSPI( "/qspi/brickconfig.txt" );
       domainManagerClass::getInstance()->parse( &config );
   }catch( const std::runtime_error& error ){
       Serial.println( error.what() );            
@@ -546,10 +546,19 @@ void loop() {
               if (cmd == "delete config") {
                 Serial.println("===== delete CONFIG =====");
                 const std::vector<String> empty;
-                saveToKVStore( "/kv/config", &empty );     
+                clearTextVecQSPI( "/qspi/brickconfig.txt" );  
                 domainManagerClass::getInstance()->emptyAll();
                 Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
               } else
+
+
+              if (cmd == "delete old config") {
+                Serial.println("===== delete old CONFIG =====");
+                const std::vector<String> empty;
+                saveToKVStore( "/kv/config", &empty );     
+                domainManagerClass::getInstance()->emptyAll();
+                Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
+              } else              
               
 
               if (cmd == "show settings") {              
@@ -642,6 +651,11 @@ void loop() {
                   Serial.println("===== ZAP IMAGES DONE =====");
                 } else
 
+              if (cmd == "zap kv") {
+                  Serial.println("===== ZAP KV =====");
+                  zapKVStore();
+                  Serial.println("===== ZAP KV =====");
+                } else
 
               if (cmd == "?") {
                 Serial.println("===== HELP =====");
@@ -663,6 +677,8 @@ void loop() {
 
                 Serial.println("list qspi");
                 Serial.println("zap images"); // from qspi
+
+                Serial.println("zap kv"); // from qspi
 
               } else         
 

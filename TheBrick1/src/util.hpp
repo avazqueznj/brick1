@@ -374,6 +374,19 @@ void zapInspectionHistory() {
     Serial.println("All inspection slots deleted.");
 }
 
+void zapKVStore()
+{
+    Serial.println("[KV] Zapping KVStore...");
+
+    int rc = kv_reset("/kv/");
+    if (rc != MBED_SUCCESS) {
+        Serial.print("[KV] kv_reset failed, rc=");
+        Serial.println(rc);
+        throw std::runtime_error("zapKVStore failed");
+    }
+
+    Serial.println("[KV] KVStore wiped");
+}
 
 //-------------------------------------------------
 
@@ -623,6 +636,109 @@ void saveBinaryFileFromBuffer(const String& path, const uint8_t* data, size_t le
 }
 
 //=============================
+
+
+void saveTextVecToQSPI(const String& path, const std::vector<String>* file)
+{
+
+    if (file == nullptr) {
+        throw std::runtime_error("saveTextVecToQSPI: file pointer is null");
+    }
+
+    if (file->empty()) {
+        throw std::runtime_error("saveTextVecToQSPI: empty config");
+    }
+
+    // Ensure QSPI is mounted
+    openQSPI();
+
+    Serial.println("[CFG] Saving config to QSPI: " + path);
+
+    FILE* f = fopen(path.c_str(), "wb");
+    if (f == NULL) {
+        throw std::runtime_error(
+            ("saveTextVecToQSPI: cannot open for write: " + path).c_str()
+        );
+    }
+
+    // Write line-by-line to avoid giant buffers
+    for (const String& line : *file) {
+        size_t len = line.length();
+        if (fwrite(line.c_str(), 1, len, f) != len ||
+            fwrite("\n", 1, 1, f) != 1)
+        {
+            fclose(f);
+            throw std::runtime_error("saveTextVecToQSPI: write failed");
+        }
+    }
+
+    fclose(f);
+
+    Serial.println("[vec] Config saved OK");
+}
+
+std::vector<String> readTextVecFromQSPI(const String& path)
+{
+    std::vector<String> result;
+
+    // Ensure QSPI is mounted
+    openQSPI();
+
+    Serial.println("[vec] readTextVecFromQSPI from QSPI: " + path);
+
+    FILE* f = fopen(path.c_str(), "rb");
+    if (f == NULL) {
+        throw std::runtime_error(
+            ("loadFromQSPI: cannot open for read: " + path).c_str()
+        );
+    }
+
+    char lineBuf[512];   // NJ style: fixed, explicit, predictable
+
+    while (fgets(lineBuf, sizeof(lineBuf), f)) {
+
+        // Strip newline / CRLF
+        size_t len = strlen(lineBuf);
+        while (len > 0 &&
+               (lineBuf[len - 1] == '\n' || lineBuf[len - 1] == '\r')) {
+            lineBuf[--len] = '\0';
+        }
+
+        // Skip empty lines (optional)
+        if (len == 0) {
+            continue;
+        }
+
+        result.emplace_back(lineBuf);
+    }
+
+    fclose(f);
+
+    Serial.print("[vec] Loaded ");
+    Serial.print(result.size());
+    Serial.println(" lines");
+
+    return result;
+}
+
+void clearTextVecQSPI(const String& path)
+{
+    openQSPI();
+
+    Serial.println("[CFG] Clearing QSPI text file: " + path);
+
+    FILE* f = fopen(path.c_str(), "wb");
+    if (f == NULL) {
+        throw std::runtime_error(
+            ("clearTextVecQSPI: cannot open for write: " + path).c_str()
+        );
+    }
+
+    // "wb" truncates or creates the file
+    fclose(f);
+
+    Serial.println("[CFG] File cleared");
+}
 
 #endif
 
