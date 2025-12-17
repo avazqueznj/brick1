@@ -71,7 +71,7 @@ public:
         for( int i = 0 ; i < SSL_CLIENT_RET_COUNT; i++){
 
             client.stop();       
-            delay(200);         
+            delay(500);         
 
             if( !client.connect( serverURL.c_str(), 443 ) ){
                 Serial.println("Cannto connect 2, retrying...");                
@@ -154,13 +154,20 @@ public:
 
     
     virtual ~SSLClient(){
-        client.stop();  // no pointer always there
-        WiFi.end();        
+        client.stop();  
+        delay(200); // Give Mbed OS time to send the FIN packet
+
+        // THE FIX: Instead of just end(), check status and force a hardware reset
+        if (WiFi.status() != WL_NO_SHIELD) {
+            WiFi.disconnect(); 
+            delay(100);
+            WiFi.end();
+        }
         
-        Serial.println("                                ********************************************************");        
-        Serial.println("                                DISConnecting from server... ");        
-        Serial.println("                                ********************************************************");        
+        // Final grace period for the RPC bus to clear
+        delay(200);
         
+        Serial.println("                [CLEAN SHUTDOWN] Hardware released");
     }
 
 
@@ -209,11 +216,11 @@ public:
         SSLClient client;
         client.connect( serverURL, ssid, pass );
 
-        // ok send content request
+        // send content request
         Serial.print("GET ");
         Serial.println( path );
 
-        // send request
+        // send request headers
         client.print("GET ");
         client.print(path);         
         client.println(" HTTP/1.1");
@@ -229,38 +236,38 @@ public:
         // read the response ...
         int wait = 0;
         String currentRow;
-        while (true) {            
+        currentRow.reserve(128); // Pre-allocate internal string buffer to avoid char-by-char churn
+
+        while (client.connected() || client.available()) {            
 
             if (client.available()) {
 
-                // read pending data
-                char c = client.read();              
+                // read pending data line-by-line for efficiency
+                currentRow = client.readStringUntil('\n');
+                currentRow.trim(); // Remove \r and whitespace
 
-                // end of row   ...                 
-                if( c == '\r' or c == '\n' ){                    
-                    if( currentRow == "" ) continue;  // null line
-                    response.push_back( currentRow );  // add, next ...       
+                // end of row check
+                if( currentRow.length() > 0 ){      
+                    
+                    Serial.println(currentRow);
+                    
+                    response.push_back( currentRow );
+                    
                     if( response.size() > 10000 ){
                         Serial.println( "Error more than 10,000 rows read !!!" );            
                         throw std::runtime_error( "Error more than 10,000 rows read" );
                     }                
-                    Serial.println(currentRow );
-                    currentRow = "";
-                    continue;
+
+                    // Optional: limit serial spam but show progress
+                    if( response.size() % 100 == 0 ) {
+                        Serial.print("Read rows: ");
+                        Serial.println(response.size());
+                    }
                 }
+                
+                wait = 0; // reset timeout on successful read
 
-                // keep reading
-                currentRow += c;
-                if( currentRow.length() > 1000 ){
-                    Serial.println( "Error more than 1000 chars in line!!!" );            
-                    throw std::runtime_error( "Error more than 1000 chars in line" );
-                }                
-
-            }else{
-
-                if (!client.connected()) {
-                    break;
-                }
+            } else {
 
                 // or no data ... wait
                 Serial.print(".");
@@ -270,94 +277,72 @@ public:
             }                        
         }
 
-        if( currentRow != "" ){
-            Serial.println(currentRow );
-            response.push_back( currentRow );
-        }
-
         Serial.println("GET done!");
 
-        // one every get? 
+        // sync clock while WiFi is still powered (before destructor kills it)
         syncClockWithNTP();
 
-        Serial.println( "Wifi shut down ***" );            
-
+        Serial.println( "Wifi shutting down via RAII destructor ***" );            
     }
 
 
-    // redo all this in domain
-    String POST( String serverURL, String ssid, String pass, String path, const String& payload) {
-
+   String POST(String serverURL, String ssid, String pass, String path, const String& payload) {
         Serial.println("POSTing to server...");
-
         SSLClient client;
-        client.connect( serverURL, ssid, pass );
+        client.connect(serverURL, ssid, pass);
 
-        // Compose HTTP POST request
         String request = "";
+        request.reserve(payload.length() + 1024); 
+        
         request += "POST " + path + " HTTP/1.1\r\n";
         request += "Host: " + serverURL + "\r\n";
         request += "Content-Type: text/plain\r\n";
         request += "Authorization: Bearer " + BEARER_TOKEN + "\r\n";            
-        request += "User-Agent: InspectionBrick/1.0 ( ARM; " + String( lv_label_get_text(objects.version_label) ) + ")\r\n" ;
+        request += "User-Agent: InspectionBrick/1.0 (ARM; " + String(lv_label_get_text(objects.version_label)) + ")\r\n";
         request += "Content-Length: " + String(payload.length()) + "\r\n";
         request += "Connection: close\r\n";
         request += "\r\n";
         request += payload;
         
-        //Serial.println( request ); // leaks the token!!!
-        Serial.println( "Sending ..." );
-        Serial.println( request );
+        Serial.println("--- POST PAYLOAD START ---");
+        Serial.println(payload);
+        Serial.println("--- POST PAYLOAD END ---");
 
-        client.print(request); // send - 
+        client.print(request); 
 
-        // wait reply
         unsigned long timeout = millis();
         while (client.available() == 0) {
-            if (millis() - timeout > BRICK_HTTP_READ_TIMEOUT) {                    
-                Serial.println( "Server did not respond!!!!" );      
-                throw std::runtime_error("Server did not respond!"); 
-            }
-            Serial.print( "." );                        
+            if (millis() - timeout > BRICK_HTTP_READ_TIMEOUT) throw std::runtime_error("Server did not respond!");
+            Serial.print(".");
             delayBlink();
         }
 
-        // Read response
         String response = "";
+        response.reserve(1024);
         while (client.available()) {
             String line = client.readStringUntil('\n');
             response += line + "\n";
-            Serial.println(line);                        
             delayBlink();
         }
 
-        Serial.println( "read reply done!:" );                        
-        Serial.println( response );            
-        Serial.println( "Wifi shut down ***" );   
+        int bodyIndex = response.indexOf("\n\n");
+        if (bodyIndex == -1) bodyIndex = response.indexOf("\r\n\r\n");
 
-        //Extract only body , ie remove headers
-        int bodyIndex = response.indexOf("\r\n\r\n");
         if (bodyIndex != -1) {
-            response = response.substring(bodyIndex + 4);
-        } else {
-            Serial.println( "ERROR: could not find payload marker!!!!" );      
-            throw std::runtime_error("ERROR: could not find payload marker"); 
+            response = response.substring(bodyIndex + (response.charAt(bodyIndex) == '\r' ? 4 : 2));
         }
 
-
-        if (
-            response.indexOf("\"success\":true") != -1  ||
-            response.indexOf("Duplicate inspection ID") != -1
-        ) {
-            Serial.println( "Success !!!" );            
+        if (response.indexOf("\"success\":true") != -1 || response.indexOf("Duplicate inspection ID") != -1) {
+            Serial.println("Success !!!");            
         } else {
-            Serial.println( "ERROR !!!" );            
-            Serial.println( response );            
-            throw std::runtime_error("ERROR: Transmission error."); 
+            Serial.println("!!!!! POST FAILED !!!!!");
+            Serial.println("RAW RESPONSE:");
+            Serial.println(response);
+            // No more vague messages. Throw the actual bad response.
+            throw std::runtime_error("Transmission error!" ); 
         }
 
         return response;
-
     }
 
     void syncClockWithNTP() {

@@ -431,27 +431,6 @@ public:
 #include <stdio.h>   
 #define INSP_SUBMIT_ERROR  "\uF071"
 #define INSP_SUBMIT_OK     "\uF00C"
-extern "C" void* sdram_malloc(size_t size);
-extern "C" void  sdram_free(void* ptr);
-template <typename T>
-struct SDRAMAllocator {
-    using value_type = T;
-
-    SDRAMAllocator() noexcept {}
-    template <class U> SDRAMAllocator(const SDRAMAllocator<U>&) noexcept {}
-
-    T* allocate(std::size_t n) {
-        void* p = sdram_malloc(n * sizeof(T));
-        if (!p) {
-            throw std::runtime_error("Vector SDRAM allocator failed!!!");
-        }
-        return static_cast<T*>(p);
-    }
-
-    void deallocate(T* p, std::size_t) noexcept {
-        sdram_free(p);
-    }
-};
 extern QSPIFBlockDevice qspi;
 extern mbed::FATFileSystem fs;
 

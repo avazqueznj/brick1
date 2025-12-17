@@ -57,6 +57,40 @@ static uint8_t* jpg_io_buf = NULL;
 
 //-------------------------------
 
+#include <vector>
+
+// SDRAM
+void* sdram_malloc(size_t size) {
+    return SDRAM.malloc(size);
+}
+void sdram_free(void* ptr) {
+    SDRAM.free(ptr);
+}
+template <typename T>
+struct SDRAMAllocator {
+    using value_type = T;
+
+    SDRAMAllocator() noexcept {}
+
+    template <class U> SDRAMAllocator(const SDRAMAllocator<U>&) noexcept {}
+
+    T* allocate(std::size_t n) {
+        void* p = sdram_malloc(n * sizeof(T));
+        if (!p) {
+            throw std::runtime_error("Vector SDRAM allocator failed!!!");
+        }
+        return static_cast<T*>(p);
+    }
+
+    void deallocate(T* p, std::size_t) noexcept {
+        sdram_free(p);
+    }
+};
+
+typedef std::vector<String, SDRAMAllocator<String>> SDRAMVector;
+
+//----------------------------------
+
 #include "QSPIFBlockDevice.h"
 #include "FATFileSystem.h"
 #include <cstdio> // For C file I/O
@@ -143,14 +177,7 @@ void getInternalHeapFreeBytes() {
 }
 
 
-// SDRAM
-void* sdram_malloc(size_t size) {
-    return SDRAM.malloc(size);
-}
 
-void sdram_free(void* ptr) {
-    SDRAM.free(ptr);
-}
 
 void setup() {
 
