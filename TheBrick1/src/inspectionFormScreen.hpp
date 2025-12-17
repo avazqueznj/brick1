@@ -100,6 +100,8 @@ public:
 
     void start() override{
 
+        Serial.println( "== form fields start ==" );   
+
         domainManagerClass* domain = domainManagerClass::getInstance();
         inspectionTypeClass* currentType = domain->currentInspection.type;
         inspectionClass* currentInspection = &domain->currentInspection;
@@ -109,7 +111,8 @@ public:
         }
 
         // Show the current inspection type name at top
-        lv_label_set_text(objects.inspection_type_name, currentType->name.c_str());            
+        lv_label_set_text(objects.inspection_type_name, currentType->name.c_str());         
+        Serial.println( currentType->name );   
 
         // Clear old textarea handles
         textareas.clear();
@@ -122,15 +125,21 @@ public:
         for (size_t i = 0; i < currentType->formFields.size(); ++i) {
             const std::vector<String>& row = currentType->formFields[i];
 
+            Serial.println( currentType->name );   
+
             String fieldName = row[0];
             String fieldType = row[1];
-            String fieldMax = row.size() >= 3 ? row[2] : "30";
+            String fieldMax = row[2];
+
+            Serial.println( fieldName );   
+            Serial.println( fieldType );   
+            Serial.println( fieldMax );   
 
             int maxLength = fieldMax.toInt();
             if (maxLength <= 0) maxLength = 30;
 
-            // === Flex container ===
-            lv_obj_t* rowContainer = lv_obj_create(parent_obj);
+            // === field row ===
+            lv_obj_t* rowContainer = lv_obj_create(parent_obj); Serial.println( "Added >>>" );   
             lv_obj_set_size(rowContainer, 700, 72);
             lv_obj_set_style_pad_right(rowContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_bottom(rowContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
