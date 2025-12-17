@@ -322,6 +322,7 @@ public:
         while (client.available()) {
             String line = client.readStringUntil('\n');
             response += line + "\n";
+            Serial.print(line);
             delayBlink();
         }
 
