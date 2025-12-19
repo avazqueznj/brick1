@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/5",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/8",
     "selectedStyleObject": "[TheBrickUI.eez-project]:/lvglStyles/styles/3",
     "subnavigationSelectedItems": {}
   },
@@ -194,10 +194,10 @@
                 {
                   "type": "tab",
                   "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
-                  "name": "loginScreen",
+                  "name": "inspectionHistory",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[TheBrickUI.eez-project]:/userPages/5",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/8",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -1298,16 +1298,11 @@
     "[TheBrickUI.eez-project]:/userPages/6[flow-state]": {
       "selection": {
         "0": {
-          "1": {
-            "0": {}
-          },
+          "1": {},
           "4": {},
           "6": {},
           "8": {},
-          "11": {},
-          "13": {
-            "$selected": true
-          }
+          "11": {}
         }
       },
       "transform": {
@@ -1327,17 +1322,22 @@
     "[TheBrickUI.eez-project]:/userPages/1[flow-state]": {
       "selection": {
         "0": {
-          "5": {},
+          "5": {
+            "0": {},
+            "1": {}
+          },
+          "6": {
+            "0": {}
+          },
+          "8": {},
           "9": {},
-          "13": {
-            "$selected": true
-          }
+          "13": {}
         }
       },
       "transform": {
         "translate": {
           "x": -279,
-          "y": -226
+          "y": -126
         },
         "scale": 0.67
       },
@@ -1351,11 +1351,12 @@
     "[TheBrickUI.eez-project]:/userPages/2[flow-state]": {
       "selection": {
         "0": {
-          "3": {},
+          "3": {
+            "0": {},
+            "1": {}
+          },
           "4": {},
-          "8": {
-            "$selected": true
-          }
+          "8": {}
         }
       },
       "transform": {
@@ -1381,9 +1382,7 @@
             "0": {}
           },
           "6": {},
-          "9": {
-            "$selected": true
-          }
+          "9": {}
         }
       },
       "transform": {
@@ -1404,7 +1403,22 @@
       "selection": {
         "0": {
           "0": {},
-          "2": {}
+          "2": {},
+          "6": {},
+          "8": {
+            "0": {
+              "0": {}
+            }
+          },
+          "17": {
+            "0": {
+              "5": {
+                "0": {},
+                "1": {}
+              },
+              "8": {}
+            }
+          }
         }
       },
       "transform": {
@@ -1449,6 +1463,11 @@
         "0": {
           "2": {
             "0": {}
+          },
+          "9": {
+            "3": {
+              "$selected": true
+            }
           }
         }
       },
