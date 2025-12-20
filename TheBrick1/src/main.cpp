@@ -9,6 +9,12 @@
  *
  ********************************************************************************************/
 
+
+// main switches 
+#define FEATURE_RFID   0  // we will integrate with camera later.. maybe
+#define FEATURE_CAMERA 1
+
+
 #include <Arduino.h>
 
 #include "mbed.h"
@@ -22,7 +28,9 @@
 #include "src/ui.h"
 
 #include <SPI.h>
-#include <MFRC522.h>
+#if FEATURE_RFID
+  #include <MFRC522.h>
+#endif
 #include "RTClib.h"
 
 
@@ -130,7 +138,9 @@ String BEARER_TOKEN = "";
 Arduino_H7_Video* Display = nullptr;
 Arduino_GigaDisplayTouch* TouchDetector = nullptr;
 RTC_DS3231* rtc = nullptr;
-MFRC522* mfrc522 = nullptr;
+#if FEATURE_RFID
+  MFRC522* mfrc522 = nullptr;
+#endif
 stateManagerClass* stateManager = nullptr;  
 
 // Misc
@@ -248,10 +258,13 @@ void setup() {
   SPI.begin();
 
   //check the rfid reader on spi
-  Serial.println("RFID");
-  mfrc522 = new MFRC522(SS_PIN, RST_PIN);
-  mfrc522->PCD_Init();
-  mfrc522->PCD_DumpVersionToSerial();
+
+  #if FEATURE_RFID
+    Serial.println("RFID");
+    mfrc522 = new MFRC522(SS_PIN, RST_PIN);
+    mfrc522->PCD_Init();
+    mfrc522->PCD_DumpVersionToSerial();
+  #endif
 
   // start i2c clock
   Serial.println("RTC");
@@ -331,7 +344,6 @@ void setup() {
   }catch(...){
     Serial.println( "ERROR could not load token" );
   }
-
 
   stateManager = new stateManagerClass();  
   stateManager->init();
@@ -427,64 +439,65 @@ void loop() {
     }
 
     // ---------------- RFID ----------------
+    #if FEATURE_RFID
+        if (
+            ( 
+              ( stateManager->currentScreenState )
+              &&
+              ( stateManager->currentScreenState->screenId == SCREEN_ID_SELECT_ASSET_SCREEN 
+              || 
+              stateManager->currentScreenState->screenId == SCREEN_ID_INSPECTION_ZONES )
+            )
 
-    if (
-        ( 
-          ( stateManager->currentScreenState )
-          &&
-          ( stateManager->currentScreenState->screenId == SCREEN_ID_SELECT_ASSET_SCREEN 
-          || 
-          stateManager->currentScreenState->screenId == SCREEN_ID_INSPECTION_ZONES )
-        )
+            && 
 
-        && 
+            mfrc522 && (now - lastRfidAt >= RFID_MS)
+        ) {
 
-        mfrc522 && (now - lastRfidAt >= RFID_MS)
-    ) {
+          lastRfidAt = now;
 
-      lastRfidAt = now;
+          static unsigned long lastCardReadTime = 0;
+          static byte lastUID[10];
+          static byte lastUIDLength = 0;
 
-      static unsigned long lastCardReadTime = 0;
-      static byte lastUID[10];
-      static byte lastUIDLength = 0;
+          mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x83); // Field ON
 
-      mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x83); // Field ON
+          if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
 
-      if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
-
-        bool isSameCard = false;
-        if (mfrc522->uid.size == lastUIDLength) {
-          if (memcmp(mfrc522->uid.uidByte, lastUID, lastUIDLength) == 0) {
-            if ((now - lastCardReadTime) < 3000UL) {
-              isSameCard = true;
+            bool isSameCard = false;
+            if (mfrc522->uid.size == lastUIDLength) {
+              if (memcmp(mfrc522->uid.uidByte, lastUID, lastUIDLength) == 0) {
+                if ((now - lastCardReadTime) < 3000UL) {
+                  isSameCard = true;
+                }
+              }
             }
+
+            if (!isSameCard) {
+              lastCardReadTime = now;
+              lastUIDLength = mfrc522->uid.size;
+              if (lastUIDLength > sizeof(lastUID)) lastUIDLength = sizeof(lastUID);
+              memcpy(lastUID, mfrc522->uid.uidByte, lastUIDLength);
+
+              // Build tag string in your style
+              String data = "RFID event [";
+              for (byte i = 0; i < mfrc522->uid.size; i++) {
+                  data += ":";
+                  data += String(mfrc522->uid.uidByte[i]);
+              }
+              data += "]";
+              Serial .println( data );
+
+              stateManager->rfidEvent(mfrc522->uid.uidByte, mfrc522->uid.size);
+            }
+
+            mfrc522->PICC_HaltA();
+            mfrc522->PCD_StopCrypto1();
           }
+
+          mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x00); // Field OFF
         }
-
-        if (!isSameCard) {
-          lastCardReadTime = now;
-          lastUIDLength = mfrc522->uid.size;
-          if (lastUIDLength > sizeof(lastUID)) lastUIDLength = sizeof(lastUID);
-          memcpy(lastUID, mfrc522->uid.uidByte, lastUIDLength);
-
-          // Build tag string in your style
-          String data = "RFID event [";
-          for (byte i = 0; i < mfrc522->uid.size; i++) {
-              data += ":";
-              data += String(mfrc522->uid.uidByte[i]);
-          }
-          data += "]";
-          Serial .println( data );
-
-          stateManager->rfidEvent(mfrc522->uid.uidByte, mfrc522->uid.size);
-        }
-
-        mfrc522->PICC_HaltA();
-        mfrc522->PCD_StopCrypto1();
-      }
-
-      mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x00); // Field OFF
-    }
+    #endif
 
     // ---------------- RTC ----------------
     if (rtcUp && rtc && (now - lastRtcAt >= RTC_MS)) {
