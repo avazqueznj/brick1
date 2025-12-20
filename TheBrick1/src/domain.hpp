@@ -616,7 +616,7 @@ public:
 
     }
 
-
+//TODO: !!!!!!!!!!!!! THIS IS THE PROBLEM!!!! do not use vec to RAM
     void parse( std::vector<String>* config ){     
 
         Serial.println( "Parsing ..." );
@@ -1071,177 +1071,6 @@ public:
     //==========================================================================================================================================
     //==========================================================================================================================================    
 
-    uint8_t* downloadImageToSDRAM(
-        const String& uuid,
-        size_t& outLen
-    ) {
-
-        SSLClient client;
-        client.connect( serverURL, comms->ssid, comms->pass );
-
-        outLen = 0;
-        String path = "/api/device/images/" + uuid;
-
-        Serial.println("==============================");
-        Serial.println("[IMG] Starting image download (allocate-once)");
-        Serial.print("[IMG] Server: "); Serial.println(domainManagerClass::getInstance()->serverURL);
-        Serial.print("[IMG] Path: "); Serial.println(path);
-        Serial.println("==============================");
-    
-        uint8_t* buffer = 0;
-        int httpStatus = 0;
-        String statusLine;
-        try{
-            Serial.println("[IMG] Sending HTTP request...");
-            client.print("GET " + path + " HTTP/1.1\r\n");
-            client.print("Host: " + domainManagerClass::getInstance()->serverURL + "\r\n");
-            client.print("Authorization: Bearer " + BEARER_TOKEN + "\r\n");
-            client.print("Accept: */*\r\n");
-            client.print("Connection: close\r\n");
-            client.print("\r\n");
-
-            int contentLength = -1;
-            String line;
-            String contentType = "";
-            bool isStatusLine = true;
-
-            Serial.println("[IMG] Reading HTTP headers...");
-
-            int headerTries = 0;
-            const int HEADER_MAX_TRIES = 100; // 100 * 100ms = 10s
-
-            Serial.println("[IMG] Reading HTTP headers...");
-            while (client.connected()) {
-                if (!client.available()) {
-                    Serial.println("wait .... "); 
-                    delay(100);
-                    headerTries++;
-                    if (headerTries >= HEADER_MAX_TRIES) {                        
-                        Serial.println("[FATAL] HTTP header read timeout!");
-                        throw std::runtime_error("HTTP header read timeout");
-                    }
-                    continue;
-                }
-                headerTries = 0; // Reset on progress
-                line = client.readStringUntil('\n');
-                line.trim();
-                if (line.length() == 0) break;
-
-                Serial.print("[HDR] "); Serial.println(line);
-
-                if (isStatusLine) {
-                    statusLine = line;
-                    isStatusLine = false;
-                    int firstSpace = line.indexOf(' ');
-                    int secondSpace = line.indexOf(' ', firstSpace + 1);
-                    if (firstSpace > 0 && secondSpace > firstSpace) {
-                        httpStatus = line.substring(firstSpace + 1, secondSpace).toInt();
-                        Serial.print("[HDR] HTTP Status = "); Serial.println(httpStatus);
-                    }
-                }
-                if (line.startsWith("Content-Length:")) {
-                    contentLength = line.substring(15).toInt();
-                    Serial.print("[HDR] Content-Length = ");
-                    Serial.println(contentLength);
-                }
-                if (line.startsWith("Content-Type:")) {
-                    contentType = line.substring(13);
-                    contentType.trim();
-                    Serial.print("[HDR] Content-Type = ");
-                    Serial.println(contentType);
-                }
-                if (line.startsWith("Transfer-Encoding:") && line.indexOf("chunked") >= 0) {
-                    Serial.println("[FATAL] Chunked transfer not allowed!");
-                    throw std::runtime_error("Image download error: chunked transfer not supported");
-                }
-            }
-
-            // --- Check HTTP Status ---
-            if (httpStatus < 200 || httpStatus >= 300) {
-                // Not OK! Read and log the body as error message
-                Serial.print("[FATAL] HTTP error code: "); Serial.println(httpStatus);
-                String errorMsg;
-                while (client.available()) {
-                    char c = client.read();
-                    errorMsg += c;
-                }
-                Serial.print("[FATAL] Server error message: ");
-                Serial.println(errorMsg);
-                String error = "Image download failed with HTTP status " +  String(httpStatus) + errorMsg;
-                throw std::runtime_error(
-                    error.c_str()
-                );
-            }
-
-            if (!contentType.startsWith("image/jpeg")) {
-                Serial.print("[FATAL] Bad Content-Type: "); Serial.println(contentType);
-                throw std::runtime_error("Image download error: not a JPEG (Content-Type mismatch)");
-            }
-
-            if (contentLength <= 0) {
-                Serial.println("[FATAL] No Content-Length!");
-                throw std::runtime_error("Image download error: missing Content-Length");
-            }
-
-            Serial.print("[IMG] Allocating SDRAM: ");
-            Serial.println(contentLength);
-            buffer = (uint8_t*)SDRAM.malloc(contentLength);
-            if (!buffer) {
-                Serial.println("[FATAL] SDRAM alloc failed!");
-                throw std::runtime_error("SDRAM allocation failed");
-            }
-
-            size_t totalRead = 0;
-            size_t tries = 0;
-            const size_t MAX_TRIES = 100; 
-            while (totalRead < (size_t)contentLength) {
-                int n = client.read(buffer + totalRead, contentLength - totalRead);
-                if (n > 0) {
-                    totalRead += n;
-                    Serial.print("[IMG] Bytes read: "); Serial.println(totalRead);
-                    tries = 0;
-                } else if (!client.connected()) {
-                    Serial.println("[FATAL] Connection closed before download complete.");
-                    break;
-                } else {
-                    delay(100);
-                    Serial.print("[IMG] No data, wait .... ");        
-                    tries++;
-                    if (tries >= MAX_TRIES) {
-                        Serial.println("[FATAL] Read timeout: no progress for 10 seconds.");
-                        throw std::runtime_error("Image download failed: network timeout (no progress for 10 seconds)");
-                        break;
-                    }
-                }
-            }
-
-
-            if (totalRead != (size_t)contentLength) {
-                SDRAM.free(buffer);
-                Serial.print("[FATAL] Only read "); Serial.print(totalRead); Serial.print(" of "); Serial.println(contentLength);
-                throw std::runtime_error("Image download incomplete (Content-Length mismatch)");
-            }
-
-            outLen = totalRead;
-            Serial.println("[IMG] Download complete");
-            Serial.print("[IMG] Total bytes: "); Serial.println(outLen);
-            Serial.println("==============================");
-
-            return buffer;
-
-        } catch(...) {
-            if (buffer) {
-                SDRAM.free(buffer);
-                buffer = nullptr;
-            }        
-            throw;
-        }
-    }    
-
-
-    //=========================================================
-    //=========================================================
-
 
     int syncPics(  ) {
 
@@ -1375,16 +1204,16 @@ public:
     
             uint8_t* img; 
 
-            img = downloadImageToSDRAM(uuid, imgLen);
+            img = comms->GETImageToSDRAM( serverURL, uuid, imgLen);
             if (img == NULL || imgLen == 0) {
-                Serial.println("[PICS] downloadImageToSDRAM returned null/0");
-                throw std::runtime_error("syncPics: downloadImageToSDRAM failed");
+                Serial.println("[PICS] GETImageToSDRAM returned null/0");
+                throw std::runtime_error("syncPics: GETImageToSDRAM failed");
             }
 
             // Save to QSPI, always free img
             Serial.println("Save to disk!!!");
             try {
-                saveBinaryFileFromBuffer(path, img, imgLen);
+                saveQSPIBinaryFileFromBuffer(path, img, imgLen);
             } catch (...) {
                 SDRAM.free(img);
                 throw;
