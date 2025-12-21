@@ -11,9 +11,7 @@
 
 
 // main switches 
-#define FEATURE_RFID   0  // we will integrate with camera later.. maybe
-#define FEATURE_CAMERA 1
-
+#define FEATURE_RFID   1  // we will integrate with camera later.. maybe
 
 #include <Arduino.h>
 
@@ -461,6 +459,8 @@ void loop() {
           static byte lastUIDLength = 0;
 
           mfrc522->PCD_WriteRegister(mfrc522->TxControlReg, 0x83); // Field ON
+
+          delay( 10 );
 
           if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
 
