@@ -64,16 +64,20 @@ public:
             ( focused == objects.login && key == "#" ) ||
             ( focused == objects.login_password && key == "#" )
         ){
-            if(
-                    domainManagerClass::getInstance()->login(    
-                        String( lv_textarea_get_text( objects.login_username ) ),
-                        String( lv_textarea_get_text( objects.login_password ) ) 
-                        )                    
-                ){
-                    navigateTo( SCREEN_ID_MAIN );
-                }else{
-                    showDialog( "Invalid credentials" );  
-                }
+            try{
+                if(
+                        domainManagerClass::getInstance()->login(    
+                            String( lv_textarea_get_text( objects.login_username ) ),
+                            String( lv_textarea_get_text( objects.login_password ) ) 
+                            )                    
+                    ){
+                        navigateTo( SCREEN_ID_MAIN );
+                    }else{
+                        showDialog( "Invalid credentials" );  
+                    }
+            }catch( std::runtime_error& error ){
+                showDialog( error.what() );  
+            }                
 
         }
 
@@ -92,6 +96,8 @@ public:
         }        
 
     }
+
+    //---------->
 
     void handleTouchEvent( lv_event_t* e ) override{
         lv_obj_t* target = lv_event_get_target(e);
@@ -113,17 +119,20 @@ public:
         if( 
             ( target == objects.login  )
         ){
-            if(
-                domainManagerClass::getInstance()->login(    
-                    String( lv_textarea_get_text( objects.login_username ) ),
-                    String( lv_textarea_get_text( objects.login_password ) ) )
-                    
-            ){
-                navigateTo( SCREEN_ID_MAIN );
-            }else{
-                showDialog( "Invalid credentials" );  
+            try{
+                if(
+                    domainManagerClass::getInstance()->login(    
+                        String( lv_textarea_get_text( objects.login_username ) ),
+                        String( lv_textarea_get_text( objects.login_password ) ) )
+                        
+                ){
+                    navigateTo( SCREEN_ID_MAIN );
+                }else{
+                    showDialog( "Invalid credentials" );  
+                }
+            }catch( std::runtime_error& error ){
+                showDialog( error.what() );  
             }
-
         }
 
 
