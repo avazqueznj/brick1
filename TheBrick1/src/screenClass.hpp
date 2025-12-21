@@ -79,7 +79,7 @@ public:
 
             Serial.print("[PIC] load ... ");                
             size_t imgLen = 0;
-            loadQSPIBinaryFileToSDRAM( path, imgLen );
+            loadBinaryFileToSDRAM( path, imgLen );
             // jpg_io_buf
             Serial.print("Loaded .... Total bytes: ");
             Serial.println(imgLen);

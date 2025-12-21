@@ -689,7 +689,7 @@ void loop() {
                 }
                 Serial.println("User partition mounted as /qspi/");
                 // 3. List directory before write
-                listQSPIFiles("/qspi/");
+                listFiles("/qspi/");
                 Serial.println("===== list qspi DONE! =====");\
               } else
 

@@ -504,7 +504,7 @@ public:
 
     //-=-=-=-=
 
-void listQSPIFiles(const char* path) {
+void listFiles(const char* path) {
   Serial.print("Listing directory: "); Serial.println(path);
   // Use opendir/readdir/closedir (POSIX style, supported by Mbed FS)
   DIR* dir = opendir(path);
@@ -529,13 +529,14 @@ void listQSPIFiles(const char* path) {
 #include <SDRAM.h>
 
 // QSPI FS is handled elsewhere; helpers assume it's already mounted.
-void loadQSPIBinaryFileToSDRAM(const String& path, size_t& outLen) {
+
+void loadBinaryFileToSDRAM(const String& path, size_t& outLen) {
 
     outLen = 0;
 
     // Hard fail if someone forgot to allocate in setup()
     if (jpg_io_buf == NULL) {
-        String msg = "loadQSPIBinaryFileToSDRAM: jpg_io_buf is NULL (not allocated in setup)";
+        String msg = "loadBinaryFileToSDRAM: jpg_io_buf is NULL (not allocated in setup)";
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
@@ -550,7 +551,7 @@ void loadQSPIBinaryFileToSDRAM(const String& path, size_t& outLen) {
     // open the file
     FILE* f = fopen(path.c_str(), "rb");
     if (f == NULL) {
-        String msg = "loadQSPIBinaryFileToSDRAM: cannot open for read: " + path;
+        String msg = "loadBinaryFileToSDRAM: cannot open for read: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
@@ -558,14 +559,14 @@ void loadQSPIBinaryFileToSDRAM(const String& path, size_t& outLen) {
     // Get file size
     if (fseek(f, 0, SEEK_END) != 0) {
         fclose(f);
-        String msg = "loadQSPIBinaryFileToSDRAM: fseek end failed for: " + path;
+        String msg = "loadBinaryFileToSDRAM: fseek end failed for: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
     long fileSize = ftell(f);
     if (fileSize < 0) {
         fclose(f);
-        String msg = "loadQSPIBinaryFileToSDRAM: ftell failed for: " + path;
+        String msg = "loadBinaryFileToSDRAM: ftell failed for: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
@@ -573,7 +574,7 @@ void loadQSPIBinaryFileToSDRAM(const String& path, size_t& outLen) {
     // rewind
     if (fseek(f, 0, SEEK_SET) != 0) {
         fclose(f);
-        String msg = "loadQSPIBinaryFileToSDRAM: fseek set failed for: " + path;
+        String msg = "loadBinaryFileToSDRAM: fseek set failed for: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
@@ -581,11 +582,11 @@ void loadQSPIBinaryFileToSDRAM(const String& path, size_t& outLen) {
     // Check capacity vs JPG_IO_BUF_SIZE
     if ((size_t)fileSize > JPG_IO_BUF_SIZE) {
         fclose(f);
-        Serial.print("loadQSPIBinaryFileToSDRAM: file too big for jpg_io_buf. size=");
+        Serial.print("loadBinaryFileToSDRAM: file too big for jpg_io_buf. size=");
         Serial.print((size_t)fileSize);
         Serial.print(" > cap=");
         Serial.println(JPG_IO_BUF_SIZE);
-        throw std::runtime_error("loadQSPIBinaryFileToSDRAM: file too big for jpg_io_buf");
+        throw std::runtime_error("loadBinaryFileToSDRAM: file too big for jpg_io_buf");
     }
 
     // Read file into the static jpg_io_buf
@@ -593,14 +594,14 @@ void loadQSPIBinaryFileToSDRAM(const String& path, size_t& outLen) {
     fclose(f);
 
     if (totalRead != (size_t)fileSize) {
-        String msg = "loadQSPIBinaryFileToSDRAM: short read for: " + path;
+        String msg = "loadBinaryFileToSDRAM: short read for: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
 
     outLen = (size_t)fileSize;
 
-    Serial.print("loadQSPIBinaryFileToSDRAM: loaded ");
+    Serial.print("loadBinaryFileToSDRAM: loaded ");
     Serial.print(outLen);
     Serial.print(" bytes from ");
     Serial.println(path);
@@ -611,13 +612,13 @@ void loadQSPIBinaryFileToSDRAM(const String& path, size_t& outLen) {
 //--------------------------------------------------
 // Save binary buffer → QSPI file
 //--------------------------------------------------
-void saveQSPIBinaryFileFromBuffer(const String& path, const uint8_t* data, size_t len) {
+void saveBinaryFileFromBuffer(const String& path, const uint8_t* data, size_t len) {
 
     Serial.println("Saving file " + path);
 
     FILE* f = fopen(path.c_str(), "wb");
     if (f == NULL) {
-        String msg = "saveQSPIBinaryFileFromBuffer: cannot open for write: " + path;
+        String msg = "saveBinaryFileFromBuffer: cannot open for write: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
@@ -626,7 +627,7 @@ void saveQSPIBinaryFileFromBuffer(const String& path, const uint8_t* data, size_
     fclose(f);
 
     if (written != len) {
-        String msg = "saveQSPIBinaryFileFromBuffer: short write for: " + path;
+        String msg = "saveBinaryFileFromBuffer: short write for: " + path;
         Serial.println(msg);
         throw std::runtime_error(msg.c_str());
     }
