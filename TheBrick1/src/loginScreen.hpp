@@ -146,11 +146,11 @@ public:
 //                 size_t imgLen = 0;
 //                 // Use your UUID that points to the test JPEG on the server
 //                 //WiFiSSLClient serverConnection = domainManagerClass::getInstance()->comms->connectToServer(domainManagerClass::getInstance()->serverURL);                                                                                
-//                 //uint8_t* img = domainManagerClass::getInstance()->downloadImageToSDRAM(serverConnection,"a80e0519-c1b3-4a02-84ec-7f52bdfc4b57", imgLen);
+//                 //uint8_t* img = domainManagerClass::getInstance()->GETImageToSDRAM(serverConnection,"a80e0519-c1b3-4a02-84ec-7f52bdfc4b57", imgLen);
 
 //                 //--------------
             
-// loadBinaryFileToSDRAM(
+// loadQSPIBinaryFileToSDRAM(
 //     "/qspi/brickimg_a80e0519-c1b3-4a02-84ec-7f52bdfc4b57.jpg", imgLen );
 //     uint8_t* img = jpg_io_buf;
 
@@ -160,7 +160,7 @@ public:
 //                 Serial.println(imgLen);
 
 //                 if (img == NULL) {
-//                     Serial.println("[FATAL] downloadImageToSDRAM returned null");
+//                     Serial.println("[FATAL] GETImageToSDRAM returned null");
 //                     return;
 //                 }
 
