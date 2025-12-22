@@ -51,21 +51,21 @@ public:
   void init(){
     try{      
       settings.load( settingsFileName );
+      readSettingsFile();
     } catch (const std::exception& e) {
         String msg = String( "Could not load config, defaulting: " ) + e.what() ;
         Serial.println(msg); // optional
         resetSettingsFile();
-    }
-    readSettingsFile();
+    }    
   }
      
-
   void saveSettingsFile() {
 
-    Serial.println( "*** Config has been update !! ***" );
+    Serial.println( "*** Config has been updated !! ***" );
 
     // Domain
     settings["company"] = domainManagerClass::getInstance()->company;
+    settings["location"] = domainManagerClass::getInstance()->location;
 
     settings["timeZoneIndex"] = String(domainManagerClass::getInstance()->timeZoneIndex);
     settings["timeOffsetFromUTC"] = String(domainManagerClass::getInstance()->timeOffsetFromUTC);
@@ -87,6 +87,7 @@ public:
   void readSettingsFile(){
 
     domainManagerClass::getInstance()->company  = settings[ "company" ] ;
+    domainManagerClass::getInstance()->location  = settings[ "location" ] ;
 
     domainManagerClass::getInstance()->timeZoneIndex = settings[ "timeZoneIndex" ].toInt(); 
     domainManagerClass::getInstance()->timeOffsetFromUTC = settings[ "timeOffsetFromUTC" ].toInt();
@@ -102,6 +103,7 @@ public:
 
   void printLoadedSettings(){
     Serial.println( "company=" + domainManagerClass::getInstance()->company  );
+    Serial.println( "location=" + domainManagerClass::getInstance()->location  );
 
     Serial.println( "timeZoneIndex=" + String( domainManagerClass::getInstance()->timeZoneIndex ) );
     Serial.println( "timeOffsetFromUTC=" + String( domainManagerClass::getInstance()->timeOffsetFromUTC ) );
@@ -119,6 +121,7 @@ public:
 
         // domain
         settings.defaultKey( "company" , "NEC" );
+        settings.defaultKey( "location" , "NEC Headquarters" );
 
         settings.defaultKey( "timeZoneIndex" , "2" );
         settings.defaultKey( "timeOffsetFromUTC" , "-420" );

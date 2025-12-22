@@ -122,7 +122,7 @@ typedef struct _objects_t {
     lv_obj_t *dst;
     lv_obj_t *obj12;
     lv_obj_t *clock_settings;
-    lv_obj_t *setting_wifi_password_1;
+    lv_obj_t *setting_location;
     lv_obj_t *logo1_7;
     lv_obj_t *history_list;
     lv_obj_t *obj13;

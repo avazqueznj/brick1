@@ -11,29 +11,24 @@
 
 
 // main switches 
-#define FEATURE_RFID   1  // we will integrate with camera later.. maybe
+#define FEATURE_RFID   1  
 
 #include <Arduino.h>
-
 #include "mbed.h"
 #include <SDRAM.h>
 #include <WiFi.h>
-
-// configure lvgl
-#include "Arduino_H7_Video.h"
+#include "Arduino_H7_Video.h" // configure lvgl
 #include "lvgl.h"
 #include "Arduino_GigaDisplayTouch.h"
 #include "src/ui.h"
-
 #include <SPI.h>
 #if FEATURE_RFID
   #include <MFRC522.h>
 #endif
 #include "RTClib.h"
-
-
-// JPEG / LVGL glue
 #include <TJpg_Decoder.h>
+
+// jpeg decoding stuff
 static uint16_t* jpg_fb = NULL;
 static lv_img_dsc_t jpg_dsc;
 static lv_obj_t* jpg_holder = NULL;
@@ -100,7 +95,6 @@ typedef std::vector<String, SDRAMAllocator<String>> SDRAMVector;
 #include "QSPIFBlockDevice.h"
 #include "FATFileSystem.h"
 #include <cstdio> // For C file I/O
-
 QSPIFBlockDevice qspi;
 mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
 
@@ -727,8 +721,8 @@ void loop() {
                 Serial.println("list qspi");
                 Serial.println("zap images"); // from qspi
 
-                Serial.println("zap kv"); // from qspi
-
+                Serial.println("zap kv"); 
+                
               } else         
 
               {

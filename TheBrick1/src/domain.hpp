@@ -440,6 +440,7 @@ public:
 
     // from the config
     String company = ""; 
+    String location = ""; 
     String serverURL = "10.0.0.32"; 
 
     int  timeZoneIndex = 0;    
@@ -557,7 +558,12 @@ public:
                 {                    
                     std::vector<String> config;
                     getInternalHeapFreeBytes();
-                    comms->GET( serverURL , comms->ssid, comms->pass, getConfigPath + "?company=" + domainManagerClass::getInstance()->company, config );
+                    comms->GET( serverURL , comms->ssid, comms->pass, 
+                        getConfigPath + 
+                        "?company=" + urlEncode( domainManagerClass::getInstance()->company )
+                        + "&" + 
+                        "location=" + urlEncode( domainManagerClass::getInstance()->location ), 
+                        config );
                     getInternalHeapFreeBytes();
                     parse( &config );
                     saveTextVecToQSPI( "/qspi/brickconfig.txt" , &config  );

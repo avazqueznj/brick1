@@ -198,6 +198,27 @@ String newUUID() {
 
 //-------------------------------------------------
 
+String urlEncode(const String& str) {
+    String encoded = "";
+    const char hex[] = "0123456789ABCDEF";
+    for (size_t i = 0; i < str.length(); ++i) {
+        char c = str.charAt(i);
+        if ((c >= 'A' && c <= 'Z') ||
+            (c >= 'a' && c <= 'z') ||
+            (c >= '0' && c <= '9') ||
+            c == '-' || c == '_' || c == '.' || c == '~') {
+            encoded += c;
+        } else {
+            encoded += '%';
+            encoded += hex[(c >> 4) & 0xF];
+            encoded += hex[c & 0xF];
+        }
+    }
+    return encoded;
+}
+
+//-------------------------------------------------
+
 //++++>>>
 
 

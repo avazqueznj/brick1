@@ -128,6 +128,7 @@ public:
   
         {
             lv_group_add_obj(inputGroup, objects.setting_company  );
+            lv_group_add_obj(inputGroup, objects.setting_location  );
             lv_group_add_obj(inputGroup, objects.settings_tz  );
             lv_group_add_obj(inputGroup, objects.dst  );
 
@@ -142,6 +143,7 @@ public:
     
         screenClass::makeKeyboards();
         screenClass::addLetterKeyboard( objects.setting_company );
+        screenClass::addLetterKeyboard( objects.setting_location );
         screenClass::addLetterKeyboard( objects.setting_wifi_name );
         screenClass::addLetterKeyboard( objects.setting_wifi_password );                        
 
@@ -153,6 +155,7 @@ public:
         Serial.println( ">>>Setting Start *********" );        
          
         lv_textarea_set_text( objects.setting_company , domainManagerClass::getInstance()->company.c_str() );
+        lv_textarea_set_text( objects.setting_location , domainManagerClass::getInstance()->location.c_str() );
 
         lv_dropdown_set_selected( objects.settings_tz , domainManagerClass::getInstance()->timeZoneIndex );        
         if(  domainManagerClass::getInstance()->DST  == 1  ){
@@ -172,6 +175,7 @@ public:
         
         // Write back company
         domainManagerClass::getInstance()->company = lv_textarea_get_text(objects.setting_company);
+        domainManagerClass::getInstance()->location = lv_textarea_get_text(objects.setting_location);
 
         // Write back selected timezone index
         domainManagerClass::getInstance()->timeZoneIndex = lv_dropdown_get_selected(objects.settings_tz);
