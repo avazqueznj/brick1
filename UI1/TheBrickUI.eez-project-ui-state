@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/1",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/5",
     "selectedStyleObject": "[TheBrickUI.eez-project]:/lvglStyles/styles/3",
     "subnavigationSelectedItems": {}
   },
@@ -194,16 +194,15 @@
                 {
                   "type": "tab",
                   "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
-                  "name": "selectAssetScreen",
+                  "name": "loginScreen",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[TheBrickUI.eez-project]:/userPages/1",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/5",
                     "permanent": false
                   },
                   "icon": "svg:page"
                 }
-              ],
-              "active": true
+              ]
             },
             {
               "type": "tabset",
@@ -226,7 +225,8 @@
                   "enableClose": false,
                   "icon": "svg:components"
                 }
-              ]
+              ],
+              "active": true
             }
           ]
         }
