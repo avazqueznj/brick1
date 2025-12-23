@@ -296,14 +296,6 @@ public:
     //============
     //====================================
 
-    static String sanitizeEDIValue(const String &in) {
-        String s = in;  // make a copy so we don't mutate the original        
-        s.replace('*', '_');      
-        s.replace('\n', ' ');
-        s.replace('\r', ' ');
-        return s;
-    }
-
     String toEDI() const {
 
         String result = "BRICKINSPECTION*1\n";
@@ -450,6 +442,8 @@ public:
     // internal
     String getConfigPath = "NOT SET";
     String postInspectionsPath = "NOT SET";
+
+    std::deque< assetClass > tempAssets;
 
 private:
 

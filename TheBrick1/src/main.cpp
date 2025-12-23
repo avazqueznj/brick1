@@ -59,6 +59,7 @@ static uint8_t* jpg_io_buf = NULL;
 //-------------------------------
 
 #include <vector>
+#include <deque>
 
 // SDRAM
 void* sdram_malloc(size_t size) {
@@ -111,7 +112,7 @@ mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
       #include "selectAssetScreen.hpp"      
       #include "selectInspectionTypeScreen.hpp"  
       #include "inspectionFormScreen.hpp"    
-      #include "inspectionScreen.hpp"
+      #include "inspectionZonesScreen.hpp"
       #include "inspectionHistoryScreen.hpp"
 
 #include "stateManager.hpp"

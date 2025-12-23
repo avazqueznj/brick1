@@ -459,20 +459,24 @@ public:
             Serial.println("compo click DONE");
             return;
         }     
+        // =====================================================
 
+        //  top bar---------------
 
-        //  top bar---------------------------------------------------------------------------------------------------
-
-        // save 0 sev 
         if (target == objects.comp_ok_button) {
             okDefectClick();
             refreshZoneAndComponentFlags();
             return;
         }
 
-
         if (target == objects.all_ok_button) {  
             allokDefectClick();
+            refreshZoneAndComponentFlags();
+            return;
+        }
+
+        if (target == objects.defect_button) {  
+            defectClick();
             refreshZoneAndComponentFlags();
             return;
         }
@@ -486,7 +490,6 @@ public:
             saveInspection();
             return;              
         }
-
 
         // zone pic
         if ( target == objects.zone_pic ) {
@@ -551,25 +554,14 @@ public:
             return;
         }   
 
-
-        // Buttons        
-
-        if (target == objects.defect_button) {  
-            defectClick();
-            refreshZoneAndComponentFlags();
-            return;
-        }
-
         // close defecto dialog <-- just call close below
-
         if (  target == objects.defect_dialog_close_btn_v2 ) {
             closeDefectDialog();
             refreshZoneAndComponentFlags();
             return;                
         }
 
-
-  
+        // defect dialog buttons: create/delete defect
         if (  
                 ( target == objects.defect_dialog_delete || target ==  objects.defect_dialog_minor || target ==  objects.defect_dialog_major )
             ){
@@ -585,6 +577,8 @@ public:
             return;                
         }
 
+        // DEFECTO dialog ---        
+        // =====================================================
 
 
     }

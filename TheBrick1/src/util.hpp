@@ -760,5 +760,13 @@ void clearTextVecQSPI(const String& path)
     Serial.println("[CFG] File cleared");
 }
 
+static String sanitizeEDIValue(const String &in) {
+    String s = in;  // make a copy so we don't mutate the original        
+    s.replace('*', '_');      
+    s.replace('\n', ' ');
+    s.replace('\r', ' ');
+    return s;
+}
+
 #endif
 
