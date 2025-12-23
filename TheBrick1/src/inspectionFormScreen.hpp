@@ -206,12 +206,12 @@ public:
                     // , LV_EVENT_PRESSED, this);
 
                     if( fieldType == "num" ){
-                        addNumericKeyboardHacked( textarea ); 
+                        addNumericKeyboardForceScroll( textarea ); 
                     }else
                     if( fieldType == "text" ){
-                        addLetterKeyboardHacked( textarea ); 
+                        addLetterKeyboardForceScroll( textarea ); 
                     }else{
-                        addNumericKeyboardHacked( textarea ); 
+                        addNumericKeyboardForceScroll( textarea ); 
                         //throw std::runtime_error( "Invalid keyboard type from config:" );
                     }
                     
@@ -254,7 +254,7 @@ public:
     }
 
 
-    void addLetterKeyboardHacked(lv_obj_t* textarea) {
+    void addLetterKeyboardForceScroll(lv_obj_t* textarea) {
 
         if (!letterKeyboard) {
             throw std::runtime_error("Keyboard not created before addKeyboard()!");
@@ -288,7 +288,7 @@ public:
         );
     }
 
-    void addNumericKeyboardHacked(lv_obj_t* textarea) {
+    void addNumericKeyboardForceScroll(lv_obj_t* textarea) {
 
         if (!numericKeyboard) {
             throw std::runtime_error("Keyboard not created before addKeyboard()!");

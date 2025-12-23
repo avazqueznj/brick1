@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/8",
+    "selectedUserPageObject": "[TheBrickUI.eez-project]:/userPages/1",
     "selectedStyleObject": "[TheBrickUI.eez-project]:/lvglStyles/styles/3",
     "subnavigationSelectedItems": {}
   },
@@ -122,7 +122,7 @@
                 {
                   "type": "tabset",
                   "id": "#20d204f2-bdde-46f3-a5d4-70bb6c608c21",
-                  "weight": 21.238551529787074,
+                  "weight": 19.186072116794307,
                   "selected": 1,
                   "enableClose": false,
                   "children": [
@@ -155,7 +155,7 @@
                 {
                   "type": "tabset",
                   "id": "#361be082-dd9d-4f88-9e68-f69a7895f328",
-                  "weight": 41.29718353014154,
+                  "weight": 43.349662943134305,
                   "children": [
                     {
                       "type": "tab",
@@ -194,15 +194,16 @@
                 {
                   "type": "tab",
                   "id": "#b89417ca-66a5-4b82-abe2-724e1617e3eb",
-                  "name": "inspectionHistory",
+                  "name": "selectAssetScreen",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[TheBrickUI.eez-project]:/userPages/8",
+                    "objectPath": "[TheBrickUI.eez-project]:/userPages/1",
                     "permanent": false
                   },
                   "icon": "svg:page"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "tabset",
@@ -225,8 +226,7 @@
                   "enableClose": false,
                   "icon": "svg:components"
                 }
-              ],
-              "active": true
+              ]
             }
           ]
         }
@@ -1302,7 +1302,10 @@
           "4": {},
           "6": {},
           "8": {},
-          "11": {}
+          "11": {},
+          "13": {
+            "$selected": true
+          }
         }
       },
       "transform": {
@@ -1322,22 +1325,18 @@
     "[TheBrickUI.eez-project]:/userPages/1[flow-state]": {
       "selection": {
         "0": {
-          "5": {
-            "0": {},
-            "1": {}
-          },
-          "6": {
-            "0": {}
-          },
-          "8": {},
+          "0": {},
+          "3": {},
           "9": {},
+          "10": {},
+          "11": {},
           "13": {}
         }
       },
       "transform": {
         "translate": {
           "x": -279,
-          "y": -126
+          "y": -226
         },
         "scale": 0.67
       },
@@ -1404,19 +1403,11 @@
         "0": {
           "0": {},
           "2": {},
-          "6": {},
-          "8": {
-            "0": {
-              "0": {}
-            }
-          },
           "17": {
             "0": {
-              "5": {
-                "0": {},
-                "1": {}
-              },
-              "8": {}
+              "2": {
+                "$selected": true
+              }
             }
           }
         }
