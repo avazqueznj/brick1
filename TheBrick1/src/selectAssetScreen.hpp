@@ -128,8 +128,130 @@ public:
         lv_obj_t* focused = lv_group_get_focused(inputGroup);
 
         updateSelected();
+                
+        if( tempAssetDialogOpen ){           
 
-        Serial.println("select: by key ..." + key );                         
+            // dialog OK  =======================
+            if 
+            ( 
+                ( focused && focused == objects.temp_asset_ok && key == "#" ) 
+                // || ( key == "#" )
+            ) {
+
+                try{
+
+                    // ---------------- layout selection ----------------
+                    String layoutName = "";
+                    uint32_t i = 0;
+                    lv_obj_t* btn = lv_obj_get_child(objects.temp_asset_layouts, i);
+                    while (btn) {
+                        if (lv_obj_has_state(btn, LV_STATE_CHECKED)) {
+                            layoutName = *((String*) lv_obj_get_user_data(btn));
+                            break;
+                        }
+                        ++i;
+                        btn = lv_obj_get_child(objects.temp_asset_layouts, i);
+                    }
+                    if (layoutName == "") throw std::runtime_error("No layout selected in temp asset");
+
+                    // ---------------- asset name ----------------
+                    String name = sanitizeEDIValue(
+                        lv_textarea_get_text(objects.temp_asset_id)
+                    );
+                    name.trim();
+                    if (name.length() == 0) throw std::runtime_error("Asset name cannot be empty");
+
+                    // ---------------- uniqueness checks ----------------
+                    domainManagerClass& dm = *domainManagerClass::getInstance();
+
+                    // check temp assets
+                    for (const assetClass& a : dm.tempAssets) {
+                        if (a.ID.equalsIgnoreCase(name)) {
+                            throw std::runtime_error(
+                                String( "Asset already exists (temp): " + name ).c_str()
+                            );
+                        }
+                    }
+
+                    // check domain assets
+                    const auto* domainAssets = dm.getAssets();
+                    for (const assetClass& a : *domainAssets) {
+                        if (a.ID.equalsIgnoreCase(name)) {
+                            throw std::runtime_error(
+                                String( "Asset already exists (domain): " + name ).c_str()
+                            );
+                        }
+                    }
+
+                    // ---------------- create asset ----------------
+                    Serial.println("User asset --> [" + name + ":" + layoutName + "]");
+
+                    assetClass newAsset(name, layoutName, "");
+                    dm.tempAssets.push_back(newAsset);
+
+                    addAssetToList(
+                        objects.selected_asset_list,
+                        &dm.tempAssets.back(),
+                        false
+                    );
+
+                    closeTempAssetDialog();                    
+                    
+                }catch( std::runtime_error &error){
+                    showDialog( error.what() );
+                }                
+            }
+
+
+
+            // input to tempa asset dialog id
+            if ( focused && focused == objects.temp_asset_id ){ 
+
+                // if numeric send to the current field in the form 
+                if( key != "A" && key != "B" && key != "C" && key != "D" && key != "*" && key != "#"  ){
+                    lv_textarea_add_text(objects.temp_asset_id, key.c_str());                    
+                }
+
+                // use * as backspace
+                if (key == "*") {
+                    if (focused && lv_obj_check_type(focused, &lv_textarea_class)) {
+                        String txt = lv_textarea_get_text(focused);  // copy the text
+                        int len = txt.length();
+                        if (len > 0) {
+                            txt = txt.substring(0, len - 1);  // remove last character
+                            lv_textarea_del_char( focused ); // oohh ok, some lgvl bug. second is the good one
+                            lv_textarea_del_char( focused );                                         
+                        }
+                    }
+
+                    return;
+                }                            
+            }
+
+            // dialog CANCEL  ======================
+            if ( 
+                ( focused && focused == objects.temp_asset_cancel && key == "#" )
+                // || ( key == "*" )
+            ) {
+                    closeTempAssetDialog();                    
+            }            
+
+            return;
+        }
+
+
+        // dialog OPEN  ======================            
+        if( focused && focused == objects.temp_asset_button ){
+            if(  key == "#" ){
+                openTempAssetDialog();
+                return;
+            }
+        }                
+        if(  key == "1" ){
+            openTempAssetDialog();
+            return;
+        }
+                            
 
         if (key.length() == 1 && isdigit(key[0])) {
             // key is a single digit character
@@ -207,7 +329,11 @@ public:
                 }
 
             }
-        }        
+        }       
+        
+
+
+
     }
 
 
@@ -222,103 +348,103 @@ public:
 
         // temp asset =======================================
 
-            if( tempAssetDialogOpen ){
+        if( tempAssetDialogOpen ){
 
-                // temp asset list scroll reset 
-                if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == objects.temp_asset_layouts ) {
-                    
-                    Serial.println("layout click");
-                    
-                    uint32_t child_count = lv_obj_get_child_cnt( objects.temp_asset_layouts ); 
-                    for (uint32_t i = 0; i < child_count; ++i) {                
-                        lv_obj_t* btn = lv_obj_get_child( objects.temp_asset_layouts , i);
-                        if (!lv_obj_check_type(btn, &lv_btn_class)) continue;
+            // temp asset list scroll reset 
+            if (  lv_obj_check_type(target, &lv_btn_class) &&  parent == objects.temp_asset_layouts ) {
+                
+                Serial.println("layout click");
+                
+                uint32_t child_count = lv_obj_get_child_cnt( objects.temp_asset_layouts ); 
+                for (uint32_t i = 0; i < child_count; ++i) {                
+                    lv_obj_t* btn = lv_obj_get_child( objects.temp_asset_layouts , i);
+                    if (!lv_obj_check_type(btn, &lv_btn_class)) continue;
 
-                        if (btn != target) {
-                            lv_obj_clear_state(btn, LV_STATE_CHECKED);
-                        } else {
-                            lv_obj_add_state(btn, LV_STATE_CHECKED);
-                        }
-
+                    if (btn != target) {
+                        lv_obj_clear_state(btn, LV_STATE_CHECKED);
+                    } else {
+                        lv_obj_add_state(btn, LV_STATE_CHECKED);
                     }
 
-
-                    Serial.println("temp_asset_layouts click DONE");
-                    return;
-                }                     
-
-                if (target == objects.temp_asset_ok) {
-
-                    try{
-
-                        // ---------------- layout selection ----------------
-                        String layoutName = "";
-                        uint32_t i = 0;
-                        lv_obj_t* btn = lv_obj_get_child(objects.temp_asset_layouts, i);
-                        while (btn) {
-                            if (lv_obj_has_state(btn, LV_STATE_CHECKED)) {
-                                layoutName = *((String*) lv_obj_get_user_data(btn));
-                                break;
-                            }
-                            ++i;
-                            btn = lv_obj_get_child(objects.temp_asset_layouts, i);
-                        }
-                        if (layoutName == "") throw std::runtime_error("No layout selected in temp asset");
-
-                        // ---------------- asset name ----------------
-                        String name = sanitizeEDIValue(
-                            lv_textarea_get_text(objects.temp_asset_id)
-                        );
-                        name.trim();
-                        if (name.length() == 0) throw std::runtime_error("Asset name cannot be empty");
-
-                        // ---------------- uniqueness checks ----------------
-                        domainManagerClass& dm = *domainManagerClass::getInstance();
-
-                        // check temp assets
-                        for (const assetClass& a : dm.tempAssets) {
-                            if (a.ID.equalsIgnoreCase(name)) {
-                                throw std::runtime_error(
-                                    String( "Asset already exists (temp): " + name ).c_str()
-                                );
-                            }
-                        }
-
-                        // check domain assets
-                        const auto* domainAssets = dm.getAssets();
-                        for (const assetClass& a : *domainAssets) {
-                            if (a.ID.equalsIgnoreCase(name)) {
-                                throw std::runtime_error(
-                                    String( "Asset already exists (domain): " + name ).c_str()
-                                );
-                            }
-                        }
-
-                        // ---------------- create asset ----------------
-                        Serial.println("User asset --> [" + name + ":" + layoutName + "]");
-
-                        assetClass newAsset(name, layoutName, "");
-                        dm.tempAssets.push_back(newAsset);
-
-                        addAssetToList(
-                            objects.selected_asset_list,
-                            &dm.tempAssets.back(),
-                            false
-                        );
-
-                        closeTempAssetDialog();                    
-                        
-                    }catch( std::runtime_error &error){
-                        showDialog( error.what() );
-                    }                
                 }
 
-                if (target == objects.temp_asset_cancel) {
-                        closeTempAssetDialog();                    
-                }
 
+                Serial.println("temp_asset_layouts click DONE");
                 return;
+            }                     
+
+            if (target == objects.temp_asset_ok) {
+
+                try{
+
+                    // ---------------- layout selection ----------------
+                    String layoutName = "";
+                    uint32_t i = 0;
+                    lv_obj_t* btn = lv_obj_get_child(objects.temp_asset_layouts, i);
+                    while (btn) {
+                        if (lv_obj_has_state(btn, LV_STATE_CHECKED)) {
+                            layoutName = *((String*) lv_obj_get_user_data(btn));
+                            break;
+                        }
+                        ++i;
+                        btn = lv_obj_get_child(objects.temp_asset_layouts, i);
+                    }
+                    if (layoutName == "") throw std::runtime_error("No layout selected in temp asset");
+
+                    // ---------------- asset name ----------------
+                    String name = sanitizeEDIValue(
+                        lv_textarea_get_text(objects.temp_asset_id)
+                    );
+                    name.trim();
+                    if (name.length() == 0) throw std::runtime_error("Asset name cannot be empty");
+
+                    // ---------------- uniqueness checks ----------------
+                    domainManagerClass& dm = *domainManagerClass::getInstance();
+
+                    // check temp assets
+                    for (const assetClass& a : dm.tempAssets) {
+                        if (a.ID.equalsIgnoreCase(name)) {
+                            throw std::runtime_error(
+                                String( "Asset already exists (temp): " + name ).c_str()
+                            );
+                        }
+                    }
+
+                    // check domain assets
+                    const auto* domainAssets = dm.getAssets();
+                    for (const assetClass& a : *domainAssets) {
+                        if (a.ID.equalsIgnoreCase(name)) {
+                            throw std::runtime_error(
+                                String( "Asset already exists (domain): " + name ).c_str()
+                            );
+                        }
+                    }
+
+                    // ---------------- create asset ----------------
+                    Serial.println("User asset --> [" + name + ":" + layoutName + "]");
+
+                    assetClass newAsset(name, layoutName, "");
+                    dm.tempAssets.push_back(newAsset);
+
+                    addAssetToList(
+                        objects.selected_asset_list,
+                        &dm.tempAssets.back(),
+                        false
+                    );
+
+                    closeTempAssetDialog();                    
+                    
+                }catch( std::runtime_error &error){
+                    showDialog( error.what() );
+                }                
             }
+
+            if (target == objects.temp_asset_cancel) {
+                    closeTempAssetDialog();                    
+            }
+
+            return;
+        }
 
 
         if( target == objects.temp_asset_button ){
@@ -499,6 +625,7 @@ public:
 
         lv_obj_clean(objects.selected_asset_list);   
         domainManagerClass::getInstance()->currentInspection.clear();
+        domainManagerClass::getInstance()->tempAssets.clear();
 
         Serial.println("select: do deselect OK");                          
         return;
@@ -507,26 +634,28 @@ public:
 
     //----------------------------------
 
+    void createMainInputGroup(){
+    
+        //-------------------------------------
+        // Add focusable widgets
+
+        lv_group_add_obj(inputGroup, objects.search_asset );            
+        //lv_group_add_obj(inputGroup, objects.search_asset_clear);            
+
+        lv_group_add_obj(inputGroup, objects.asset_list  );
+        // lv_group_add_obj(inputGroup, objects.select_asset);
+        // lv_group_add_obj(inputGroup, objects.de_select_asset);
+
+        // nav bar 
+        lv_group_add_obj(inputGroup, objects.do_select_inspection_type);            
+        lv_group_add_obj(inputGroup, objects.back_from_select_asset);            
+
+    }
+
     void init() override {
 
+        createMainInputGroup();
 
-        {
-            //-------------------------------------
-            // Add focusable widgets
-
-            lv_group_add_obj(inputGroup, objects.search_asset );            
-            //lv_group_add_obj(inputGroup, objects.search_asset_clear);            
-
-            lv_group_add_obj(inputGroup, objects.asset_list  );
-            // lv_group_add_obj(inputGroup, objects.select_asset);
-            // lv_group_add_obj(inputGroup, objects.de_select_asset);
-
-            // nav bar 
-            lv_group_add_obj(inputGroup, objects.do_select_inspection_type);            
-            lv_group_add_obj(inputGroup, objects.back_from_select_asset);            
-
-        }
-        
         screenClass::init(); // always last, only if no issues
 
         // setup temp asset dialog
@@ -730,10 +859,18 @@ public:
 
     //==========================================================================
 
-    void openTempAssetDialog(){
+    void openTempAssetDialog(){        
         Serial.println("temp asset dialog click ...");
+
         lv_obj_clear_flag(  objects.temp_asset_dialog, LV_OBJ_FLAG_HIDDEN);     
         lv_obj_clear_flag(  objects.temp_asset_overlay, LV_OBJ_FLAG_HIDDEN);     
+
+        lv_group_remove_all_objs(inputGroup);
+        lv_group_add_obj(inputGroup, objects.temp_asset_id);            
+        lv_group_add_obj(inputGroup, objects.temp_asset_layouts);            
+        lv_group_add_obj(inputGroup, objects.temp_asset_ok);            
+        lv_group_add_obj(inputGroup, objects.temp_asset_cancel);            
+
         tempAssetDialogOpen = true;       
         Serial.println("temp asset dialog click done!");
     }
@@ -741,14 +878,21 @@ public:
     bool tempAssetDialogOpen = false;
     void closeTempAssetDialog(){
         Serial.println("Close temp asset dialog ...");                
+
         if( tempAssetDialogOpen ){
             lv_obj_add_flag(  objects.temp_asset_dialog, LV_OBJ_FLAG_HIDDEN);   
             lv_obj_add_flag(  objects.temp_asset_overlay, LV_OBJ_FLAG_HIDDEN);   
             lv_textarea_set_text( objects.temp_asset_id, "" );         
+
+            lv_group_remove_all_objs(inputGroup);
+            createMainInputGroup();
         }
+
         tempAssetDialogOpen = false;
+        Serial.println("Close temp asset dialog ... done!");                
     }
 
     //==========================================================================    
 
 };
+
