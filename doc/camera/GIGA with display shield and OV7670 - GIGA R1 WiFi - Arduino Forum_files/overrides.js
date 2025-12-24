@@ -1,0 +1,1 @@
+I18n._overrides = {"en":{"js.composer.code_title":"Use code tags to format code for the forum","js.composer.reply_placeholder_rte":"Type here. Use the toolbar for formatting. Drag or paste images.","js.search.title":"Search Forum"}};
