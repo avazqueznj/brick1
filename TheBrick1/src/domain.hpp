@@ -11,8 +11,70 @@ extern String BEARER_TOKEN;
 extern void getInternalHeapFreeBytes();
 
 
+
+
                                 // P R O B L E M  ***  D O M A I N 
 
+
+//-------------------------------------------------
+// SETTINGS
+//-------------------------------------------------
+
+class settingsClass : public std::map<String, String> {
+public:
+
+    // Throwing operator[]
+    String& operator[](const String& key) {
+        auto it = this->find(key);
+        if (it == this->end())
+            throw std::out_of_range(("Missing config key: " + key).c_str());
+        return it->second;
+    }
+    
+    void defaultKey( String k, String v ){
+        std::map<String, String>::operator[](k) = v;
+    }
+
+    void load(const String& filename) {
+        this->clear(); //<------------- note
+        try {
+            auto lines = loadFromKVStore(filename); // may throw
+            for (const String& line : lines) {
+                String s = line; s.trim();
+                if (s.length() == 0 || s.startsWith("//")) continue;
+                int eq = s.indexOf('=');
+                if (eq > 0) {
+                    String k = s.substring(0, eq); k.trim();
+                    String v = s.substring(eq + 1); v.trim();
+                    std::map<String, String>::operator[](k) = v;
+                }
+            }
+        } catch (const std::exception& e) {
+            // Add more context and rethrow
+            String msg = String("Could not load config: ") + filename + " :: " + e.what();
+            Serial.println(msg); // optional: log before throw
+            throw std::runtime_error(msg.c_str());
+        }
+    }
+
+
+
+    void save(const String& filename) const {
+        try {
+            std::vector<String> lines;
+            for (const auto& it : *this)
+                lines.push_back(it.first + "=" + it.second);
+            saveToKVStore(filename, &lines); // may throw
+        } catch (const std::exception& e) {
+            String msg = String("Could not save config: ") + filename + " :: " + e.what();
+            Serial.println(msg); // optional
+            throw std::runtime_error(msg.c_str());
+        }
+    }
+
+
+
+};                                
 
 class userClass{
 public:

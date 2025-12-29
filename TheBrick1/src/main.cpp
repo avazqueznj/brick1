@@ -100,12 +100,14 @@ QSPIFBlockDevice qspi;
 mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
 
 //-------------------------------
+#define NUM_INSPECTION_SLOTS 10
 
   #include "util.hpp"
+  #include "fsutil.hpp"
   #include "comms.hpp"
   #include "domain.hpp"
+  #include "screenClass.hpp"
 
-      #include "screenClass.hpp"
       #include "loginScreen.hpp"
       #include "settingsScreen.hpp"
       #include "mainScreen.hpp"
@@ -743,3 +745,9 @@ void loop() {
       
 
 }
+
+
+
+
+
+

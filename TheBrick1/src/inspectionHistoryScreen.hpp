@@ -9,6 +9,72 @@
  *
  ********************************************************************************************/
 
+std::vector<String> getInspectionHistory() {
+
+    std::vector<String> result;
+    result.reserve(NUM_INSPECTION_SLOTS);
+
+    for (int i = 1; i <= NUM_INSPECTION_SLOTS; i++) {
+
+        String path = "/kv/insp";
+        path += String(i);
+
+        Serial.print("Try read ");
+        Serial.print(path);
+        Serial.print(" -> ");
+
+        // get slot
+        if (!kvKeyExists(path)) {
+            Serial.println("Cannot read...");
+            continue;
+        }
+
+        // else read it
+        try {
+
+            std::vector<String> file = loadFromKVStore(path);
+
+            // extract header
+            for (size_t j = 0; j < file.size(); j++) {
+                if (file[j].startsWith("DISPLAYHEADER*")) {
+                    Serial.print("Slot ");
+                    Serial.print(i);
+                    Serial.print(": ");
+                    Serial.println(file[j]);
+                    result.push_back(file[j]);             
+                    break; // done
+                }
+            }
+
+        } catch (...) {
+            Serial.println("ERROR read slot");
+        }
+    }
+
+    return result;
+}
+
+void zapInspectionHistory() {
+
+    for (int i = 1; i <= NUM_INSPECTION_SLOTS; i++) {
+
+        // make filename
+        String path = "/kv/insp";
+        path += String(i);
+
+        // zap it!
+        Serial.print( "Zap " + path + " " );
+        if( kv_remove(path.c_str()) == MBED_SUCCESS ){
+            Serial.println( "Zapped  " );
+        }else{
+            Serial.println( "Zap error " );
+        }
+
+    }
+
+    Serial.println("All inspection slots deleted.");
+}
+
 
 #include "core/lv_event.h"
 class inspectionHistoryScreenClass:public screenClass{
@@ -381,6 +447,8 @@ public:
     }
 
 };
+
+
 
 
 
