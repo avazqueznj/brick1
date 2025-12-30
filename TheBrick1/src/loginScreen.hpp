@@ -6,8 +6,9 @@
  * 
  ********************************************************************************************/
 
+#include "arducam_dvp.h"
+#include "OV7670/ov767x.h"
 
-//-------------------------------------------------
 
 // global calls
 void navigateTo(int screenId);
@@ -136,6 +137,102 @@ public:
         }
 
 
+
+// Cam stuff OV7670
+#define IMAGE_MODE CAMERA_RGB565
+#define GC9A01A_CYAN 0x07FF
+#define GC9A01A_RED 0xf800
+#define GC9A01A_BLUE 0x001F
+#define GC9A01A_GREEN 0x07E0
+#define GC9A01A_MAGENTA 0xF81F
+#define GC9A01A_WHITE 0xffff
+#define GC9A01A_BLACK 0x0000
+#define GC9A01A_YELLOW 0xFFE0
+#define ALIGN_PTR(p,a)   ((p & (a-1)) ?(((uintptr_t)p + a) & ~(uintptr_t)(a-1)) : p)
+#define HTONS(x) (((x >> 8) & 0x00FF) | ((x << 8) & 0xFF00))
+
+if (target == objects.test_button1) {
+    Serial.println("[LOG] >>> INSPECTION START");
+
+    // 1. Hardware Objects (MUST be static to survive after function return)
+    static OV7670 ov767x;
+    static Camera cam(ov767x);
+    static FrameBuffer fb; 
+
+    // 2. Allocation & Alignment
+    static uint8_t *fb_mem = (uint8_t *)SDRAM.malloc(640 * 480 * 2 + 32);
+    if (!fb_mem) throw std::runtime_error("CRITICAL: SDRAM Malloc failed!");
+    
+    static bool fb_init = false;
+    if (!fb_init) {
+        fb.setBuffer((uint8_t *)ALIGN_PTR((uintptr_t)fb_mem, 32));
+        fb_init = true;
+        Serial.println("[LOG] FrameBuffer aligned and initialized.");
+    }
+
+    uint16_t *pixels = (uint16_t *)fb.getBuffer();
+    if (!pixels) throw std::runtime_error("CRITICAL: Buffer pointer is NULL!");
+
+    // 3. THE SMOKING GUN: Clear to BLUE (using your define)
+    // If the camera fails, you see BLUE. If it works, you see an image.
+    for (int i = 0; i < 640 * 480; i++) {
+        pixels[i] = GC9A01A_BLUE; 
+    }
+    SCB_CleanDCache_by_Addr((uint32_t *)pixels, 640 * 480 * 2);
+    Serial.println("[LOG] RAM white-washed with BLUE.");
+
+    // 4. Hardware Kickstart
+    Serial.println("[LOG] Starting Camera hardware...");
+    if (!cam.begin(CAMERA_R640x480, IMAGE_MODE, 10)) {
+        throw std::runtime_error("HARDWARE ERROR: cam.begin failed!");
+    }
+
+    // 5. The Shot
+    Serial.println("[LOG] Grabbing Frame...");
+    int status = cam.grabFrame(fb, 3000);
+    if (status != 0) {
+        Serial.print("[ERROR] grabFrame Status: "); Serial.println(status);
+        throw std::runtime_error("CAMERA ERROR: Failed to capture frame data.");
+    }
+    Serial.println("[LOG] Grab Success.");
+
+    // 6. Fix Endianness (HTONS)
+    for (int i = 0; i < 640 * 480; i++) {
+        pixels[i] = HTONS(pixels[i]);
+    }
+
+    // 7. Flush Cache for M7 DMA/LTDC
+    SCB_CleanDCache_by_Addr((uint32_t *)pixels, 640 * 480 * 2);
+    Serial.println("[LOG] Cache sync complete.");
+
+    // 8. LVGL Descriptor (RGB565 per lv_conf.h)
+    static lv_img_dsc_t cam_img_desc;
+    cam_img_desc.header.always_zero = 0;
+    cam_img_desc.header.reserved    = 0;
+    cam_img_desc.header.cf          = LV_IMG_CF_TRUE_COLOR; // 16-bit depth
+    cam_img_desc.header.w           = 640;
+    cam_img_desc.header.h           = 480;
+    cam_img_desc.data_size          = 640 * 480 * 2;
+    cam_img_desc.data               = (const uint8_t *)pixels;
+
+    // 9. UI Widget Update
+    static lv_obj_t * cam_img_obj = NULL;
+    if (cam_img_obj == NULL) {
+        cam_img_obj = lv_img_create(lv_scr_act());
+        if (!cam_img_obj) throw std::runtime_error("LVGL ERROR: Image object creation failed!");
+    }
+
+    lv_img_set_src(cam_img_obj, &cam_img_desc);
+    lv_obj_center(cam_img_obj);
+    lv_obj_invalidate(cam_img_obj);
+
+    Serial.println("[LOG] <<< INSPECTION COMPLETE. EXITING.");
+}
+
+
+
+};  //==
+
 // //--
 
 //  //7f88b799-a223-471a-a1ff-964a46e43166
@@ -150,7 +247,7 @@ public:
 
 //                 //--------------
             
-// loadQSPIBinaryFileToSDRAM(
+// loadQSPIFileToSDRAM(
 //     "/qspi/brickimg_a80e0519-c1b3-4a02-84ec-7f52bdfc4b57.jpg", imgLen );
 //     uint8_t* img = jpg_io_buf;
 
@@ -216,9 +313,6 @@ public:
         // }
 
 
-
-        
-    } //-- handle touche event
 
 //===================================================    
 

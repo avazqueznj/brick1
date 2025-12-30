@@ -121,6 +121,7 @@ typedef struct _objects_t {
     lv_obj_t *login;
     lv_obj_t *do_settings_2;
     lv_obj_t *do_sync_2;
+    lv_obj_t *test_button1;
     lv_obj_t *logo1_2;
     lv_obj_t *battery_settings;
     lv_obj_t *back_from_settings;

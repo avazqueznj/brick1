@@ -1275,7 +1275,7 @@ public:
             // Save to QSPI, always free img
             Serial.println("Save to disk!!!");
             try {
-                saveQSPIBinaryFileFromBuffer(path, img, imgLen);
+                saveQSPIFileFromSDRAM(path, img, imgLen);
             } catch (...) {
                 SDRAM.free(img);
                 throw;
