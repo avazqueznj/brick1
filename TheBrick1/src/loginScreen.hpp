@@ -187,6 +187,17 @@ if (target == objects.test_button1) {
         throw std::runtime_error("HARDWARE ERROR: cam.begin failed!");
     }
 
+        // 3. THE "ADJUSTMENT" PUMP
+    // The OV7670 AEC/AGC needs active clock cycles to see the dark room.
+    // We grab 10 frames in a fast loop to "pump" the auto-exposure logic.
+    Serial.println("[LOG] Pumping frames to adjust AEC/AGC...");
+    for(int i = 0; i < 10; i++) {
+        // If this returns -1, the DCMI is timed out.
+        if (cam.grabFrame(fb, 1000) != 0) {
+            Serial.print("[WARN] Adjustment skip at frame "); Serial.println(i);
+        }
+    }
+
     // 5. The Shot
     Serial.println("[LOG] Grabbing Frame...");
     int status = cam.grabFrame(fb, 3000);
