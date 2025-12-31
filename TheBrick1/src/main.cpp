@@ -167,6 +167,7 @@ void getInternalHeapFreeBytes() {
   #include "fsutil.hpp"
   #include "comms.hpp"
   #include "domain.hpp"
+  #include "camera.hpp"
   #include "screenClass.hpp"
 
       #include "loginScreen.hpp"

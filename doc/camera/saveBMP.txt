@@ -1,0 +1,36 @@
+void saveToQSPI(const String& filename) {
+    String path = "/qspi/" + filename;
+    Serial.println("[LOG] Saving BMP: " + path);
+
+    FILE* f = fopen(path.c_str(), "wb");
+    if (!f) throw std::runtime_error("FS ERROR: Cannot open BMP for write");
+
+    // 1. The 54-byte BMP Header (Standard VGA 640x480 RGB565)
+    // We use a packed struct or just a byte array for the "Simple" way
+    uint32_t fileSize = 54 + (640 * 480 * 2);
+    uint8_t header[54] = {
+        'B', 'M',                 // Signature
+        (uint8_t)(fileSize), (uint8_t)(fileSize >> 8), (uint8_t)(fileSize >> 16), (uint8_t)(fileSize >> 24),
+        0, 0, 0, 0,               // Reserved
+        54, 0, 0, 0,              // Offset to pixels
+        40, 0, 0, 0,              // Header size
+        0x80, 0x02, 0, 0,         // Width: 640
+        0xE0, 0x01, 0, 0,         // Height: 480 (Note: BMP is usually bottom-up, but 480 works)
+        1, 0,                     // Planes
+        16, 0,                    // Bits per pixel (RGB565)
+        3, 0, 0, 0,               // Compression (3 = BI_BITFIELDS for RGB565)
+        (uint8_t)(fileSize-54), (uint8_t)((fileSize-54) >> 8), (uint8_t)((fileSize-54) >> 16), (uint8_t)((fileSize-54) >> 24),
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // Resolution/Colors
+    };
+
+    // 2. Write Header
+    fwrite(header, 1, 54, f);
+
+    // 3. Write Pixels (The 600KB buffer)
+    size_t written = fwrite(pixels, 1, 640 * 480 * 2, f);
+    
+    fclose(f);
+
+    if (written != (640 * 480 * 2)) throw std::runtime_error("FS ERROR: Short BMP write");
+    Serial.println("[LOG] BMP Save Complete.");
+}
