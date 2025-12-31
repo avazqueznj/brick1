@@ -161,5 +161,48 @@ public:
     virtual ~cameraClass(){
     }
     
+
+    class cameraSystem {
+    private:
+        // ... your existing singleton stuff and pixels buffer ...
+        uint16_t* pixels; 
+        const size_t bufferSize = 640 * 480 * 2; 
+
+    public:
+
+
+        /**
+         * We don't swap bits here; we assume shootToSDRAM already did the HTONS.
+         */
+        void saveCurrentFrame(const String& path) {
+            Serial.println("[CAM] Requested save to: " + path);
+            
+            // Ensure the data is pushed from CPU cache to SDRAM before saving
+            SCB_CleanDCache_by_Addr((uint32_t *)pixels, bufferSize);
+            
+            // Call  utility helper
+            saveQSPIFileFromSDRAM(path, (const uint8_t*)pixels, bufferSize);
+            
+            Serial.println("[CAM] Save complete.");
+        }
+
+        void loadFrameToPixels(const String& path) {
+            Serial.println("[CAM] Requested load from: " + path);
+            
+            size_t actualLoaded = 0;
+            
+            // Load straight into our pixel memory
+            loadQSPIFileToSDRAM(path, (uint8_t*)pixels, bufferSize, actualLoaded);
+
+            // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
+            // that the QSPI driver just dropped into RAM.
+            SCB_InvalidateDCache_by_Addr((uint32_t *)pixels, bufferSize);
+
+            Serial.println("[CAM] Load complete. Buffer refreshed.");
+        }
+    };    
+
+
+
 };
 

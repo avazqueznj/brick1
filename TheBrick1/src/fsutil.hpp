@@ -230,26 +230,22 @@ void listQSPIFiles(const char* path) {
 #include <stdexcept>
 #include <SDRAM.h>
 
-// QSPI FS is handled elsewhere; helpers assume it's already mounted.
-void loadQSPIFileToSDRAM(const String& path, size_t& outLen) {
-
+void loadQSPIFileToSDRAM(const String& path, uint8_t* destBuffer, size_t maxCapacity, size_t& outLen) {
     outLen = 0;
 
-    // Hard fail if someone forgot to allocate in setup()
-    if (jpg_io_buf == NULL) {
-        String msg = "loadQSPIFileToSDRAM: jpg_io_buf is NULL (not allocated in setup)";
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
-    }
+    // NJ Rule: Hard fail on null
+    if (destBuffer == nullptr) throw std::runtime_error("LOAD ERROR: destBuffer is NULL");
 
-    Serial.println("Try mount FS" );
+    // KEEPING YOUR MOUNT CHECK
+    Serial.println("Try mount FS");
     int err = fs.mount(&qspi);
     if (err) {
-        //sosBlink("Mount failed (code: " + err); 
-        Serial.println("Err mounted ?");
+        // We log it, but we don't necessarily throw here because 
+        // sometimes it returns an error if already mounted. 
+        // The fopen call below will be the ultimate judge.
+        Serial.print("Mount status/err: "); Serial.println(err);
     }
 
-    // open the file
     FILE* f = fopen(path.c_str(), "rb");
     if (f == NULL) {
         String msg = "loadQSPIFileToSDRAM: cannot open for read: " + path;
@@ -258,56 +254,35 @@ void loadQSPIFileToSDRAM(const String& path, size_t& outLen) {
     }
 
     // Get file size
-    if (fseek(f, 0, SEEK_END) != 0) {
-        fclose(f);
-        String msg = "loadQSPIFileToSDRAM: fseek end failed for: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
-    }
+    fseek(f, 0, SEEK_END);
     long fileSize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
     if (fileSize < 0) {
         fclose(f);
-        String msg = "loadQSPIFileToSDRAM: ftell failed for: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
+        throw std::runtime_error(String("loadQSPIFileToSDRAM: ftell failed for: " + path).c_str());
     }
 
-    // rewind
-    if (fseek(f, 0, SEEK_SET) != 0) {
+    // Check capacity vs passed maxCapacity
+    if ((size_t)fileSize > maxCapacity) {
         fclose(f);
-        String msg = "loadQSPIFileToSDRAM: fseek set failed for: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
-    }
-
-    // Check capacity vs JPG_IO_BUF_SIZE
-    if ((size_t)fileSize > JPG_IO_BUF_SIZE) {
-        fclose(f);
-        Serial.print("loadQSPIFileToSDRAM: file too big for jpg_io_buf. size=");
+        Serial.print("loadQSPIFileToSDRAM: file too big. size=");
         Serial.print((size_t)fileSize);
         Serial.print(" > cap=");
-        Serial.println(JPG_IO_BUF_SIZE);
-        throw std::runtime_error("loadQSPIFileToSDRAM: file too big for jpg_io_buf");
+        Serial.println(maxCapacity);
+        throw std::runtime_error("loadQSPIFileToSDRAM: file too big for buffer");
     }
 
-    // Read file into the static jpg_io_buf
-    size_t totalRead = fread(jpg_io_buf, 1, (size_t)fileSize, f);
+    // Read file into the PROVIDED buffer
+    size_t totalRead = fread(destBuffer, 1, (size_t)fileSize, f);
     fclose(f);
 
     if (totalRead != (size_t)fileSize) {
-        String msg = "loadQSPIFileToSDRAM: short read for: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
+        throw std::runtime_error(String("loadQSPIFileToSDRAM: short read for: " + path).c_str());
     }
 
     outLen = (size_t)fileSize;
-
-    Serial.print("loadQSPIFileToSDRAM: loaded ");
-    Serial.print(outLen);
-    Serial.print(" bytes from ");
-    Serial.println(path);
-
-    // No return; caller knows to use jpg_io_buf.
+    Serial.println("loadQSPIFileToSDRAM: loaded " + String(outLen) + " bytes from " + path);
 }
 
 //--------------------------------------------------
