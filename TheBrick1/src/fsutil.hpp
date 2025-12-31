@@ -292,6 +292,9 @@ void saveQSPIFileFromSDRAM(const String& path, const uint8_t* data, size_t len) 
 
     Serial.println("Saving file " + path);
 
+    // Ensure QSPI is mounted
+    openQSPI();    
+
     FILE* f = fopen(path.c_str(), "wb");
     if (f == NULL) {
         String msg = "saveQSPIFileFromSDRAM: cannot open for write: " + path;

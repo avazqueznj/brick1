@@ -19,6 +19,10 @@
 #include "OV7670/ov767x.h"
 
 
+// External reference to your EEZ style applier
+extern "C" void add_style_button_default(lv_obj_t *obj);
+
+
 #define IMAGE_MODE CAMERA_RGB565
 #define GC9A01A_CYAN 0x07FF
 #define GC9A01A_RED 0xf800
@@ -41,6 +45,11 @@ public:
         return pixels;
     }
 
+    size_t getPixelsSize(){
+        return pixelsSize;
+    }
+
+
 private:
 
     // has
@@ -48,6 +57,7 @@ private:
     Camera cam;
     FrameBuffer fb; 
     uint16_t* pixels;
+    size_t pixelsSize = (640 * 480 * 2) + 32;
 
     // uses
 
@@ -60,12 +70,19 @@ private:
         Serial.println("[LOG] Cam mem init ...");
             
         // Use the SDRAM directly, but keep the pointer honest
-        uint8_t *raw_mem = (uint8_t *)SDRAM.malloc((640 * 480 * 2) + 32);
+        uint8_t *raw_mem = (uint8_t *)SDRAM.malloc( pixelsSize );
         if (!raw_mem) throw std::runtime_error("CRITICAL: SDRAM Malloc failed!");
         
         // Fixed address for the life of the program
         pixels = (uint16_t *)ALIGN_PTR((uintptr_t)raw_mem, 32);
         fb.setBuffer((uint8_t *)pixels);
+
+        // start camera
+        Serial.println("[LOG] Starting Camera hardware...");
+        if (!cam.begin(CAMERA_R640x480, IMAGE_MODE, 10)) {
+            throw std::runtime_error("HARDWARE ERROR: cam.begin failed!");
+        }        
+        Serial.println("[LOG] Starting Camera hardware... done!");        
 
         Serial.println("[LOG] Cam mem init ...  done!");
     }
@@ -88,13 +105,6 @@ public:
         for (int i = 0; i < 640 * 480; i++) { pixels[i] = GC9A01A_BLUE; }
         SCB_CleanDCache_by_Addr((uint32_t *)pixels, 640 * 480 * 2);
         Serial.println("[LOG] RAM white-washed with BLUE... done!");
-
-        // start camera
-        Serial.println("[LOG] Starting Camera hardware...");
-        if (!cam.begin(CAMERA_R640x480, IMAGE_MODE, 10)) {
-            throw std::runtime_error("HARDWARE ERROR: cam.begin failed!");
-        }        
-        Serial.println("[LOG] Starting Camera hardware... done!");
 
         // let it figure the picture exposure and all that
         Serial.println("[LOG] Pumping frames to adjust AEC/AGC...");
@@ -128,17 +138,25 @@ public:
         SCB_CleanDCache_by_Addr((uint32_t *)pixels, 640 * 480 * 2);
         Serial.println("[LOG] Cache sync complete.");
 
+        // --
+
+
+        // We use a hardcoded path for the test.
+        saveCurrentFrame("/qspi/test_shot.raw");
+        Serial.println("[TEST] Saved to QSPI.");        
     }
 
-    void renderPicFromSDRAM(){
+    // ----------------------------------------
 
+
+    void renderPicFromSDRAM() {
         Serial.println("[LOG] Render pic.");
 
-        // 8. LVGL Descriptor (RGB565 per lv_conf.h)
+        // 8. LVGL Descriptor
         static lv_img_dsc_t cam_img_desc;
         cam_img_desc.header.always_zero = 0;
         cam_img_desc.header.reserved    = 0;
-        cam_img_desc.header.cf          = LV_IMG_CF_TRUE_COLOR; // 16-bit depth
+        cam_img_desc.header.cf          = LV_IMG_CF_TRUE_COLOR;
         cam_img_desc.header.w           = 640;
         cam_img_desc.header.h           = 480;
         cam_img_desc.data_size          = 640 * 480 * 2;
@@ -146,61 +164,86 @@ public:
 
         // 9. UI Widget Update
         static lv_obj_t * cam_img_obj = NULL;
+        static lv_obj_t * btn_dismiss = NULL;
+
         if (cam_img_obj == NULL) {
-            cam_img_obj = lv_img_create(lv_scr_act());
+            // Create the image on top layer (The "Shield")
+            cam_img_obj = lv_img_create(lv_layer_top());
             if (!cam_img_obj) throw std::runtime_error("LVGL ERROR: Image object creation failed!");
+
+            lv_img_set_src(cam_img_obj, &cam_img_desc);
+            lv_obj_center(cam_img_obj);
+            
+            // Block touches from leaking to screens below
+            lv_obj_add_flag(cam_img_obj, LV_OBJ_FLAG_CLICKABLE);
+            
+            // 10. The EEZ-Styled Dismiss Button
+            btn_dismiss = lv_btn_create(lv_layer_top()); 
+            add_style_button_default(btn_dismiss); // Apply the EEZ state styles
+            
+            lv_obj_set_size(btn_dismiss, 180, 65); // Sized for your Montserrat 28 font
+            lv_obj_align(btn_dismiss, LV_ALIGN_BOTTOM_MID, 0, -30);
+            
+            lv_obj_t * label = lv_label_create(btn_dismiss);
+            lv_label_set_text(label, " ok ");
+            lv_obj_center(label);
+            lv_obj_set_style_text_font(label, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+            // Button Lambda
+            lv_obj_add_event_cb(btn_dismiss, [](lv_event_t * e) {
+                lv_obj_add_flag(cam_img_obj, LV_OBJ_FLAG_HIDDEN);
+                lv_obj_add_flag(btn_dismiss, LV_OBJ_FLAG_HIDDEN);
+                Serial.println("[UI] View dismissed.");
+            }, LV_EVENT_CLICKED, NULL);
         }
 
-        lv_img_set_src(cam_img_obj, &cam_img_desc);
-        lv_obj_center(cam_img_obj);
+        // Force Show and Move to Front
+        lv_obj_clear_flag(cam_img_obj, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(btn_dismiss, LV_OBJ_FLAG_HIDDEN);
+        
+        // Z-Order: Image first, then Button on top of it
+        lv_obj_move_foreground(cam_img_obj);
+        lv_obj_move_foreground(btn_dismiss);
+
+        // Refresh display
+        lv_img_cache_invalidate_src(&cam_img_desc);
         lv_obj_invalidate(cam_img_obj);
 
         Serial.println("[LOG] Render pic ... done");        
     }
 
-    virtual ~cameraClass(){
+    /**
+     * We don't swap bits here; we assume shootToSDRAM already did the HTONS.
+     */
+    void saveCurrentFrame(const String& path) {
+        Serial.println("[CAM] Requested save to: " + path);
+        
+        // Ensure the data is pushed from CPU cache to SDRAM before saving
+        SCB_CleanDCache_by_Addr((uint32_t *)pixels, pixelsSize);
+        
+        // Call  utility helper
+        saveQSPIFileFromSDRAM(path, (const uint8_t*)pixels, pixelsSize);
+        
+        Serial.println("[CAM] Save complete.");
     }
-    
 
-    class cameraSystem {
-    private:
-        // ... your existing singleton stuff and pixels buffer ...
-        uint16_t* pixels; 
-        const size_t bufferSize = 640 * 480 * 2; 
+    void loadFrameToPixels(const String& path) {
+        Serial.println("[CAM] Requested load from: " + path);
+        
+        size_t actualLoaded = 0;
+        
+        // Load straight into our pixel memory
+        loadQSPIFileToSDRAM(path, (uint8_t*)pixels, pixelsSize, actualLoaded);
 
-    public:
+        // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
+        // that the QSPI driver just dropped into RAM.
+        SCB_InvalidateDCache_by_Addr((uint32_t *)pixels, pixelsSize);
 
+        Serial.println("[CAM] Load complete. Buffer refreshed.");
+    }
 
-        /**
-         * We don't swap bits here; we assume shootToSDRAM already did the HTONS.
-         */
-        void saveCurrentFrame(const String& path) {
-            Serial.println("[CAM] Requested save to: " + path);
-            
-            // Ensure the data is pushed from CPU cache to SDRAM before saving
-            SCB_CleanDCache_by_Addr((uint32_t *)pixels, bufferSize);
-            
-            // Call  utility helper
-            saveQSPIFileFromSDRAM(path, (const uint8_t*)pixels, bufferSize);
-            
-            Serial.println("[CAM] Save complete.");
-        }
+    // -----------------------------------------
 
-        void loadFrameToPixels(const String& path) {
-            Serial.println("[CAM] Requested load from: " + path);
-            
-            size_t actualLoaded = 0;
-            
-            // Load straight into our pixel memory
-            loadQSPIFileToSDRAM(path, (uint8_t*)pixels, bufferSize, actualLoaded);
-
-            // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
-            // that the QSPI driver just dropped into RAM.
-            SCB_InvalidateDCache_by_Addr((uint32_t *)pixels, bufferSize);
-
-            Serial.println("[CAM] Load complete. Buffer refreshed.");
-        }
-    };    
 
 
 
