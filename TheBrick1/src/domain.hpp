@@ -485,8 +485,6 @@ public:
 #include <stdio.h>   
 #define INSP_SUBMIT_ERROR  "\uF071"
 #define INSP_SUBMIT_OK     "\uF00C"
-extern QSPIFBlockDevice qspi;
-extern mbed::FATFileSystem fs;
 
 
 class domainManagerClass {

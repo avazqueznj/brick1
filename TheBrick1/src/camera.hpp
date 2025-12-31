@@ -142,7 +142,7 @@ public:
 
 
         // We use a hardcoded path for the test.
-        saveCurrentFrame("/qspi/test_shot.raw");
+        //saveCurrentFrame("/qspi/test_shot.raw");
         Serial.println("[TEST] Saved to QSPI.");        
     }
 

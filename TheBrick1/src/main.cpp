@@ -95,12 +95,6 @@ typedef std::vector<String, SDRAMAllocator<String>> SDRAMVector;
 
 //----------------------------------
 
-#include "QSPIFBlockDevice.h"
-#include "FATFileSystem.h"
-#include <cstdio> // For C file I/O
-QSPIFBlockDevice qspi;
-mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
-
 // machine to machin token
 String BEARER_TOKEN = "";
 

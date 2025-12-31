@@ -4976,9 +4976,9 @@
               "objID": "92ea17e3-dca0-4de5-b84a-42f5d35ccee3",
               "type": "LVGLButtonWidget",
               "left": 523,
-              "top": 85,
+              "top": 86,
               "width": 120,
-              "height": 66,
+              "height": 65,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -6651,8 +6651,8 @@
             {
               "objID": "0eb27aa4-d661-44b6-edfa-103cc4606b0b",
               "type": "LVGLPanelWidget",
-              "left": -25,
-              "top": -9,
+              "left": -23,
+              "top": -24,
               "width": 846,
               "height": 538,
               "customInputs": [],

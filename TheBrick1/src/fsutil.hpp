@@ -26,8 +26,6 @@
 
 //-------------------------------------------------
 
-//++++>>>
-
 
 #include <kvstore_global_api.h>  
 
@@ -155,53 +153,124 @@ void zapKVStore()
 
 // QSPI
 
-    void openQSPI(){
-        // 1) Ensure QSPI filesystem is accessible.
-        //    If /qspi/ can be opened, assume it's already mounted.
-        DIR* qspiDir = opendir("/qspi/");
-        if (qspiDir) {
-            Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
-            closedir(qspiDir);
-        } else {
-            Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
-            int err = fs.mount(&qspi);
-            if (err) {
-                Serial.print("[PICS] QSPI mount failed, code: ");
-                Serial.println(err);
-                throw std::runtime_error("syncPics: QSPI mount failed");
-            }
-            Serial.println("[PICS] fs.mount() succeeded.");
-        }
+//=============================
+
+
+
+#include "mbed.h"
+#include "FATFileSystem.h"
+#include "MBRBlockDevice.h"
+
+// 1. Grab the raw hardware
+static mbed::BlockDevice* raw_qspi = mbed::BlockDevice::get_default_instance();
+
+// 2. Wrap it in Partition 4 but KEEP THE NAME 'qspi'
+// This ensures all  existing code doesn't break.
+static mbed::MBRBlockDevice qspi(raw_qspi, 4);
+
+// 3. Mount point "/qspi"
+static mbed::FATFileSystem fs("qspi");
+
+///-----------------
+
+void openQSPI() {
+    // 1. QUICK CHECK: If we can open the root, we are DONE.
+    DIR *dir = opendir("/qspi/");
+    if (dir != NULL) {
+        closedir(dir);
+        // Serial.println("[STORAGE] /qspi/ already active. Skipping init.");
+        return; 
     }
 
+    Serial.println("[STORAGE] openQSPI() - STARTING...");
+    
+    // 2. Only init if we are actually unmounted
+    int hw_err = qspi.init(); 
+    if (hw_err != 0) {
+        Serial.print("[FATAL] Partition Init Failed: "); Serial.println(hw_err);
+        throw std::runtime_error("QSPI_INIT_FAIL");
+    }
+
+    int err = fs.mount(&qspi);
+
+    if (err == 0 || err == -1003) {
+        Serial.println("[STORAGE] /qspi/ READY.");
+    } 
+    else {
+        Serial.print("[FATAL] Mount failed! Code: ");
+        Serial.println(err);
+        throw std::runtime_error("QSPI_MOUNT_FAIL");
+    }
+}
+
+
+
+
+    // void openQSPI(){
+    //     // 1) Ensure QSPI filesystem is accessible.
+    //     //    If /qspi/ can be opened, assume it's already mounted.
+    //     DIR* qspiDir = opendir("/qspi/");
+    //     if (qspiDir) {
+    //         Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
+    //         closedir(qspiDir);
+    //     } else {
+    //         Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
+    //         int err = fs.mount(&qspi);
+    //         if (err) {
+    //             Serial.print("[PICS] QSPI mount failed, code: ");
+    //             Serial.println(err);
+    //             throw std::runtime_error("syncPics: QSPI mount failed");
+    //         }
+    //         Serial.println("[PICS] fs.mount() succeeded.");
+    //     }
+    // }
+
     DIR* openDirFromQSPI(){
+
+        Serial.println("[STORAGE] open dir...");
+
         DIR* dir = opendir("/qspi/");
         if (dir == NULL) {
             sosHALT("[ZAP PICS] Failed to open /qspi/ directory, aborting.");
         }
 
+        Serial.println("[STORAGE] open dir...  done");        
+
         return( dir );
     }
 
     void closeDirFromQSPI( DIR* dir ){
+
+        Serial.println("[STORAGE] close dir...");        
         closedir(dir);        
+        Serial.println("[STORAGE] close dir...  done");                
     }    
 
     void deleteFileFromQSPI( String fullPath ){
+
+        Serial.println("[STORAGE] delete..");        
+
         int rc = remove(fullPath.c_str());
         if (rc == 0) {
             Serial.println("[PICS]   OK (deleted)");
         } else {
             sosHALT("[PICS]   ERROR (could not delete)");
         }        
+
+        Serial.println("[STORAGE] delete.. done");                
     }
 
     FILE* openFileFromQSPI( String path ){
+
+        Serial.println("[STORAGE] fopen..");        
         return fopen(path.c_str(), "rb");
+        Serial.println("[STORAGE] fopen.. done");                
     }
 
     void closeFileFromQSPI( FILE* f ){
+        Serial.println("[STORAGE] close..");        
         fclose(f);
+        Serial.println("[STORAGE] close..  done");        
     }
 
     //-=-=-=-=
@@ -231,20 +300,16 @@ void listQSPIFiles(const char* path) {
 #include <SDRAM.h>
 
 void loadQSPIFileToSDRAM(const String& path, uint8_t* destBuffer, size_t maxCapacity, size_t& outLen) {
+
+    Serial.println("[STORAGE] loadQSPIFileToSDRAM..");        
+
     outLen = 0;
 
     // NJ Rule: Hard fail on null
     if (destBuffer == nullptr) throw std::runtime_error("LOAD ERROR: destBuffer is NULL");
 
     // KEEPING YOUR MOUNT CHECK
-    Serial.println("Try mount FS");
-    int err = fs.mount(&qspi);
-    if (err) {
-        // We log it, but we don't necessarily throw here because 
-        // sometimes it returns an error if already mounted. 
-        // The fopen call below will be the ultimate judge.
-        Serial.print("Mount status/err: "); Serial.println(err);
-    }
+    openQSPI();
 
     FILE* f = fopen(path.c_str(), "rb");
     if (f == NULL) {

@@ -1121,8 +1121,8 @@ void create_screen_inspection_zones() {
             // compOkButton
             lv_obj_t *obj = lv_btn_create(parent_obj);
             objects.comp_ok_button = obj;
-            lv_obj_set_pos(obj, 523, 85);
-            lv_obj_set_size(obj, 120, 66);
+            lv_obj_set_pos(obj, 523, 86);
+            lv_obj_set_size(obj, 120, 65);
             lv_obj_add_event_cb(obj, action_main_event_dispatcher, LV_EVENT_PRESSED, (void *)0);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
             add_style_button_default(obj);
@@ -1517,7 +1517,7 @@ void create_screen_inspection_zones() {
             // inspection_zones_overlay
             lv_obj_t *obj = lv_obj_create(parent_obj);
             objects.inspection_zones_overlay = obj;
-            lv_obj_set_pos(obj, -25, -9);
+            lv_obj_set_pos(obj, -23, -24);
             lv_obj_set_size(obj, 846, 538);
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_style_bg_color(obj, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
