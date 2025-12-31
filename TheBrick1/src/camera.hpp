@@ -95,7 +95,7 @@ public:
         return instance;
     }
 
-    void shootToSDRAM(){
+    void shootToPixSDRAM(){
 
         // prepare blue buffer
         // get blue -> cam chip faield
@@ -138,18 +138,13 @@ public:
         SCB_CleanDCache_by_Addr((uint32_t *)pixels, 640 * 480 * 2);
         Serial.println("[LOG] Cache sync complete.");
 
-        // --
-
-
-        // We use a hardcoded path for the test.
-        //saveCurrentFrame("/qspi/test_shot.raw");
-        Serial.println("[TEST] Saved to QSPI.");        
+        // --   
     }
 
     // ----------------------------------------
 
 
-    void renderPicFromSDRAM() {
+    void renderPicFromPixSDRAM() {
         Serial.println("[LOG] Render pic.");
 
         // 8. LVGL Descriptor
@@ -213,9 +208,9 @@ public:
     }
 
     /**
-     * We don't swap bits here; we assume shootToSDRAM already did the HTONS.
+     * We don't swap bits here; we assume shootToPixSDRAM already did the HTONS.
      */
-    void saveCurrentFrame(const String& path) {
+    void savePixSDRAMToQSPI(const String& path) {
         Serial.println("[CAM] Requested save to: " + path);
         
         // Ensure the data is pushed from CPU cache to SDRAM before saving
@@ -227,7 +222,7 @@ public:
         Serial.println("[CAM] Save complete.");
     }
 
-    void loadFrameToPixels(const String& path) {
+    void loadPixSDRAMFromQSPI(const String& path) {
         Serial.println("[CAM] Requested load from: " + path);
         
         size_t actualLoaded = 0;

@@ -153,13 +153,49 @@ public:
 
 if (target == objects.test_button1) {
 
-    cameraClass camera = cameraClass::getInstance();
 
-    camera.shootToSDRAM();
 
-    camera.renderPicFromSDRAM();
+    try{
+
+        cameraClass camera = cameraClass::getInstance();
+
+        camera.shootToPixSDRAM();
+
+        spinnerStart();
+
+        camera.savePixSDRAMToQSPI("/qspi/test_shot.raw");
+
+        camera.renderPicFromPixSDRAM();
+
+    }catch( std::runtime_error& error ){
+         spinnerEnd();
+         showDialog( error.what() );
+    }
+
+    spinnerEnd();
+
 }
 
+if (target == objects.test_load1) {
+
+    spinnerStart();
+
+    try{
+
+        cameraClass camera = cameraClass::getInstance();
+
+        camera.loadPixSDRAMFromQSPI("/qspi/test_shot.raw");
+
+        camera.renderPicFromPixSDRAM();
+
+    }catch( std::runtime_error& error ){
+         spinnerEnd();
+         showDialog( error.what() );
+    }
+
+    spinnerEnd();        
+
+}
 
 //     Serial.println("[LOG] >>> INSPECTION START");
 
