@@ -153,19 +153,13 @@ public:
 
 if (target == objects.test_button1) {
 
-
-
     try{
-
         cameraClass camera = cameraClass::getInstance();
-
         camera.shootToPixSDRAM();
-
-        spinnerStart();
-
-        camera.savePixSDRAMToQSPI("/qspi/test_shot.raw");
-
         camera.renderPicFromPixSDRAM();
+        
+        spinnerStart();
+        camera.savePixSDRAMToQSPI("/qspi/test_shot.raw");
 
     }catch( std::runtime_error& error ){
          spinnerEnd();
@@ -181,11 +175,8 @@ if (target == objects.test_load1) {
     spinnerStart();
 
     try{
-
         cameraClass camera = cameraClass::getInstance();
-
         camera.loadPixSDRAMFromQSPI("/qspi/test_shot.raw");
-
         camera.renderPicFromPixSDRAM();
 
     }catch( std::runtime_error& error ){

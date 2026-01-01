@@ -19,7 +19,6 @@
 #include "OV7670/ov767x.h"
 
 
-// External reference to your EEZ style applier
 extern "C" void add_style_button_default(lv_obj_t *obj);
 
 

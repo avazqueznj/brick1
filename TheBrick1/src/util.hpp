@@ -137,7 +137,7 @@ void spinnerStart() {
     }
 
     // Create a spinner with 1000ms rotation and 60 degree arc
-    spinner = lv_spinner_create(lv_scr_act(), 1000, 60);
+    spinner = lv_spinner_create(lv_layer_top(), 1000, 60);
 
     // Set spinner size and center it
     lv_obj_set_size(spinner, 100, 100);
