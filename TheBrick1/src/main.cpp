@@ -103,7 +103,7 @@ mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
 #define NUM_INSPECTION_SLOTS 10
 
   #include "util.hpp"
-  #include "fsutil.hpp"
+  #include "disk.hpp"
   #include "comms.hpp"
   #include "domain.hpp"
   #include "camera.hpp"
