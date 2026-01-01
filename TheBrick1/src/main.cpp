@@ -11,7 +11,7 @@
 
 
 // main switches 
-#define FEATURE_RFID   0  
+#define FEATURE_RFID   1  
 
 #include <Arduino.h>
 #include "mbed.h"
