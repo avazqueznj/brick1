@@ -224,13 +224,20 @@ public:
     void loadPixSDRAMFromQSPI(const String& path) {
         Serial.println("[CAM] Requested load from: " + path);
         
+        // 1. NJ Rule: Clear the buffer physically before loading. 
+        // If we still see green, we know the QSPI read is the culprit.
+        // If the green turns to black, we know the data isn't arriving.
+        memset((void*)pixels, 0, pixelsSize);
+        SCB_CleanDCache_by_Addr((uint32_t *)pixels, pixelsSize); 
+
         size_t actualLoaded = 0;
-        
-        // Load straight into our pixel memory
         loadQSPIFileToSDRAM(path, (uint8_t*)pixels, pixelsSize, actualLoaded);
 
-        // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
-        // that the QSPI driver just dropped into RAM.
+        // 2. MANDATORY: Force the CPU to flush the newly loaded data 
+        // from the Cache into the physical SDRAM so the Display/DMA can see it.
+        SCB_CleanDCache_by_Addr((uint32_t *)pixels, pixelsSize);
+        
+        // 3. AND Invalidate so the CPU doesn't try to use old cached versions later.
         SCB_InvalidateDCache_by_Addr((uint32_t *)pixels, pixelsSize);
 
         Serial.println("[CAM] Load complete. Buffer refreshed.");
