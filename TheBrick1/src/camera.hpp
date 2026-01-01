@@ -188,7 +188,7 @@ public:
                 lv_obj_add_flag(cam_img_obj, LV_OBJ_FLAG_HIDDEN);
                 lv_obj_add_flag(btn_dismiss, LV_OBJ_FLAG_HIDDEN);
                 Serial.println("[UI] View dismissed.");
-            }, LV_EVENT_CLICKED, NULL);
+            }, LV_EVENT_PRESSED, NULL);
         }
 
         // Force Show and Move to Front
