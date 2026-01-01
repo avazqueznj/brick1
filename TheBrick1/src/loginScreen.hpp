@@ -138,18 +138,6 @@ public:
 
 
 
-// // Cam stuff OV7670
-// #define IMAGE_MODE CAMERA_RGB565
-// #define GC9A01A_CYAN 0x07FF
-// #define GC9A01A_RED 0xf800
-// #define GC9A01A_BLUE 0x001F
-// #define GC9A01A_GREEN 0x07E0
-// #define GC9A01A_MAGENTA 0xF81F
-// #define GC9A01A_WHITE 0xffff
-// #define GC9A01A_BLACK 0x0000
-// #define GC9A01A_YELLOW 0xFFE0
-// #define ALIGN_PTR(p,a)   ((p & (a-1)) ?(((uintptr_t)p + a) & ~(uintptr_t)(a-1)) : p)
-// #define HTONS(x) (((x >> 8) & 0x00FF) | ((x << 8) & 0xFF00))
 
 if (target == objects.test_button1) {
 

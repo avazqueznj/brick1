@@ -157,51 +157,26 @@ void zapKVStore()
 
 
 
-#include "mbed.h"
-#include "FATFileSystem.h"
-#include "MBRBlockDevice.h"
-
-// 1. Grab the raw hardware
-static mbed::BlockDevice* raw_qspi = mbed::BlockDevice::get_default_instance();
-
-// 2. Wrap it in Partition 4 but KEEP THE NAME 'qspi'
-// This ensures all  existing code doesn't break.
-static mbed::MBRBlockDevice qspi(raw_qspi, 4);
-
-// 3. Mount point "/qspi"
-static mbed::FATFileSystem fs("qspi");
-
 ///-----------------
 
-void openQSPI() {
-    // 1. QUICK CHECK: If we can open the root, we are DONE.
-    DIR *dir = opendir("/qspi/");
-    if (dir != NULL) {
-        closedir(dir);
-        // Serial.println("[STORAGE] /qspi/ already active. Skipping init.");
-        return; 
+    void openQSPI(){
+        // 1) Ensure QSPI filesystem is accessible.
+        //    If /qspi/ can be opened, assume it's already mounted.
+        DIR* qspiDir = opendir("/qspi/");
+        if (qspiDir) {
+            Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
+            closedir(qspiDir);
+        } else {
+            Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
+            int err = fs.mount(&qspi);
+            if (err) {
+                Serial.print("[PICS] QSPI mount failed, code: ");
+                Serial.println(err);
+                throw std::runtime_error("syncPics: QSPI mount failed");
+            }
+            Serial.println("[PICS] fs.mount() succeeded.");
+        }
     }
-
-    Serial.println("[STORAGE] openQSPI() - STARTING...");
-    
-    // 2. Only init if we are actually unmounted
-    int hw_err = qspi.init(); 
-    if (hw_err != 0) {
-        Serial.print("[FATAL] Partition Init Failed: "); Serial.println(hw_err);
-        throw std::runtime_error("QSPI_INIT_FAIL");
-    }
-
-    int err = fs.mount(&qspi);
-
-    if (err == 0 || err == -1003) {
-        Serial.println("[STORAGE] /qspi/ READY.");
-    } 
-    else {
-        Serial.print("[FATAL] Mount failed! Code: ");
-        Serial.println(err);
-        throw std::runtime_error("QSPI_MOUNT_FAIL");
-    }
-}
 
 
 

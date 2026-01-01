@@ -28,8 +28,6 @@
 #include "RTClib.h"
 #include <TJpg_Decoder.h>
 
-
-
 // jpeg decoding stuff
 static uint16_t* jpg_fb = NULL;
 static lv_img_dsc_t jpg_dsc;
@@ -95,6 +93,36 @@ typedef std::vector<String, SDRAMAllocator<String>> SDRAMVector;
 
 //----------------------------------
 
+#include "QSPIFBlockDevice.h"
+#include "FATFileSystem.h"
+#include <cstdio> // For C file I/O
+QSPIFBlockDevice qspi;
+mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
+
+//-------------------------------
+#define NUM_INSPECTION_SLOTS 10
+
+  #include "util.hpp"
+  #include "fsutil.hpp"
+  #include "comms.hpp"
+  #include "domain.hpp"
+  #include "camera.hpp"
+  #include "screenClass.hpp"
+
+      #include "loginScreen.hpp"
+      #include "settingsScreen.hpp"
+      #include "mainScreen.hpp"
+      #include "selectAssetScreen.hpp"      
+      #include "selectInspectionTypeScreen.hpp"  
+      #include "inspectionFormScreen.hpp"    
+      #include "inspectionZonesScreen.hpp"
+      #include "inspectionHistoryScreen.hpp"
+
+#include "stateManager.hpp"
+
+
+
+
 // machine to machin token
 String BEARER_TOKEN = "";
 
@@ -109,7 +137,7 @@ RTC_DS3231* rtc = nullptr;
 #if FEATURE_RFID
   MFRC522* mfrc522 = nullptr;
 #endif
-
+stateManagerClass* stateManager = nullptr;  
 
 // Misc
 bool rtcUp = false;
@@ -154,28 +182,8 @@ void getInternalHeapFreeBytes() {
   Serial.println((uintptr_t)lvgl_sdram_pool, HEX);  
 }
 
-//-------------------------------
-#define NUM_INSPECTION_SLOTS 10
 
-  #include "util.hpp"
-  #include "fsutil.hpp"
-  #include "comms.hpp"
-  #include "domain.hpp"
-  #include "camera.hpp"
-  #include "screenClass.hpp"
 
-      #include "loginScreen.hpp"
-      #include "settingsScreen.hpp"
-      #include "mainScreen.hpp"
-      #include "selectAssetScreen.hpp"      
-      #include "selectInspectionTypeScreen.hpp"  
-      #include "inspectionFormScreen.hpp"    
-      #include "inspectionZonesScreen.hpp"
-      #include "inspectionHistoryScreen.hpp"
-
-#include "stateManager.hpp"
-stateManagerClass* stateManager = nullptr;  
-//-------------------------------
 
 void setup() {
 
@@ -240,11 +248,6 @@ void setup() {
     sosHALT( "Touch sensor did not initialize!!!" );
   };
 
-  // cam buffer
-  // uint8_t *fb_mem = (uint8_t *)SDRAM.malloc(640 * 480 * 2 + 32);
-  // fb.setBuffer((uint8_t *)ALIGN_PTR((uintptr_t)fb_mem, 32));
-  // printf("Frame buffer: %p\n", fb.getBuffer());  
-  // if( !fb.getBuffer() ) sosHALT( "No cam frame buffer!!" );
 
   // start spi bus
   Serial.println("SPI");  
