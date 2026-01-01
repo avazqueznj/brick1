@@ -90,11 +90,23 @@ void setup() {
       root->erase(0x0, root->get_erase_size());
     }
 
-    MBRBlockDevice::partition(root, 1, 0x0B, 0, 1 * 1024 * 1024);
-    MBRBlockDevice::partition(root, 2, 0x0B, 1 * 1024 * 1024,  6 * 1024 * 1024);
-    MBRBlockDevice::partition(root, 3, 0x0B, 6 * 1024 * 1024,  7 * 1024 * 1024);
-    MBRBlockDevice::partition(root, 4, 0x0B, 7 * 1024 * 1024, 14 * 1024 * 1024);
-    // use space from 15.5MB to 16 MB for another fw, memory mapped
+    // MBRBlockDevice::partition(root, 1, 0x0B, 0, 1 * 1024 * 1024);
+    // MBRBlockDevice::partition(root, 2, 0x0B, 1 * 1024 * 1024,  6 * 1024 * 1024);
+    // MBRBlockDevice::partition(root, 3, 0x0B, 6 * 1024 * 1024,  7 * 1024 * 1024);
+    // MBRBlockDevice::partition(root, 4, 0x0B, 7 * 1024 * 1024, 14 * 1024 * 1024);
+    // // use space from 15.5MB to 16 MB for another fw, memory mapped
+
+// Partition 1: 7MB - THE BIG ROOM (Start: 0, End: 7MB)
+MBRBlockDevice::partition(root, 1, 0x0B, 0, 7 * 1024 * 1024);
+
+// Partition 2: 5MB - OTA (Start: 7MB, End: 12MB)
+MBRBlockDevice::partition(root, 2, 0x0B, 7 * 1024 * 1024, 12 * 1024 * 1024);
+
+// Partition 3: 1MB - KVStore (Start: 12MB, End: 13MB)
+MBRBlockDevice::partition(root, 3, 0x0B, 12 * 1024 * 1024, 13 * 1024 * 1024);
+
+// Partition 4: 1MB - THE CLOSET (Start: 13MB, End: 14MB)
+MBRBlockDevice::partition(root, 4, 0x0B, 13 * 1024 * 1024, 14 * 1024 * 1024);
 
     bool reformat = true;
     if (!wifi_data_fs.mount(&wifi_data)) {
