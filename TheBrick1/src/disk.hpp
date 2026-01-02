@@ -248,7 +248,7 @@ void zapKVStore()
         Serial.println("[STORAGE] close..  done");        
     }
 
-    //-=-=-=-=
+//===========================================================================================
 
 void listQSPIFiles(const char* path) {
   Serial.print("Listing directory: "); Serial.println(path);
@@ -269,6 +269,8 @@ void listQSPIFiles(const char* path) {
   closedir(dir);
   if (!found) Serial.println("  (empty)");
 }
+
+//===========================================================================================
 
 #include <stdio.h>
 #include <stdexcept>
@@ -321,16 +323,22 @@ void loadQSPIFileToSDRAM(const String& path, uint8_t* destBuffer, size_t maxCapa
         throw std::runtime_error(String("loadQSPIFileToSDRAM: short read for: " + path).c_str());
     }
 
+    // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
+    // that the QSPI driver just dropped into RAM.
+    SCB_InvalidateDCache_by_Addr((uint32_t *)destBuffer, totalRead);
+
     outLen = (size_t)fileSize;
     Serial.println("loadQSPIFileToSDRAM: loaded " + String(outLen) + " bytes from " + path);
 }
 
-//--------------------------------------------------
-// Save binary buffer → QSPI file
-//--------------------------------------------------
+//=============
+
 void saveQSPIFileFromSDRAM(const String& path, const uint8_t* data, size_t len) {
 
     Serial.println("Saving file " + path);
+
+    // Ensure the data is pushed from CPU cache to SDRAM before saving
+    SCB_CleanDCache_by_Addr((uint32_t *)data, len);    
 
     // Ensure QSPI is mounted
     openQSPI();    
@@ -354,7 +362,7 @@ void saveQSPIFileFromSDRAM(const String& path, const uint8_t* data, size_t len) 
     Serial.println("Saving file " + path + "Done!!" );    
 }
 
-//=============================
+//===========================================================================================
 
 
 void saveTextVecToQSPI(const String& path, const std::vector<String>* file)
