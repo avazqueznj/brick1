@@ -211,10 +211,7 @@ public:
      */
     void savePixSDRAMToQSPI(const String& path) {
         Serial.println("[CAM] Requested save to: " + path);
-        
-        // Ensure the data is pushed from CPU cache to SDRAM before saving
-        SCB_CleanDCache_by_Addr((uint32_t *)pixels, pixelsSize);
-        
+                
         // Call  utility helper
         saveQSPIFileFromSDRAM(path, (const uint8_t*)pixels, pixelsSize);
         
@@ -228,10 +225,6 @@ public:
         
         // Load straight into our pixel memory
         loadQSPIFileToSDRAM(path, (uint8_t*)pixels, pixelsSize, actualLoaded);
-
-        // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
-        // that the QSPI driver just dropped into RAM.
-        SCB_InvalidateDCache_by_Addr((uint32_t *)pixels, pixelsSize);
 
         Serial.println("[CAM] Load complete. Buffer refreshed.");
     }
