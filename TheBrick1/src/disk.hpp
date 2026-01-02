@@ -313,22 +313,8 @@ void loadQSPIFileToSDRAM(const String& path, uint8_t* destBuffer, size_t maxCapa
         throw std::runtime_error("loadQSPIFileToSDRAM: file too big for buffer");
     }
 
-    size_t totalRead = 0;
-    size_t chunkSize = 4096; // 4KB chunks - much easier on the bus
-    while (totalRead < (size_t)fileSize) {
-        size_t toRead = std::min(chunkSize, (size_t)fileSize - totalRead);
-        size_t readNow = fread(destBuffer + totalRead, 1, toRead, f);
-        
-        if (readNow == 0){
-            throw std::runtime_error("Read error! read = 0 ");
-        }
-        
-        totalRead += readNow;
-        
-        delay(10);
-    }
-
-    //!!!!!!!!!!
+    // Read file into the PROVIDED buffer
+    size_t totalRead = fread(destBuffer, 1, (size_t)fileSize, f);
     fclose(f);
 
     if (totalRead != (size_t)fileSize) {
