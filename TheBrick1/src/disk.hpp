@@ -325,7 +325,7 @@ void loadQSPIFileToSDRAM(const String& path, uint8_t* destBuffer, size_t maxCapa
 
     // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
     // that the QSPI driver just dropped into RAM.
-    SCB_InvalidateDCache_by_Addr((uint32_t *)destBuffer, totalRead);
+    ///SCB_InvalidateDCache_by_Addr((uint32_t *)destBuffer, totalRead);
 
     outLen = (size_t)fileSize;
     Serial.println("loadQSPIFileToSDRAM: loaded " + String(outLen) + " bytes from " + path);
