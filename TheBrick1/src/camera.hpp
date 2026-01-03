@@ -206,28 +206,28 @@ public:
         Serial.println("[LOG] Render pic ... done");        
     }
 
-    /**
-     * We don't swap bits here; we assume shootToPixSDRAM already did the HTONS.
-     */
-    void savePixSDRAMToQSPI(const String& path) {
-        Serial.println("[CAM] Requested save to: " + path);
+    // /**
+    //  * We don't swap bits here; we assume shootToPixSDRAM already did the HTONS.
+    //  */
+    // void savePixSDRAMToQSPI(const String& path) {
+    //     Serial.println("[CAM] Requested save to: " + path);
                 
-        // Call  utility helper
-        saveQSPIFileFromSDRAM(path, (const uint8_t*)pixels, pixelsSize);
+    //     // Call  utility helper
+    //     saveQSPIFileFromSDRAM(path, (const uint8_t*)pixels, pixelsSize);
         
-        Serial.println("[CAM] Save complete.");
-    }
+    //     Serial.println("[CAM] Save complete.");
+    // }
 
-    void loadPixSDRAMFromQSPI(const String& path) {
-        Serial.println("[CAM] Requested load from: " + path);
+    // void loadPixSDRAMFromQSPI(const String& path) {
+    //     Serial.println("[CAM] Requested load from: " + path);
         
-        size_t actualLoaded = 0;
+    //     size_t actualLoaded = 0;
         
-        // Load straight into our pixel memory
-        loadQSPIFileToSDRAM(path, (uint8_t*)pixels, pixelsSize, actualLoaded);
+    //     // Load straight into our pixel memory
+    //     loadQSPIFileToSDRAM(path, (uint8_t*)pixels, pixelsSize, actualLoaded);
 
-        Serial.println("[CAM] Load complete. Buffer refreshed.");
-    }
+    //     Serial.println("[CAM] Load complete. Buffer refreshed.");
+    // }
 
     // -----------------------------------------
 
