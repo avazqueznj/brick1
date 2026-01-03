@@ -52,7 +52,8 @@ public:
                 if( ( status ) != WL_CONNECTED ){
                     Serial.print(" not WL_CONNECTED ... status: ");             
                     Serial.println( status );        
-                    delayBlink();     
+                    delayBlink();   
+                    spinnerContinue();  
                 }else{
                     break;
                 }
@@ -71,7 +72,8 @@ public:
         for( int i = 0 ; i < SSL_CLIENT_RET_COUNT; i++){
 
             client.stop();       
-            delay(500);         
+            delay(500);        
+            spinnerContinue();   
 
             if( !client.connect( serverURL.c_str(), 443 ) ){
                 Serial.println("Cannto connect 2, retrying...");                
@@ -218,6 +220,7 @@ public:
 
         SSLClient client;
         client.connect( serverURL, ssid, pass );
+        spinnerContinue();        
 
         outLen = 0;
         String path = "/api/device/images/" + uuid;
@@ -367,6 +370,7 @@ public:
             Serial.print("[IMG] Total bytes: "); Serial.println(outLen);
             Serial.println("==============================");
 
+            spinnerContinue();
             return buffer;
 
         } catch(...) {
@@ -379,10 +383,10 @@ public:
     }    
 
     void GET( String serverURL, String ssid, String pass, String path, std::vector<String>& response ){
-
             
         SSLClient client;
         client.connect( serverURL, ssid, pass );
+        spinnerContinue();
 
         // send content request
         Serial.print("GET ");
@@ -447,8 +451,12 @@ public:
 
         Serial.println("GET done!");
 
+        spinnerContinue();
+
         // sync clock while WiFi is still powered (before destructor kills it)
         syncClockWithNTP();
+
+        spinnerContinue();        
 
         Serial.println( "Wifi shutting down via RAII destructor ***" );            
     }
@@ -458,6 +466,7 @@ public:
         Serial.println("POSTing to server...");
         SSLClient client;
         client.connect(serverURL, ssid, pass);
+        spinnerContinue();   
 
         String request = "";
         request.reserve(payload.length() + 1024); 
@@ -477,6 +486,7 @@ public:
         Serial.println("--- POST PAYLOAD END ---");
 
         client.print(request); 
+        spinnerContinue();   
 
         unsigned long timeout = millis();
         while (client.available() == 0) {

@@ -117,40 +117,122 @@ std::vector<String> tokenize(String input, char delimiter) {
 //----------------------------------------------
 
 // Declare a global pointer for the spinner so we can remove it later
-static lv_obj_t * spinner = NULL;
+static lv_obj_t * progress_arc = NULL;
+static int progress_arc_progress = 0;
+static bool progress_arc_yellow =  true;
 
-// Timer callback to remove the spinner
-static void spinnerEnd() {
+void spinnerReset() {
+    progress_arc_progress = 0;
+}
 
-    if (spinner) {
-        lv_obj_del(spinner);  // Remove (delete) the spinner from screen
-        spinner = NULL;
+void spinnerContinue() {
+    if (progress_arc) {
+
+        lv_obj_set_style_opa(progress_arc, LV_OPA_COVER, LV_PART_MAIN);
+        lv_obj_set_style_opa(progress_arc, LV_OPA_COVER, LV_PART_INDICATOR);
+
+        progress_arc_progress += 10;
+        if( progress_arc_progress >= 100 ){
+            progress_arc_progress = 0;
+            if( progress_arc_yellow ){
+                progress_arc_yellow = false;                     
+                lv_obj_set_style_arc_color(
+                    progress_arc,
+                    lv_palette_main(LV_PALETTE_BLUE),
+                    LV_PART_MAIN
+                );
+                lv_obj_set_style_arc_color(
+                    progress_arc,
+                    lv_palette_darken(LV_PALETTE_YELLOW, 3),
+                    LV_PART_INDICATOR
+                );            
+            }else{
+                progress_arc_yellow = true;
+                lv_obj_set_style_arc_color(
+                    progress_arc,
+                    lv_palette_darken(LV_PALETTE_YELLOW, 3),
+                    LV_PART_MAIN
+                );
+
+                lv_obj_set_style_arc_color(
+                    progress_arc,
+                    lv_palette_main(LV_PALETTE_BLUE),
+                    LV_PART_INDICATOR
+                );                
+            }       
+        }
+
+        lv_arc_set_value(progress_arc, progress_arc_progress);
+
+        lv_timer_handler(); // Trigger one UI update
+        delay(20);          // Give display time to actually render
+        lv_refr_now(NULL);
     }
+}
 
+
+static void spinnerEnd() {
+    if (progress_arc) {
+        lv_obj_set_style_opa(progress_arc, LV_OPA_TRANSP, LV_PART_MAIN);
+        lv_obj_set_style_opa(progress_arc, LV_OPA_TRANSP, LV_PART_INDICATOR);
+    }
 }
 
 void spinnerStart() {
 
-    if (spinner) {
-        lv_obj_del(spinner);  // Remove (delete) the spinner from screen
-        spinner = NULL;
+    if (progress_arc) {
+        lv_obj_move_foreground(progress_arc);
+        spinnerContinue();
+        return;
     }
 
-    // Create a spinner with 1000ms rotation and 60 degree arc
-    spinner = lv_spinner_create(lv_layer_top(), 1000, 60);
+    lv_obj_t * parent = lv_layer_top();
+    progress_arc = lv_arc_create(parent);
 
-    // Set spinner size and center it
-    lv_obj_set_size(spinner, 100, 100);
-    lv_obj_center(spinner);
+    /* Size & position */
+    lv_obj_set_size(progress_arc, 100, 100);
+    lv_obj_center(progress_arc);
 
-    // Customize appearance (optional)
-    lv_obj_set_style_arc_color(spinner, lv_palette_main(LV_PALETTE_YELLOW), LV_PART_MAIN);
-    lv_obj_set_style_arc_width(spinner, 8, LV_PART_MAIN);
+    /* Progress semantics */
+    lv_arc_set_range(progress_arc, 0, 100);
+    lv_arc_set_value(progress_arc, 0);
 
-    lv_timer_handler(); // Trigger one UI update
-    delay(20);          // Give display time to actually render
+    /* Full circular background */
+    lv_arc_set_bg_angles(progress_arc, 0, 360);
 
-    lv_refr_now(NULL);
+    /* Start at 12 o’clock */
+    lv_arc_set_rotation(progress_arc, 270);
+
+    /* Display-only (no knob) */
+    lv_obj_remove_style(progress_arc, NULL, LV_PART_KNOB);
+
+    /* Styling */
+    lv_obj_set_style_arc_width(progress_arc, 14, LV_PART_MAIN);
+    lv_obj_set_style_arc_width(progress_arc, 14, LV_PART_INDICATOR);
+
+    lv_obj_set_style_arc_color(
+        progress_arc,
+        lv_palette_darken(LV_PALETTE_YELLOW, 3),
+        LV_PART_MAIN
+    );
+
+    lv_obj_set_style_arc_color(
+        progress_arc,
+        lv_palette_main(LV_PALETTE_BLUE),
+        LV_PART_INDICATOR
+    );
+
+    /* Start invisible but alive */
+    lv_obj_set_style_opa(progress_arc, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_opa(progress_arc, LV_OPA_COVER, LV_PART_INDICATOR);
+
+    // do not steal click
+    lv_obj_clear_flag(progress_arc, LV_OBJ_FLAG_CLICKABLE);
+
+
+    // ---
+
+    spinnerContinue();
 
 }
 

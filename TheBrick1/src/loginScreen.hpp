@@ -142,13 +142,14 @@ public:
 if (target == objects.test_button1) {
 
     try{
+
         cameraClass camera = cameraClass::getInstance();
         camera.shootToPixSDRAM();
         camera.renderPicFromPixSDRAM();
-        
-        spinnerStart();
-        
+                
         //camera.savePixSDRAMToQSPI("/qspi/test_shot.raw");
+        spinnerReset();
+        spinnerStart();
 
         savePhotoToRAWQSPI( (uint8_t*)camera.getPixels(), camera.getPixelsSize(), 0 );
 
@@ -163,6 +164,7 @@ if (target == objects.test_button1) {
 
 if (target == objects.test_load1) {
 
+    spinnerReset();
     spinnerStart();
 
     try{

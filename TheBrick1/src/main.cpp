@@ -663,7 +663,7 @@ void loop() {
                 Serial.println( "S[" + savedToken[0] + "]" );
               } else
 
-              if (cmd.indexOf("show token") == 0) {
+              if (cmd.indexOf("show token1") == 0) {
                 Serial.println("===== (SHOW TOKEN) =====");
                 std::vector<arduino::String> savedToken = loadFromKVStore( "/kv/token" );
                 Serial.println( "S[" + savedToken[0] + "]" );

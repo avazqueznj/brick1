@@ -603,6 +603,7 @@ public:
 
     String sync(){
         
+        spinnerReset();
         spinnerStart();
 
         try{
@@ -937,6 +938,8 @@ public:
 
 
     void doSubmitInspection( String EDI, String inspectionText){
+
+        spinnerReset();
 
         // for the record                        
         Serial.println( EDI );                        
