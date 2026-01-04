@@ -137,51 +137,26 @@ public:
         }
 
 
+static String jpegPK  = "[test]";
 
-
-if (target == objects.test_button1) {
+if (target == objects.test_load1 ){
 
     try{
 
         cameraClass camera = cameraClass::getInstance();
-        camera.shootToPixSDRAM();        
-        camera.renderPicFromPixSDRAM();
-                
-        //camera.savePixSDRAMToQSPI("/qspi/test_shot.raw");
-        spinnerReset();
-        spinnerStart();
 
-        //savePhotoToRAWQSPI( (uint8_t*)camera.getPixels(), camera.getPixelsSize(), 0 );
+        camera.loadJPGSDRAMFromWarehouse( jpegPK );        
+
+        camera.showJpegFromSDRAM( jpg_holder );
+
 
     }catch( std::runtime_error& error ){
-         spinnerEnd();
-         showDialog( error.what() );
+
     }
 
-    spinnerEnd();
 
 }
 
-if (target == objects.test_load1) {
-
-    spinnerReset();
-    spinnerStart();
-
-    try{
-        cameraClass camera = cameraClass::getInstance();
-
-        //camera.loadPixSDRAMFromQSPI("/qspi/test_shot.raw");
-        loadImageFromRAWQSPI( (uint8_t*)camera.getPixels(), 0, true );
-        camera.renderPicFromPixSDRAM();
-
-    }catch( std::runtime_error& error ){
-         spinnerEnd();
-         showDialog( error.what() );
-    }
-
-    spinnerEnd();        
-
-}
 
 
 /// JPG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -189,22 +164,20 @@ if (target == objects.test_jpg ) {
 
     try{
 
-
-
         cameraClass camera = cameraClass::getInstance();
 
         camera.shootToPixSDRAM();        
 
-        camera.pixelsToJPG();
+        camera.encodePixelsToJPG();
 
-        camera.showJpegFromSDRAM();
+        camera.showJpegFromSDRAM( jpg_holder );
 
+        jpegPK  = camera.saveJPGSDRAMToWarehouse();
 
     }catch( std::runtime_error& error ){
 
     }
 
-    spinnerEnd();
 
 }
 

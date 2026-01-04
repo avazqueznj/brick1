@@ -1,10 +1,8 @@
 /********************************************************************************************
  * CONFIDENTIAL AND PROPRIETARY
- * 
- * The Brick 1.0 
+ * * The Brick 1.0 
  * © [2025] [Alejandro Vazquez]. All rights reserved.
- * 
- ********************************************************************************************/
+ * ********************************************************************************************/
 
 #pragma once
 
@@ -21,6 +19,14 @@
 
 extern "C" void add_style_button_default(lv_obj_t *obj);
 
+// --- HEADER DEFINITION ---
+// Forced to 64 bytes for clean alignment
+struct BucketHeader {
+    uint32_t length;      // 4 bytes: Actual JPEG size
+    char uuid[36];        // 36 bytes: UUID String (The raw chars)
+    char terminal;        // 1 byte: THE GUARDIAN (Forced 0 to stop runaways)
+    uint8_t padding[23];  // 23 bytes: Reserved/Padding to reach 64
+};
 
 #define IMAGE_MODE CAMERA_RGB565
 #define GC9A01A_CYAN 0x07FF
@@ -33,11 +39,9 @@ extern "C" void add_style_button_default(lv_obj_t *obj);
 #define GC9A01A_YELLOW 0xFFE0
 #define ALIGN_PTR(p,a)   ((p & (a-1)) ?(((uintptr_t)p + a) & ~(uintptr_t)(a-1)) : p)
 #define HTONS(x) (((x >> 8) & 0x00FF) | ((x << 8) & 0xFF00))
+
 class cameraClass {
 public:
-
-    // has
-
 
     // uses
     const uint16_t* getPixels(){
@@ -65,11 +69,9 @@ private:
     size_t lastJpegSize = 0;
     const size_t MAX_JPG_SIZE = 128 * 1024; // 128KB is plenty for 640x480
 
-
-    // uses
+    String currentPK;
 
 //---------------------------------------------------------------
-
 
 private:
     cameraClass() : ov767x(),  cam(ov767x),  fb()           
@@ -90,7 +92,7 @@ private:
         // 3. JPEG Workspace (The Encoder's "Engine Room" - ~32KB)
         jpegWorkSpace = (uint8_t *)SDRAM.malloc(32000);
         if (!jpegWorkSpace) throw std::runtime_error("CRITICAL: SDRAM Malloc failed for Workspace!");
-        // JPEG ==================        
+        // JPEG ==================         
 
         // start camera ==============================================
         Serial.println("[LOG] Starting Camera hardware...");
@@ -101,6 +103,67 @@ private:
         
     }
 
+    //---
+
+    // NJ Style UUID Generator
+    String generatePK() {
+        uint8_t uuid[16];
+        for (int i = 0; i < 16; ++i) uuid[i] = random(0, 256);
+        uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
+        uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1
+        char buf[37];
+        snprintf(buf, sizeof(buf),
+            "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+            uuid[0], uuid[1], uuid[2], uuid[3], uuid[4], uuid[5], uuid[6], uuid[7],
+            uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
+        return String(buf);
+    }
+
+    // INTERNAL: Scans 64-byte headers across the QSPI grid
+    int findBucketIndex(String targetUUID = "") {
+        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+        if (!bd) throw std::runtime_error("QSPI CRITICAL: BlockDevice is NULL");
+        
+        if (bd->init() != 0) throw std::runtime_error("QSPI INIT FAIL during scan");
+
+        BucketHeader header;
+        int foundIndex = -1;
+
+        for (int i = 0; i < 64; i++) {
+            uint32_t addr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
+            bd->read((uint8_t*)&header, addr, sizeof(BucketHeader));
+            header.terminal = 0; // Force null so String() doesn't explode if flash is dirty
+
+            if (targetUUID == "") { 
+                // Look for empty (erased flash is 0xFF)
+                if (header.length == 0 || header.length == 0xFFFFFFFF) {
+                    foundIndex = i;
+                    break;
+                }
+            } else {
+                // Match the UUID string via safe strncmp
+                if (strncmp(targetUUID.c_str(), header.uuid, 36) == 0) {
+                    foundIndex = i;
+                    break;
+                }
+            }
+        }
+        bd->deinit();
+
+        // NJ STYLE: No silent returns.
+        if (foundIndex == -1) {
+            if (targetUUID == "") {
+                // This is a system-halting state for a 'Save' operation
+                throw std::runtime_error(" EXCEPTION: SILICON IS FULL. NO SLOTS AVAILABLE.");
+            } else {
+                // This is a system-halting state for a 'Load' or 'Delete' operation
+                Serial.print("[ERROR] UUID NOT FOUND: "); Serial.println(targetUUID);
+                throw std::runtime_error(" EXCEPTION: PK NOT FOUND IN SILICON.");
+            }
+        }
+
+        return foundIndex;
+    }    
 
 public:
 
@@ -222,11 +285,10 @@ public:
         Serial.println("[LOG] Render pic ... done");        
     }
 
-    size_t pixelsToJPG(int quality = 80) {
+    size_t encodePixelsToJPG(int quality = 80) {
         Serial.println("[LOG] Starting JPEG Compression...");
         
         // 1. Open the encoder directly to your SDRAM landing zone
-        // Based on JPEGENC.cpp: open(uint8_t *pOutput, int iBufferSize)
         int rc = jpg.open(jpegBuffer, (int)MAX_JPG_SIZE);
         if (rc != JPEGE_SUCCESS) {
             Serial.println("[ERROR] JPEG Open failed!");
@@ -246,7 +308,6 @@ public:
         }
 
         // 3. Encode the frame from your pixels SDRAM
-        // addFrame(pEncode, pPixels, iPitch)
         rc = jpg.addFrame(&jpe, (uint8_t *)pixels, 640 * 2);
         if (rc != JPEGE_SUCCESS) {
             Serial.println("[ERROR] addFrame failed!");
@@ -264,92 +325,272 @@ public:
 
     //---------------------------------------
 
-void showJpegFromSDRAM() {
-    Serial.println("[PIC] showJpegFromSDRAM (rendering from internal buffer)");
+    void showJpegFromSDRAM( lv_obj_t* jpg_holder  ) {
+        Serial.println("[PIC] showJpegFromSDRAM (rendering from internal buffer)");
 
-    try {
-        // 1. Safety Check
-        if (lastJpegSize == 0 || jpegBuffer == NULL) {
-            throw std::runtime_error("NJ ERROR: No JPEG data available to show!");
+        try {
+            // 1. Safety Check
+            if (lastJpegSize == 0 || jpegBuffer == NULL) {
+                throw std::runtime_error("NJ ERROR: No JPEG data available to show!");
+            }
+
+            // 2. Validate JPEG magic bytes (FF D8)
+            if (!(jpegBuffer[0] == 0xFF && jpegBuffer[1] == 0xD8)) {
+                Serial.println("[FATAL] Memory buffer is NOT a valid JPEG");
+                return;
+            }
+
+            Serial.print("[PIC] Processing JPEG of size: ");
+            Serial.println(lastJpegSize);
+
+            // 3. Force Dimensions for Centering
+            uint16_t jw = 640; 
+            uint16_t jh = 480;
+            int16_t  x  = 0;
+            int16_t  y  = 0;
+
+            uint16_t realW = 0, realH = 0;
+            if (TJpgDec.getJpgSize(&realW, &realH, jpegBuffer, lastJpegSize)) {
+                jw = realW;
+                jh = realH;
+                Serial.print("[PIC] Header Parse Success: ");
+            } else {
+                Serial.println("[WARN] Header parse failed - FORCING 640x480 for layout.");
+            }
+
+            // NJ Center Logic: Inside your 800x480 (JPG_W x JPG_H) frame
+            if (jw < JPG_W) x = (int16_t)((JPG_W - jw) / 2);
+            if (jh < JPG_H) y = (int16_t)((JPG_H - jh) / 2);
+
+            Serial.print("[PIC] Dimensions: "); Serial.print(jw); Serial.print("x"); Serial.println(jh);
+            Serial.print("[PIC] Center calculated: x="); Serial.print(x);
+            Serial.print(" y="); Serial.println(y);
+
+            // 4. Wipe the Framebuffer before decoding
+            size_t fb_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
+            memset(jpg_fb, 0, fb_bytes);
+
+            // 5. The Decode: Blast from jpegBuffer into jpg_fb
+            Serial.println("[PIC] Starting TJpgDec hardware blast...");
+            TJpgDec.drawJpg(x, y, jpegBuffer, lastJpegSize); 
+            Serial.println("[PIC] Decode complete.");
+
+            // 6. LVGL UI Update
+            if (jpg_holder == NULL) {
+                jpg_holder = lv_img_create(lv_scr_act());
+                lv_obj_add_flag(jpg_holder, LV_OBJ_FLAG_CLICKABLE);
+                lv_obj_add_event_cb(
+                    jpg_holder,
+                    [](lv_event_t* e) {
+                        lv_obj_t* obj = lv_event_get_target(e);
+                        lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+                        Serial.println("[UI] SDRAM Photo View Hidden.");
+                    },
+                    LV_EVENT_CLICKED,
+                    NULL
+                );
+            }
+
+            lv_img_set_src(jpg_holder, &jpg_dsc);
+            lv_obj_center(jpg_holder);
+            lv_obj_clear_flag(jpg_holder, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_move_foreground(jpg_holder);
+
+        } catch (const std::exception& e) {
+            Serial.println("========================================");
+            Serial.println("CRITICAL ERROR IN showJpegFromSDRAM:");
+            Serial.println(e.what());
+            Serial.println("========================================");
         }
 
-        // 2. Validate JPEG magic bytes (FF D8)
-        if (!(jpegBuffer[0] == 0xFF && jpegBuffer[1] == 0xD8)) {
-            Serial.println("[FATAL] Memory buffer is NOT a valid JPEG");
-            return;
-        }
-
-        Serial.print("[PIC] Processing JPEG of size: ");
-        Serial.println(lastJpegSize);
-
-        // 3. Force Dimensions for Centering
-        // We know the Grinder is set to 640x480. We don't care if TJpgDec's 
-        // getJpgSize is being picky about the header markers.
-        uint16_t jw = 640; 
-        uint16_t jh = 480;
-        int16_t  x  = 0;
-        int16_t  y  = 0;
-
-        // Try to get size anyway for logging, but don't let it stop us
-        uint16_t realW = 0, realH = 0;
-        if (TJpgDec.getJpgSize(&realW, &realH, jpegBuffer, lastJpegSize)) {
-            jw = realW;
-            jh = realH;
-            Serial.print("[PIC] Header Parse Success: ");
-        } else {
-            Serial.println("[WARN] Header parse failed - FORCING 640x480 for layout.");
-        }
-
-        // NJ Center Logic: Inside your 800x480 (JPG_W x JPG_H) frame
-        if (jw < JPG_W) x = (int16_t)((JPG_W - jw) / 2);
-        if (jh < JPG_H) y = (int16_t)((JPG_H - jh) / 2);
-
-        Serial.print("[PIC] Dimensions: "); Serial.print(jw); Serial.print("x"); Serial.println(jh);
-        Serial.print("[PIC] Center calculated: x="); Serial.print(x);
-        Serial.print(" y="); Serial.println(y);
-
-        // 4. Wipe the Framebuffer before decoding
-        size_t fb_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
-        memset(jpg_fb, 0, fb_bytes);
-
-        // 5. The Decode: Blast from jpegBuffer into jpg_fb
-        Serial.println("[PIC] Starting TJpgDec hardware blast...");
-        TJpgDec.drawJpg(x, y, jpegBuffer, lastJpegSize); 
-        Serial.println("[PIC] Decode complete.");
-
-        // 6. LVGL UI Update
-        if (jpg_holder == NULL) {
-            jpg_holder = lv_img_create(lv_scr_act());
-            lv_obj_add_flag(jpg_holder, LV_OBJ_FLAG_CLICKABLE);
-            lv_obj_add_event_cb(
-                jpg_holder,
-                [](lv_event_t* e) {
-                    lv_obj_t* obj = lv_event_get_target(e);
-                    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
-                    Serial.println("[UI] SDRAM Photo View Hidden.");
-                },
-                LV_EVENT_CLICKED,
-                NULL
-            );
-        }
-
-        lv_img_set_src(jpg_holder, &jpg_dsc);
-        lv_obj_center(jpg_holder);
-        lv_obj_clear_flag(jpg_holder, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_move_foreground(jpg_holder);
-
-    } catch (const std::exception& e) {
-        Serial.println("========================================");
-        Serial.println("CRITICAL ERROR IN showJpegFromSDRAM:");
-        Serial.println(e.what());
-        Serial.println("========================================");
+        Serial.println("[PIC] Render finished.");
     }
-
-    Serial.println("[PIC] Render finished.");
-}
 
 
     //---------------------------------------
 
+    ///WAREHOUSE
+
+    //---------------------------------------
+    
+    // ======================================================================
+    // SAVE: Finds a bucket, writes Header + Data, returns UUID
+    // ======================================================================
+    String saveJPGSDRAMToWarehouse() {
+        Serial.println("------------------------------------------");
+        Serial.println("[WAREHOUSE] AUTO-SAVE INITIATED");
+
+        if (lastJpegSize == 0 || jpegBuffer == nullptr) {
+            throw std::runtime_error("WAREHOUSE EXCEPTION: No image in RAM to save!");
+        }
+
+        int bucket = findBucketIndex(""); 
+        if (bucket == -1) throw std::runtime_error("WAREHOUSE EXCEPTION: Silicon is FULL!");
+
+        // Initialize the Header
+        BucketHeader header;
+        memset(&header, 0, sizeof(header));
+        header.length = (uint32_t)lastJpegSize;
+        String newPK = generatePK(); 
+        strncpy(header.uuid, newPK.c_str(), 36);
+        header.terminal = 0; // Forced terminal
+
+        uint32_t targetAddr = WAREHOUSE_START + (bucket * PIC_SLOT_SIZE);
+        
+        Serial.print("[WAREHOUSE] Target Slot: "); Serial.println(bucket);
+        Serial.print("[WAREHOUSE] Assigning PK: "); Serial.println(newPK);
+
+        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+        bd->init();
+        
+        // 1. Erase the 128KB slot
+        if (bd->erase(targetAddr, PIC_SLOT_SIZE) != 0) throw std::runtime_error("QSPI ERASE FAIL");
+
+        // 2. Write the 64-byte Header at the start
+        if (bd->program((uint8_t*)&header, targetAddr, 64) != 0) throw std::runtime_error("QSPI HEADER FAIL");
+
+        // 3. Write the JPEG data starting 64 bytes in
+        if (bd->program(jpegBuffer, targetAddr + 64, header.length) != 0) throw std::runtime_error("QSPI DATA FAIL");
+
+        bd->deinit();
+        
+        currentPK = newPK;
+        Serial.println("[WAREHOUSE] SAVE SUCCESSFUL");
+        Serial.println("------------------------------------------");
+        return newPK; 
+    }
+
+    // ======================================================================
+    // LOAD: Finds UUID in silicon and pulls the data into RAM
+    // ======================================================================
+    void loadJPGSDRAMFromWarehouse(String targetUUID) {
+        Serial.println("------------------------------------------");
+        Serial.print("[WAREHOUSE] SEARCHING FOR PK: "); Serial.println(targetUUID);
+
+        int bucket = findBucketIndex(targetUUID);
+        if (bucket == -1) throw std::runtime_error("WAREHOUSE EXCEPTION: PK not found!");
+
+        uint32_t targetAddr = WAREHOUSE_START + (bucket * PIC_SLOT_SIZE);
+        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+        bd->init();
+
+        BucketHeader header;
+        bd->read((uint8_t*)&header, targetAddr, 64);
+        header.terminal = 0; // Safety for String(header.uuid) conversion
+        
+        if (header.length > (PIC_SLOT_SIZE - 64)) {
+            bd->deinit();
+            throw std::runtime_error("WAREHOUSE EXCEPTION: Header corruption!");
+        }
+
+        lastJpegSize = (size_t)header.length;
+        currentPK = String(header.uuid);
+
+        // Read data starting at +64
+        int rc = bd->read(jpegBuffer, targetAddr + 64, header.length);
+        bd->deinit();
+
+        if (rc != 0) throw std::runtime_error("QSPI READ FAIL");
+
+        Serial.println("[WAREHOUSE] LOAD SUCCESSFUL");
+        Serial.println("------------------------------------------");
+    }
+
+
+    // ======================================================================
+    // ZAP: Locates a PK and wipes the silicon clean
+    // ======================================================================
+    void zapJPGfromWarehouse(String targetUUID) {
+        Serial.println("------------------------------------------");
+        Serial.print("[WAREHOUSE] ZAP REQUESTED FOR PK: "); Serial.println(targetUUID);
+
+        if (targetUUID.length() < 36) {
+            throw std::runtime_error("ZAP EXCEPTION: Invalid UUID provided");
+        }
+
+        // 1. Locate the physical bucket
+        int bucket = findBucketIndex(targetUUID);
+        if (bucket == -1) {
+            Serial.print("[WARN] Zap failed - UUID not found in silicon: "); Serial.println(targetUUID);
+            return; 
+        }
+
+        uint32_t targetAddr = WAREHOUSE_START + (bucket * PIC_SLOT_SIZE);
+        
+        Serial.print("[WAREHOUSE] Found PK in Slot: "); Serial.println(bucket);
+        Serial.print("[WAREHOUSE] Nuking Address: 0x"); Serial.println(targetAddr, HEX);
+
+        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+        if (bd == NULL) throw std::runtime_error("QSPI CRITICAL: BD is NULL");
+
+        int rc = bd->init();
+        if (rc != 0) throw std::runtime_error("QSPI ZAP: Init failed");
+
+        Serial.print("[QSPI] Erasing 128KB Slot...");
+        rc = bd->erase(targetAddr, PIC_SLOT_SIZE);
+        
+        bd->deinit();
+
+        if (rc != 0) {
+            throw std::runtime_error("QSPI ZAP: Erase operation failed on silicon");
+        }
+
+        Serial.println("DONE");
+        Serial.println("[WAREHOUSE] ZAP SUCCESSFUL - Slot is now available");
+        Serial.println("------------------------------------------");
+    }
+
+
 };
 
+
+// ======================================================================
+// ZAP ALL: Scans every bucket and erases any that contain data
+// ======================================================================
+void zapAllWarehouseSlots() {
+    Serial.println("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    Serial.println("[WAREHOUSE] GLOBAL ZAP INITIATED");
+    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+    mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+    if (!bd) throw std::runtime_error("QSPI CRITICAL: BD is NULL");
+
+    int rc = bd->init();
+    if (rc != 0) throw std::runtime_error("QSPI GLOBAL ZAP: Init failed");
+
+    int zappedCount = 0;
+    BucketHeader header;
+
+    for (int i = 0; i < 64; i++) {
+        uint32_t targetAddr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
+        
+        bd->read((uint8_t*)&header, targetAddr, sizeof(BucketHeader));
+        header.terminal = 0; // The Guardian
+
+        Serial.print("[SLOT "); Serial.print(i); 
+        Serial.print(" @ 0x"); Serial.print(targetAddr, HEX); Serial.print("]: ");
+
+        if (header.length != 0 && header.length != 0xFFFFFFFF) {
+            Serial.print("FOUND DATA. PK: "); Serial.print(header.uuid);
+            Serial.print(" ("); Serial.print(header.length); Serial.println(" bytes)");
+            
+            Serial.print("   -> Erasing silicon...");
+            rc = bd->erase(targetAddr, PIC_SLOT_SIZE);
+            if (rc != 0) {
+                bd->deinit();
+                throw std::runtime_error(String( "QSPI GLOBAL ZAP: Erase failed at slot " + String(i) ).c_str());
+            }
+            Serial.println(" CLEANSED.");
+            zappedCount++;
+        } else {
+            Serial.println("EMPTY. Skipping.");
+        }
+    }
+
+    bd->deinit();
+
+    Serial.println("------------------------------------------");
+    Serial.print("[WAREHOUSE] GLOBAL ZAP COMPLETE. Total Slots Cleared: "); 
+    Serial.println(zappedCount);
+    Serial.println("------------------------------------------\n");
+}

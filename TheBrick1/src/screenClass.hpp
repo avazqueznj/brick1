@@ -19,6 +19,7 @@ LV_FONT_DECLARE(lv_font_montserrat_28);
 void fireModalDialogEvent( String action, String button );\
 static lv_style_t style_font;
 static bool style_ready = false;
+
 class screenClass{
 public:
 
@@ -29,6 +30,7 @@ public:
     lv_obj_t* letterKeyboard = nullptr;    
     lv_obj_t* numericKeyboard = nullptr;    
 
+    lv_obj_t* jpg_holder = NULL;
 
     screenClass( settingsClass* settingsParam, ScreensEnum screenIdParam ): 
     settings{settingsParam}, screenId{screenIdParam}{

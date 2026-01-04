@@ -31,7 +31,6 @@
 // jpeg decoding stuff
 static uint16_t* jpg_fb = NULL;
 static lv_img_dsc_t jpg_dsc;
-static lv_obj_t* jpg_holder = NULL;
 static const int JPG_W = 800;
 static const int JPG_H = 480;
 bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
@@ -713,6 +712,12 @@ void loop() {
                   Serial.println("===== ZAP KV =====");
                 } else
 
+              if (cmd == "zap part4") {
+                  Serial.println("===== ZAP partition 4/user =====");
+                  zapAllWarehouseSlots();
+                  Serial.println("===== ZAP partition 4/user =====");
+                } else                
+
               if (cmd == "?") {
                 Serial.println("===== HELP =====");
                 
@@ -733,8 +738,9 @@ void loop() {
 
                 Serial.println("list qspi");
                 Serial.println("zap images"); // from qspi
-
                 Serial.println("zap kv"); 
+
+                Serial.println("zap part4"); // from qspi                
                 
               } else         
 
@@ -755,7 +761,6 @@ void loop() {
       
 
 }
-
 
 
 

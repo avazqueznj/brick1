@@ -469,15 +469,12 @@ void clearTextVecQSPI(const String& path)
 
 
 //--------------------------------------------------------------------------------------------------------------
-//-------------------------------   RAW WAREHOUSE (Part 4) - NJ PRODUCTION GRADE
+//-------------------------------    RAW WAREHOUSE (Part 4) - NJ PRODUCTION GRADE (UNIFIED)
 //--------------------------------------------------------------------------------------------------------------
 
-
 // --- PRODUCTION ADDRESS MAP (Part 4) ---
-#define WAREHOUSE_START    0x700000  // Partition 4 Start (7MB mark)
-#define LAYOUT_SLOT_SIZE   0x20000   // 128KB per Layout (Max 16)
-#define PHOTO_START_ADDR   0x900000  // 9MB Mark
-#define PHOTO_SLOT_SIZE    0xA0000   // 640KB per Photo (Max 8)
+#define WAREHOUSE_START    0x700000   // Partition 4 Start (7MB mark)
+#define PIC_SLOT_SIZE      0x20000    // 128KB per Slot (Unified for all JPEGs)
 
 void checkResult(int result, const char* msg) {
     if (result != 0) {
@@ -529,10 +526,8 @@ void writeToSilicon(uint32_t baseAddr, int bucket, uint8_t* source, uint32_t len
     Serial.println("------------------------------------------");
 }
 
-uint32_t loadImageFromRAWQSPI(uint8_t* dest, int bucket, bool isPhoto) {
-    uint32_t base = isPhoto ? PHOTO_START_ADDR : WAREHOUSE_START;
-    uint32_t slotSize = isPhoto ? PHOTO_SLOT_SIZE : LAYOUT_SLOT_SIZE;
-    uint32_t targetAddr = base + (bucket * slotSize);
+uint32_t loadPicFromRAWQSPI(uint8_t* dest, int bucket) {
+    uint32_t targetAddr = WAREHOUSE_START + (bucket * PIC_SLOT_SIZE);
     uint32_t actualLen = 0;
 
     Serial.println("------------------------------------------");
@@ -544,7 +539,7 @@ uint32_t loadImageFromRAWQSPI(uint8_t* dest, int bucket, bool isPhoto) {
 
     bd->read((uint8_t*)&actualLen, targetAddr, 4);
     
-    if (actualLen > 0 && actualLen <= (slotSize - 4)) {
+    if (actualLen > 0 && actualLen <= (PIC_SLOT_SIZE - 4)) {
         Serial.print("Found Valid Image: "); Serial.print(actualLen); Serial.println(" bytes");
         bd->read(dest, targetAddr + 4, actualLen);
         Serial.println("QSPI: LOAD SUCCESSFUL");
@@ -558,13 +553,6 @@ uint32_t loadImageFromRAWQSPI(uint8_t* dest, int bucket, bool isPhoto) {
     return actualLen;
 }
 
-// PUBLIC WRAPPERS
-void saveImageToRAWQSPI(uint8_t* source, uint32_t len, int bucket) {
-    writeToSilicon(WAREHOUSE_START, bucket, source, len, LAYOUT_SLOT_SIZE);
-}
 
-void savePhotoToRAWQSPI(uint8_t* source, uint32_t len, int bucket) {
-    writeToSilicon(PHOTO_START_ADDR, bucket, source, len, PHOTO_SLOT_SIZE);
-}
 
 #endif
