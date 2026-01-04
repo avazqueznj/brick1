@@ -17,7 +17,7 @@
 #include <vector>
 #include "arducam_dvp.h"
 #include "OV7670/ov767x.h"
-
+#include <JPEGENC.h>
 
 extern "C" void add_style_button_default(lv_obj_t *obj);
 
@@ -58,6 +58,14 @@ private:
     uint16_t* pixels;
     size_t pixelsSize = (640 * 480 * 2) + 32;
 
+    // JPEG stuff
+    JPEGENC jpg;
+    uint8_t* jpegBuffer;        // Landing zone for finished JPG
+    uint8_t* jpegWorkSpace;     // Encoder's scratchpad
+    size_t lastJpegSize = 0;
+    const size_t MAX_JPG_SIZE = 128 * 1024; // 128KB is plenty for 640x480
+
+
     // uses
 
 //---------------------------------------------------------------
@@ -70,21 +78,29 @@ private:
             
         // Use the SDRAM directly, but keep the pointer honest
         uint8_t *raw_mem = (uint8_t *)SDRAM.malloc( pixelsSize );
-        if (!raw_mem) throw std::runtime_error("CRITICAL: SDRAM Malloc failed!");
-        
-        // Fixed address for the life of the program
+        if (!raw_mem) throw std::runtime_error("CRITICAL: SDRAM Malloc failed!");    
         pixels = (uint16_t *)ALIGN_PTR((uintptr_t)raw_mem, 32);
         fb.setBuffer((uint8_t *)pixels);
 
-        // start camera
+        // JPEG ==================
+        // 2. JPEG Landing Buffer (128KB)
+        jpegBuffer = (uint8_t *)SDRAM.malloc(MAX_JPG_SIZE);
+        if (!jpegBuffer) throw std::runtime_error("CRITICAL: SDRAM Malloc failed for JPEG Buffer!");
+
+        // 3. JPEG Workspace (The Encoder's "Engine Room" - ~32KB)
+        jpegWorkSpace = (uint8_t *)SDRAM.malloc(32000);
+        if (!jpegWorkSpace) throw std::runtime_error("CRITICAL: SDRAM Malloc failed for Workspace!");
+        // JPEG ==================        
+
+        // start camera ==============================================
         Serial.println("[LOG] Starting Camera hardware...");
         if (!cam.begin(CAMERA_R640x480, IMAGE_MODE, 10)) {
             throw std::runtime_error("HARDWARE ERROR: cam.begin failed!");
         }        
         Serial.println("[LOG] Starting Camera hardware... done!");        
-
-        Serial.println("[LOG] Cam mem init ...  done!");
+        
     }
+
 
 public:
 
@@ -206,33 +222,134 @@ public:
         Serial.println("[LOG] Render pic ... done");        
     }
 
-    // /**
-    //  * We don't swap bits here; we assume shootToPixSDRAM already did the HTONS.
-    //  */
-    // void savePixSDRAMToQSPI(const String& path) {
-    //     Serial.println("[CAM] Requested save to: " + path);
-                
-    //     // Call  utility helper
-    //     saveQSPIFileFromSDRAM(path, (const uint8_t*)pixels, pixelsSize);
+    size_t pixelsToJPG(int quality = 80) {
+        Serial.println("[LOG] Starting JPEG Compression...");
         
-    //     Serial.println("[CAM] Save complete.");
-    // }
+        // 1. Open the encoder directly to your SDRAM landing zone
+        // Based on JPEGENC.cpp: open(uint8_t *pOutput, int iBufferSize)
+        int rc = jpg.open(jpegBuffer, (int)MAX_JPG_SIZE);
+        if (rc != JPEGE_SUCCESS) {
+            Serial.println("[ERROR] JPEG Open failed!");
+            return 0;
+        }
 
-    // void loadPixSDRAMFromQSPI(const String& path) {
-    //     Serial.println("[CAM] Requested load from: " + path);
+        // 2. Initialize the encode process
+        JPEGENCODE jpe; 
+        // Quality: 0=Best, 1=High, 2=Med, 3=Low
+        uint8_t q = JPEGE_Q_HIGH;
+        if (quality < 50) q = JPEGE_Q_MED;
+
+        rc = jpg.encodeBegin(&jpe, 640, 480, JPEGE_PIXEL_RGB565, JPEGE_SUBSAMPLE_444, q);
+        if (rc != JPEGE_SUCCESS) {
+            Serial.print("[ERROR] encodeBegin failed: "); Serial.println(rc);
+            return 0;
+        }
+
+        // 3. Encode the frame from your pixels SDRAM
+        // addFrame(pEncode, pPixels, iPitch)
+        rc = jpg.addFrame(&jpe, (uint8_t *)pixels, 640 * 2);
+        if (rc != JPEGE_SUCCESS) {
+            Serial.println("[ERROR] addFrame failed!");
+            return 0;
+        }
+
+        // 4. Close returns the final compressed size
+        lastJpegSize = (size_t)jpg.close();
         
-    //     size_t actualLoaded = 0;
+        Serial.print("[LOG] Compression done. Size: ");
+        Serial.println(lastJpegSize);
         
-    //     // Load straight into our pixel memory
-    //     loadQSPIFileToSDRAM(path, (uint8_t*)pixels, pixelsSize, actualLoaded);
+        return lastJpegSize;
+    }
 
-    //     Serial.println("[CAM] Load complete. Buffer refreshed.");
-    // }
+    //---------------------------------------
 
-    // -----------------------------------------
+void showJpegFromSDRAM() {
+    Serial.println("[PIC] showJpegFromSDRAM (rendering from internal buffer)");
+
+    try {
+        // 1. Safety Check
+        if (lastJpegSize == 0 || jpegBuffer == NULL) {
+            throw std::runtime_error("NJ ERROR: No JPEG data available to show!");
+        }
+
+        // 2. Validate JPEG magic bytes (FF D8)
+        if (!(jpegBuffer[0] == 0xFF && jpegBuffer[1] == 0xD8)) {
+            Serial.println("[FATAL] Memory buffer is NOT a valid JPEG");
+            return;
+        }
+
+        Serial.print("[PIC] Processing JPEG of size: ");
+        Serial.println(lastJpegSize);
+
+        // 3. Force Dimensions for Centering
+        // We know the Grinder is set to 640x480. We don't care if TJpgDec's 
+        // getJpgSize is being picky about the header markers.
+        uint16_t jw = 640; 
+        uint16_t jh = 480;
+        int16_t  x  = 0;
+        int16_t  y  = 0;
+
+        // Try to get size anyway for logging, but don't let it stop us
+        uint16_t realW = 0, realH = 0;
+        if (TJpgDec.getJpgSize(&realW, &realH, jpegBuffer, lastJpegSize)) {
+            jw = realW;
+            jh = realH;
+            Serial.print("[PIC] Header Parse Success: ");
+        } else {
+            Serial.println("[WARN] Header parse failed - FORCING 640x480 for layout.");
+        }
+
+        // NJ Center Logic: Inside your 800x480 (JPG_W x JPG_H) frame
+        if (jw < JPG_W) x = (int16_t)((JPG_W - jw) / 2);
+        if (jh < JPG_H) y = (int16_t)((JPG_H - jh) / 2);
+
+        Serial.print("[PIC] Dimensions: "); Serial.print(jw); Serial.print("x"); Serial.println(jh);
+        Serial.print("[PIC] Center calculated: x="); Serial.print(x);
+        Serial.print(" y="); Serial.println(y);
+
+        // 4. Wipe the Framebuffer before decoding
+        size_t fb_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
+        memset(jpg_fb, 0, fb_bytes);
+
+        // 5. The Decode: Blast from jpegBuffer into jpg_fb
+        Serial.println("[PIC] Starting TJpgDec hardware blast...");
+        TJpgDec.drawJpg(x, y, jpegBuffer, lastJpegSize); 
+        Serial.println("[PIC] Decode complete.");
+
+        // 6. LVGL UI Update
+        if (jpg_holder == NULL) {
+            jpg_holder = lv_img_create(lv_scr_act());
+            lv_obj_add_flag(jpg_holder, LV_OBJ_FLAG_CLICKABLE);
+            lv_obj_add_event_cb(
+                jpg_holder,
+                [](lv_event_t* e) {
+                    lv_obj_t* obj = lv_event_get_target(e);
+                    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+                    Serial.println("[UI] SDRAM Photo View Hidden.");
+                },
+                LV_EVENT_CLICKED,
+                NULL
+            );
+        }
+
+        lv_img_set_src(jpg_holder, &jpg_dsc);
+        lv_obj_center(jpg_holder);
+        lv_obj_clear_flag(jpg_holder, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_move_foreground(jpg_holder);
+
+    } catch (const std::exception& e) {
+        Serial.println("========================================");
+        Serial.println("CRITICAL ERROR IN showJpegFromSDRAM:");
+        Serial.println(e.what());
+        Serial.println("========================================");
+    }
+
+    Serial.println("[PIC] Render finished.");
+}
 
 
-
+    //---------------------------------------
 
 };
 

@@ -144,14 +144,14 @@ if (target == objects.test_button1) {
     try{
 
         cameraClass camera = cameraClass::getInstance();
-        camera.shootToPixSDRAM();
+        camera.shootToPixSDRAM();        
         camera.renderPicFromPixSDRAM();
                 
         //camera.savePixSDRAMToQSPI("/qspi/test_shot.raw");
         spinnerReset();
         spinnerStart();
 
-        savePhotoToRAWQSPI( (uint8_t*)camera.getPixels(), camera.getPixelsSize(), 0 );
+        //savePhotoToRAWQSPI( (uint8_t*)camera.getPixels(), camera.getPixelsSize(), 0 );
 
     }catch( std::runtime_error& error ){
          spinnerEnd();
@@ -172,7 +172,6 @@ if (target == objects.test_load1) {
 
         //camera.loadPixSDRAMFromQSPI("/qspi/test_shot.raw");
         loadImageFromRAWQSPI( (uint8_t*)camera.getPixels(), 0, true );
-
         camera.renderPicFromPixSDRAM();
 
     }catch( std::runtime_error& error ){
@@ -181,6 +180,31 @@ if (target == objects.test_load1) {
     }
 
     spinnerEnd();        
+
+}
+
+
+/// JPG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+if (target == objects.test_jpg ) {
+
+    try{
+
+
+
+        cameraClass camera = cameraClass::getInstance();
+
+        camera.shootToPixSDRAM();        
+
+        camera.pixelsToJPG();
+
+        camera.showJpegFromSDRAM();
+
+
+    }catch( std::runtime_error& error ){
+
+    }
+
+    spinnerEnd();
 
 }
 
