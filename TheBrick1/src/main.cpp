@@ -738,35 +738,35 @@ void loop() {
                 Serial.println("===== HELP =====");
                 Serial.println("KV:");
 
-                  Serial.println("\tshow settings");
-                  Serial.println("\treset settings");              
+                  Serial.println(" show settings");
+                  Serial.println(" reset settings");              
 
-                  Serial.println("\tshow history");
-                  Serial.println("\tzap history");
+                  Serial.println(" show history");
+                  Serial.println(" zap history");
 
-                  Serial.println("\tset token{token}");
+                  Serial.println(" set token{token}");
                   //Serial.println("show token"); redacted
 
-                  Serial.println("\tzap kv");                 
+                  Serial.println(" zap kv");                 
 
                 Serial.println("QSPI PART1/wifi:");                
 
-                  Serial.println("\tshow config");
-                  Serial.println("\tdelete config");
-                  Serial.println("\tdelete old config");
+                  Serial.println(" show config");
+                  Serial.println(" delete config");
+                  Serial.println(" delete old config");
 
-                  Serial.println("\tlist part1");
-                  Serial.println("\tzap images"); // from qspi                  
+                  Serial.println(" list part1");
+                  Serial.println(" zap images"); // from qspi                  
 
                 Serial.println("QSPI PART4/user:");                                
 
-                  Serial.println("\tzap part4"); // from qspi                
-                  Serial.println("\tlist part4"); // from qspi                
+                  Serial.println(" zap part4"); // from qspi                
+                  Serial.println(" list part4"); // from qspi                
 
                 Serial.println("MISC:");                                                
 
-                Serial.println("\tshow inspection");
-                Serial.println("\tshow human inspection");
+                Serial.println(" show inspection");
+                Serial.println(" show human inspection");
 
               } else         
 
