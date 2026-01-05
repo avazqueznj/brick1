@@ -594,27 +594,8 @@ void loop() {
           cmd.trim();
           if (cmd.length() > 0) {
 
-              if (cmd == "show config") {
-                Serial.println("===== SHOW CONFIG =====");
-                domainManagerClass::getInstance()->printDebugContents();               
-              } else
-              if (cmd == "delete config") {
-                Serial.println("===== delete CONFIG =====");
-                const std::vector<String> empty;
-                clearTextVecQSPI( "/qspi/brickconfig.txt" );  
-                domainManagerClass::getInstance()->emptyAll();
-                Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
-              } else
-
-
-              if (cmd == "delete old config") {
-                Serial.println("===== delete old CONFIG =====");
-                const std::vector<String> empty;
-                saveToKVStore( "/kv/config", &empty );     
-                domainManagerClass::getInstance()->emptyAll();
-                Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
-              } else              
-              
+    
+          //Serial.println("===== KV =====");
 
               if (cmd == "show settings") {              
                 Serial.println("===== SHOW SETTINGS =====");
@@ -630,17 +611,6 @@ void loop() {
                 Serial.println("===== RESET SETTINGS  =====");
                 stateManager->resetSettingsFile();
               }else
-                        
-              
-              if (cmd == "show inspection") {
-                Serial.println("===== SHW INSPECTION  =====");
-                Serial.println( domainManagerClass::getInstance()->currentInspection.toEDI() );
-              } else
-              if (cmd == "show human inspection") {
-                Serial.println("===== SHW HUMAN INSPECTION  =====");
-                Serial.println( domainManagerClass::getInstance()->currentInspection.toHumanString() );
-              } else
-              
 
             if (cmd == "show history") {
                 Serial.println("===== HISTORY  =====");
@@ -669,8 +639,36 @@ void loop() {
                 Serial.println( "B[" + BEARER_TOKEN + "]" );
               } else
 
-              if (cmd.indexOf("list qspi") == 0) {
-                Serial.println("===== list qspi =====");
+              if (cmd == "zap kv") {
+                  Serial.println("===== ZAP KV =====");
+                  zapKVStore();
+                  Serial.println("===== ZAP KV =====");
+                } else
+
+
+          //Serial.println("===== QSPI FAT PART1 =====");
+
+              if (cmd == "show config") {
+                Serial.println("===== SHOW CONFIG =====");
+                domainManagerClass::getInstance()->printDebugContents();               
+              } else
+              if (cmd == "delete config") {
+                Serial.println("===== delete CONFIG =====");
+                const std::vector<String> empty;
+                clearTextVecQSPI( "/qspi/brickconfig.txt" );  
+                domainManagerClass::getInstance()->emptyAll();
+                Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
+              } else
+              if (cmd == "delete old config") {
+                Serial.println("===== delete old CONFIG =====");
+                const std::vector<String> empty;
+                saveToKVStore( "/kv/config", &empty );     
+                domainManagerClass::getInstance()->emptyAll();
+                Serial.println("*** WARNING: THIS REQUIRES RESET DEVICE ***");
+              } else              
+              
+              if (cmd.indexOf("list part1") == 0) {
+                Serial.println("===== list part1 =====");
                 
                 // PART SIZE -----------------------------------
                 Serial.println("QSPI  PARTITION TEST (C I/O ONLY)");
@@ -706,42 +704,70 @@ void loop() {
                   Serial.println("===== ZAP IMAGES DONE =====");
                 } else
 
-              if (cmd == "zap kv") {
-                  Serial.println("===== ZAP KV =====");
-                  zapKVStore();
-                  Serial.println("===== ZAP KV =====");
-                } else
+                        
+         // Serial.println("===== QSPI RAW PART4 =====");          
+
+              if (cmd == "list part4") {
+                  Serial.println("===== ZAP partition 4/user =====");
+                  listAllWarehouseSlots();
+                  Serial.println("===== ZAP partition 4/user =====");
+                } else                
+          
 
               if (cmd == "zap part4") {
                   Serial.println("===== ZAP partition 4/user =====");
                   zapAllWarehouseSlots();
                   Serial.println("===== ZAP partition 4/user =====");
                 } else                
+          
+
+          //====
+          //Serial.println("===== MISC =====");          
+
+              if (cmd == "show inspection") {
+                Serial.println("===== SHW INSPECTION  =====");
+                Serial.println( domainManagerClass::getInstance()->currentInspection.toEDI() );
+              } else
+              if (cmd == "show human inspection") {
+                Serial.println("===== SHW HUMAN INSPECTION  =====");
+                Serial.println( domainManagerClass::getInstance()->currentInspection.toHumanString() );
+              } else
+              
 
               if (cmd == "?") {
                 Serial.println("===== HELP =====");
-                
-                Serial.println("show config");
-                Serial.println("delete config");
+                Serial.println("KV:");
 
-                Serial.println("show settings");
-                Serial.println("reset settings");              
-                
-                Serial.println("show inspection");
-                Serial.println("show human inspection");
+                  Serial.println("\tshow settings");
+                  Serial.println("\treset settings");              
 
-                Serial.println("show history");
-                Serial.println("zap history");
+                  Serial.println("\tshow history");
+                  Serial.println("\tzap history");
 
-                Serial.println("set token{token}");
-                //Serial.println("show token"); redacted
+                  Serial.println("\tset token{token}");
+                  //Serial.println("show token"); redacted
 
-                Serial.println("list qspi");
-                Serial.println("zap images"); // from qspi
-                Serial.println("zap kv"); 
+                  Serial.println("\tzap kv");                 
 
-                Serial.println("zap part4"); // from qspi                
-                
+                Serial.println("QSPI PART1/wifi:");                
+
+                  Serial.println("\tshow config");
+                  Serial.println("\tdelete config");
+                  Serial.println("\tdelete old config");
+
+                  Serial.println("\tlist part1");
+                  Serial.println("\tzap images"); // from qspi                  
+
+                Serial.println("QSPI PART4/user:");                                
+
+                  Serial.println("\tzap part4"); // from qspi                
+                  Serial.println("\tlist part4"); // from qspi                
+
+                Serial.println("MISC:");                                                
+
+                Serial.println("\tshow inspection");
+                Serial.println("\tshow human inspection");
+
               } else         
 
               {

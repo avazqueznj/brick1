@@ -594,3 +594,41 @@ void zapAllWarehouseSlots() {
     Serial.println(zappedCount);
     Serial.println("------------------------------------------\n");
 }
+
+void listAllWarehouseSlots() {
+    Serial.println("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    Serial.println("[WAREHOUSE] List raw");
+    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+    mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+    if (!bd) throw std::runtime_error("QSPI CRITICAL: BD is NULL");
+
+    int rc = bd->init();
+    if (rc != 0) throw std::runtime_error("QSPI listP: Init failed");
+
+
+    BucketHeader header;
+    for (int i = 0; i < 64; i++) {
+        uint32_t targetAddr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
+        
+        bd->read((uint8_t*)&header, targetAddr, sizeof(BucketHeader));
+        header.terminal = 0; // The Guardian
+
+        Serial.print("[SLOT "); Serial.print(i); 
+        Serial.print(" @ 0x"); Serial.print(targetAddr, HEX); Serial.print("]: ");
+
+        if (header.length != 0 && header.length != 0xFFFFFFFF) {
+            Serial.print("FOUND DATA. PK: "); Serial.print(header.uuid);
+            Serial.print(" ("); Serial.print(header.length); Serial.println(" bytes)");
+            
+        } else {
+            Serial.println("EMPTY. Skipping.");
+        }        
+    }
+
+    bd->deinit();
+
+    Serial.println("------------------------------------------");
+    Serial.print("[WAREHOUSE] List raw "); 
+    Serial.println("------------------------------------------\n");
+}
