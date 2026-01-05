@@ -241,6 +241,11 @@ public:
 
         driver_username = "";        
         driver_name = "";
+
+        pic1id = "NONE";    
+        pic2id = "NONE";    
+        pic3id = "NONE";            
+        pic4id = "NONE";            
     }
 
     void finished( int timeOffsetFromUTC ){     

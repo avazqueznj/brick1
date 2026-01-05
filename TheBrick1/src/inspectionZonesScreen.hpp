@@ -740,7 +740,7 @@ public:
                 spinnerStart();
                 cameraClass camera = cameraClass::getInstance();
                 camera.zapJPGfromWarehouse( *id );
-                *id = "DELETED";
+                *id = "NONE";
                 lv_obj_add_state(pic_view1, LV_STATE_DISABLED);
                 lv_obj_add_state(pic_del1, LV_STATE_DISABLED);          
                 spinnerEnd();    
@@ -1431,6 +1431,34 @@ public:
     void start() override {
 
         domainManagerClass* domain = domainManagerClass::getInstance();
+
+
+        lv_obj_add_state(objects.pic_view1, LV_STATE_DISABLED);
+        lv_obj_add_state(objects.pic_del1, LV_STATE_DISABLED);
+        lv_obj_add_state(objects.pic_view2, LV_STATE_DISABLED);
+        lv_obj_add_state(objects.pic_del2, LV_STATE_DISABLED);
+        lv_obj_add_state(objects.pic_view3, LV_STATE_DISABLED);
+        lv_obj_add_state(objects.pic_del3, LV_STATE_DISABLED);
+        lv_obj_add_state(objects.pic_view4, LV_STATE_DISABLED);
+        lv_obj_add_state(objects.pic_del4, LV_STATE_DISABLED);
+
+        if( domainManagerClass::getInstance()->currentInspection.pic1id != "NONE" ){
+            lv_obj_clear_state(objects.pic_view1, LV_STATE_DISABLED);
+            lv_obj_clear_state(objects.pic_del1, LV_STATE_DISABLED);
+        }
+        if( domainManagerClass::getInstance()->currentInspection.pic2id != "NONE" ){
+            lv_obj_clear_state(objects.pic_view2, LV_STATE_DISABLED);
+            lv_obj_clear_state(objects.pic_del2, LV_STATE_DISABLED);
+        }
+        if( domainManagerClass::getInstance()->currentInspection.pic3id != "NONE" ){
+            lv_obj_clear_state(objects.pic_view3, LV_STATE_DISABLED);
+            lv_obj_clear_state(objects.pic_del3, LV_STATE_DISABLED);
+        }
+        if( domainManagerClass::getInstance()->currentInspection.pic4id != "NONE" ){
+            lv_obj_clear_state(objects.pic_view4, LV_STATE_DISABLED);
+            lv_obj_clear_state(objects.pic_del4, LV_STATE_DISABLED);
+        }
+
         
         // Clear existing items
         lv_obj_clean(objects.zone_asset_list);
