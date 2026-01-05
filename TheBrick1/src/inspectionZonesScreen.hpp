@@ -55,10 +55,7 @@ public:
         
         if (rfidTag == "::233:112:67:194") { // kfob
             targetZoneTag = "5";
-        } else 
-        
-        
-        
+        } else                         
         {
             showDialog("Unknown tag");
             return;
@@ -531,6 +528,115 @@ public:
         }
 
 
+        // zone pic
+        if ( target == objects.take_pic ) {
+            openPicDialog();
+        }
+
+        // close defecto dialog <-- just call close below
+        if (  target == objects.pic_close ) {
+            closePicDialog();
+            return;                
+        }
+
+        // =====================================================
+        // PICO dialog ---
+
+        //1
+        if (  target == objects.pic_shoot1 ) {
+            shootPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic1id),
+                objects.pic_view1,
+                objects.pic_del1
+            );
+        }        
+        if (  target == objects.pic_view1 ) {
+            viewPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic1id),
+                objects.pic_view1,
+                objects.pic_del1
+            );
+            return;                   
+        }        
+        if (  target == objects.pic_del1 ) {
+            delPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic1id),
+                objects.pic_view1,
+                objects.pic_del1
+            );                
+        }        
+
+        //2
+        if (  target == objects.pic_shoot2 ) {
+            shootPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic2id),
+                objects.pic_view2,
+                objects.pic_del2
+            );
+        }        
+        if (  target == objects.pic_view2 ) {
+            viewPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic2id),
+                objects.pic_view2,
+                objects.pic_del2
+            );
+            return;                   
+        }        
+        if (  target == objects.pic_del2 ) {
+            delPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic2id),
+                objects.pic_view2,
+                objects.pic_del2
+            );                
+        }   
+
+        //3
+        if (  target == objects.pic_shoot3 ) {
+            shootPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic3id),
+                objects.pic_view3,
+                objects.pic_del3
+            );
+        }        
+        if (  target == objects.pic_view3 ) {
+            viewPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic3id),
+                objects.pic_view3,
+                objects.pic_del3
+            );
+            return;                   
+        }        
+        if (  target == objects.pic_del3 ) {
+            delPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic3id),
+                objects.pic_view3,
+                objects.pic_del3
+            );                
+        }   
+        
+        //4
+        if (  target == objects.pic_shoot4 ) {
+            shootPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic4id),
+                objects.pic_view4,
+                objects.pic_del4
+            );
+        }        
+        if (  target == objects.pic_view4 ) {
+            viewPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic4id),
+                objects.pic_view4,
+                objects.pic_del4
+            );
+            return;                   
+        }        
+        if (  target == objects.pic_del4 ) {
+            delPic(  
+                &(domainManagerClass::getInstance()->currentInspection.pic4id),
+                objects.pic_view4,
+                objects.pic_del4
+            );                
+        }           
         // =====================================================
         // DEFECTO dialog ---
 
@@ -583,7 +689,68 @@ public:
 
     }
 
+//==================================================================================================================================
+// PICO handlers
 
+        void shootPic( String* id, lv_obj_t* pic_view1, lv_obj_t* pic_del1 ){
+            Serial.println( "*** SHOOT PIC ***" );
+            try{
+
+                spinnerStart();
+                cameraClass camera = cameraClass::getInstance();
+                camera.shootToPixSDRAM();        
+                camera.encodePixelsToJPG();
+                camera.showJpegFromSDRAM( jpg_holder );
+                *id = camera.saveJPGSDRAMToWarehouse();
+                lv_obj_clear_state(pic_view1, LV_STATE_DISABLED);
+                lv_obj_clear_state(pic_del1, LV_STATE_DISABLED);
+                spinnerEnd();
+
+            }catch( std::runtime_error& error ){
+                spinnerEnd();
+                showDialog( error.what() );
+            }
+            return;                
+        }        
+
+
+        void viewPic( String* id, lv_obj_t* pic_view1, lv_obj_t* pic_del1 ){
+            Serial.println( "*** VIEW PIC ***" );
+            try{
+
+                spinnerStart();
+                cameraClass camera = cameraClass::getInstance();
+                camera.loadJPGSDRAMFromWarehouse( *id );        
+                camera.showJpegFromSDRAM( jpg_holder );  
+                spinnerEnd();              
+
+            }catch( std::runtime_error& error ){
+                spinnerEnd();
+                showDialog( error.what() );
+            }
+            return;                   
+        }        
+
+
+        void delPic( String* id, lv_obj_t* pic_view1, lv_obj_t* pic_del1 ){
+
+            Serial.println( "*** DEL PIC ***" );
+            try{
+
+                spinnerStart();
+                cameraClass camera = cameraClass::getInstance();
+                camera.zapJPGfromWarehouse( *id );
+                *id = "DELETED";
+                lv_obj_add_state(pic_view1, LV_STATE_DISABLED);
+                lv_obj_add_state(pic_del1, LV_STATE_DISABLED);          
+                spinnerEnd();    
+
+            }catch( std::runtime_error& error ){
+                spinnerEnd();
+                showDialog( error.what() );
+            }
+            return;                
+        } 
 
 //==================================================================================================================================
 //==================================================================================================================================
@@ -1235,12 +1402,26 @@ public:
 
         screenClass::init();
 
-        lv_obj_t* close_btn = lv_msgbox_get_close_btn(objects.defect_dialog);
-        if (close_btn){
-            lv_obj_del(close_btn);         
-        } 
-        lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
-        lv_obj_add_flag(  objects.inspection_zones_overlay, LV_OBJ_FLAG_HIDDEN);     
+        // defect dialog
+        {
+            lv_obj_t* close_btn = lv_msgbox_get_close_btn(objects.defect_dialog);
+            if (close_btn){
+                lv_obj_del(close_btn);         
+            } 
+            lv_obj_add_flag(  objects.defect_dialog, LV_OBJ_FLAG_HIDDEN);     
+            lv_obj_add_flag(  objects.inspection_zones_overlay, LV_OBJ_FLAG_HIDDEN);     
+        }
+
+        {
+            // pic dialog
+            lv_obj_t* close_btn = lv_msgbox_get_close_btn(objects.pic_dialog);
+            if (close_btn){
+                lv_obj_del(close_btn);         
+            } 
+            lv_obj_add_flag(  objects.pic_dialog, LV_OBJ_FLAG_HIDDEN);     
+            lv_obj_add_flag(  objects.pic_overlay, LV_OBJ_FLAG_HIDDEN);     
+        }
+
 
         makeKeyboards();
         addLetterKeyboard( objects.defect_dialog_notes );
@@ -1326,6 +1507,16 @@ public:
         defectDialogOpen = false;
     }
 
+    
+    bool picDialogOpen = false;
+    void closePicDialog(){
+        Serial.println("Close pic dialog ...");                
+        if( picDialogOpen ){
+            lv_obj_add_flag(  objects.pic_dialog, LV_OBJ_FLAG_HIDDEN);   
+            lv_obj_add_flag(  objects.pic_overlay, LV_OBJ_FLAG_HIDDEN);   
+        }
+        picDialogOpen = false;
+    }
         
     //---------------------------------------------    
 
@@ -1335,6 +1526,7 @@ public:
     String selected_component_name;    
     void openDefectDialog( std::vector<String>* compVec ){
 
+        Serial.println("Open defect dialog ...");                
 
         //=======================
         // while i fix the unselect issue
@@ -1386,8 +1578,6 @@ public:
                     showDialog("Selected component name is empty.");
                     return;
                 }
-
-        //===================
 
         domainManagerClass* domain = domainManagerClass::getInstance();
         defectClass* existingDefect = nullptr;
@@ -1463,6 +1653,20 @@ public:
         Serial.println("defect click done!");
 
     }    
+
+    //---------------------------------------------    
+
+    void openPicDialog(  ){
+
+        Serial.println("open pic dialog!");
+
+        lv_obj_clear_flag(  objects.pic_dialog, LV_OBJ_FLAG_HIDDEN);     
+        lv_obj_clear_flag(  objects.pic_overlay, LV_OBJ_FLAG_HIDDEN);     
+        picDialogOpen = true;       
+
+        Serial.println("pic click done!");
+
+    }  
 
 //==============================================
 

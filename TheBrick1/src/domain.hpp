@@ -209,6 +209,11 @@ public:
     String driver_username;    
     String driver_name;
 
+    String pic1id = "NONE";    
+    String pic2id = "NONE";    
+    String pic3id = "NONE";            
+    String pic4id = "NONE";            
+
 private:
 
     String finishedTimeString = "";
@@ -350,6 +355,12 @@ public:
                 result += "\n\n";
             }
         }
+
+        result += "Pictures:\n";
+        result += "Picture 1:" + pic1id + "\n"; 
+        result += "Picture 2:" + pic2id + "\n"; 
+        result += "Picture 3:" + pic3id + "\n"; 
+        result += "Picture 4:" + pic4id + "\n";         
 
         return result;
     }   

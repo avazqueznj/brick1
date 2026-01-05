@@ -137,49 +137,49 @@ public:
         }
 
 
-static String jpegPK  = "[test]";
+// static String jpegPK  = "[test]";
 
-if (target == objects.test_load1 ){
+// if (target == objects.test_load1 ){
 
-    try{
+//     try{
 
-        cameraClass camera = cameraClass::getInstance();
+//         cameraClass camera = cameraClass::getInstance();
 
-        camera.loadJPGSDRAMFromWarehouse( jpegPK );        
+//         camera.loadJPGSDRAMFromWarehouse( jpegPK );        
 
-        camera.showJpegFromSDRAM( jpg_holder );
-
-
-    }catch( std::runtime_error& error ){
-
-    }
+//         camera.showJpegFromSDRAM( jpg_holder );
 
 
-}
+//     }catch( std::runtime_error& error ){
+
+//     }
+
+
+// }
 
 
 
-/// JPG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-if (target == objects.test_jpg ) {
+// /// JPG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// if (target == objects.test_jpg ) {
 
-    try{
+//     try{
 
-        cameraClass camera = cameraClass::getInstance();
+//         cameraClass camera = cameraClass::getInstance();
 
-        camera.shootToPixSDRAM();        
+//         camera.shootToPixSDRAM();        
 
-        camera.encodePixelsToJPG();
+//         camera.encodePixelsToJPG();
 
-        camera.showJpegFromSDRAM( jpg_holder );
+//         camera.showJpegFromSDRAM( jpg_holder );
 
-        jpegPK  = camera.saveJPGSDRAMToWarehouse();
+//         jpegPK  = camera.saveJPGSDRAMToWarehouse();
 
-    }catch( std::runtime_error& error ){
+//     }catch( std::runtime_error& error ){
 
-    }
+//     }
 
 
-}
+// }
 
 //     Serial.println("[LOG] >>> INSPECTION START");
 
