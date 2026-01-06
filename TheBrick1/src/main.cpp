@@ -700,7 +700,7 @@ void loop() {
               
               if (cmd == "zap images") {
                   Serial.println("===== ZAP IMAGES =====");
-                  domainManagerClass::getInstance()->zapPics();
+                  domainManagerClass::getInstance()->zapPicsXXX();
                   Serial.println("===== ZAP IMAGES DONE =====");
                 } else
 

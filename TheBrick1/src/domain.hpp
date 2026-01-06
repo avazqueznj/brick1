@@ -1248,7 +1248,7 @@ public:
 
     //----------------
 
-    void zapPics() {
+    void zapPicsXXX() {
 
         Serial.println("ZAP PICS (DIR SCAN) =========================================");
 
