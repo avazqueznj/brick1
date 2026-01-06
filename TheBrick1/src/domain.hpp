@@ -367,6 +367,9 @@ public:
         result += "Picture 3:" + pic3id + "\n"; 
         result += "Picture 4:" + pic4id + "\n";         
 
+
+        result += "Submission status: \n";         
+
         return result;
     }   
     
