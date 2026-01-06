@@ -212,7 +212,7 @@ public:
     // ----------------------------------------
 
 
-    void renderPicFromPixSDRAM() {
+    void renderPicFromPixSDRAMXXX() {
         Serial.println("[LOG] Render pic.");
 
         // 8. LVGL Descriptor
