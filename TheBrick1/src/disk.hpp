@@ -151,7 +151,7 @@ void zapKVStore()
 
 //=============================
 
-// QSPI
+// QSPI - parition 4 - but deprecated as there is a bug in the giga part1 and wifi
 
 //=============================
 
@@ -178,27 +178,6 @@ void zapKVStore()
         }
     }
 
-
-
-
-    // void openQSPI(){
-    //     // 1) Ensure QSPI filesystem is accessible.
-    //     //    If /qspi/ can be opened, assume it's already mounted.
-    //     DIR* qspiDir = opendir("/qspi/");
-    //     if (qspiDir) {
-    //         Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
-    //         closedir(qspiDir);
-    //     } else {
-    //         Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
-    //         int err = fs.mount(&qspi);
-    //         if (err) {
-    //             Serial.print("[PICS] QSPI mount failed, code: ");
-    //             Serial.println(err);
-    //             throw std::runtime_error("syncPics: QSPI mount failed");
-    //         }
-    //         Serial.println("[PICS] fs.mount() succeeded.");
-    //     }
-    // }
 
     DIR* openDirFromQSPI(){
 
@@ -275,94 +254,6 @@ void listQSPIFiles(const char* path) {
 #include <stdio.h>
 #include <stdexcept>
 #include <SDRAM.h>
-
-void loadQSPIFileToSDRAMXXX(const String& path, uint8_t* destBuffer, size_t maxCapacity, size_t& outLen) {
-
-    Serial.println("[STORAGE] loadQSPIFileToSDRAM..");        
-
-    outLen = 0;
-
-    // NJ Rule: Hard fail on null
-    if (destBuffer == nullptr) throw std::runtime_error("LOAD ERROR: destBuffer is NULL");
-
-    // KEEPING YOUR MOUNT CHECK
-    openQSPI();
-
-    FILE* f = fopen(path.c_str(), "rb");
-    if (f == NULL) {
-        String msg = "loadQSPIFileToSDRAM: cannot open for read: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
-    }
-
-    // Get file size
-    fseek(f, 0, SEEK_END);
-    long fileSize = ftell(f);
-    fseek(f, 0, SEEK_SET);
-
-    if (fileSize < 0) {
-        fclose(f);
-        throw std::runtime_error(String("loadQSPIFileToSDRAM: ftell failed for: " + path).c_str());
-    }
-
-    // Check capacity vs passed maxCapacity
-    if ((size_t)fileSize > maxCapacity) {
-        fclose(f);
-        Serial.print("loadQSPIFileToSDRAM: file too big. size=");
-        Serial.print((size_t)fileSize);
-        Serial.print(" > cap=");
-        Serial.println(maxCapacity);
-        throw std::runtime_error("loadQSPIFileToSDRAM: file too big for buffer");
-    }
-
-    // Read file into the PROVIDED buffer
-    size_t totalRead = fread(destBuffer, 1, (size_t)fileSize, f);
-    fclose(f);
-
-    if (totalRead != (size_t)fileSize) {
-        throw std::runtime_error(String("loadQSPIFileToSDRAM: short read for: " + path).c_str());
-    }
-
-    // MANDATORY NJ RULE: Invalidate cache so the CPU/LVGL sees the new data 
-    // that the QSPI driver just dropped into RAM.
-    ///SCB_InvalidateDCache_by_Addr((uint32_t *)destBuffer, totalRead);
-
-    outLen = (size_t)fileSize;
-    Serial.println("loadQSPIFileToSDRAM: loaded " + String(outLen) + " bytes from " + path);
-}
-
-//=============
-
-void saveQSPIFileFromSDRAMXX(const String& path, const uint8_t* data, size_t len) {
-
-    Serial.println("Saving file " + path);
-
-    // Ensure the data is pushed from CPU cache to SDRAM before saving
-    SCB_CleanDCache_by_Addr((uint32_t *)data, len);    
-
-    // Ensure QSPI is mounted
-    openQSPI();    
-
-    FILE* f = fopen(path.c_str(), "wb");
-    if (f == NULL) {
-        String msg = "saveQSPIFileFromSDRAM: cannot open for write: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
-    }
-
-    size_t written = fwrite(data, 1, len, f);
-    fclose(f);
-
-    if (written != len) {
-        String msg = "saveQSPIFileFromSDRAM: short write for: " + path;
-        Serial.println(msg);
-        throw std::runtime_error(msg.c_str());
-    }
-
-    Serial.println("Saving file " + path + "Done!!" );    
-}
-
-//===========================================================================================
 
 
 void saveTextVecToQSPI(const String& path, const std::vector<String>* file)
