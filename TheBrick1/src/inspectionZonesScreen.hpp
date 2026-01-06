@@ -311,9 +311,7 @@ public:
                 return;
             }
 
-            String picPath = "/qspi/brickimg_";
-            picPath += selected_zone->zonePic;
-            picPath += ".jpg";
+            String picPath = selected_zone->zonePic;
 
             Serial.print("[PIC] Request show: ");
             Serial.println(picPath);
@@ -509,9 +507,7 @@ public:
                 return;
             }
 
-            String picPath = "/qspi/brickimg_";
-            picPath += selected_zone->zonePic;
-            picPath += ".jpg";
+            String picPath = selected_zone->zonePic;
 
             Serial.print("[PIC] Request show: ");
             Serial.println(picPath);
@@ -696,12 +692,11 @@ public:
             Serial.println( "*** SHOOT PIC ***" );
             try{
 
-                spinnerStart();
-                cameraClass camera = cameraClass::getInstance();
-                camera.shootToPixSDRAM();        
-                camera.encodePixelsToJPG();
-                camera.showJpegFromSDRAM( jpg_holder );
-                *id = camera.saveJPGSDRAMToWarehouse();
+                spinnerStart();                
+                cameraClass::getInstance()->shootToPixSDRAM();        
+                cameraClass::getInstance()->encodePixelsToJPG();
+                cameraClass::getInstance()->renderJpegFromSDRAM( jpg_holder );
+                *id = cameraClass::getInstance()->saveJPGSDRAMToWarehouse();
                 lv_obj_clear_state(pic_view1, LV_STATE_DISABLED);
                 lv_obj_clear_state(pic_del1, LV_STATE_DISABLED);
                 spinnerEnd();
@@ -719,9 +714,8 @@ public:
             try{
 
                 spinnerStart();
-                cameraClass camera = cameraClass::getInstance();
-                camera.loadJPGSDRAMFromWarehouse( *id );        
-                camera.showJpegFromSDRAM( jpg_holder );  
+                cameraClass::getInstance()->loadJPGSDRAMFromWarehouse( *id );        
+                cameraClass::getInstance()->renderJpegFromSDRAM( jpg_holder );  
                 spinnerEnd();              
 
             }catch( std::runtime_error& error ){
@@ -738,8 +732,7 @@ public:
             try{
 
                 spinnerStart();
-                cameraClass camera = cameraClass::getInstance();
-                camera.zapJPGfromWarehouse( *id );
+                cameraClass::getInstance()->zapJPGfromWarehouse( *id );
                 *id = "NONE";
                 lv_obj_add_state(pic_view1, LV_STATE_DISABLED);
                 lv_obj_add_state(pic_del1, LV_STATE_DISABLED);          

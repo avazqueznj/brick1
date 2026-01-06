@@ -147,7 +147,7 @@ public:
 
 //         camera.loadJPGSDRAMFromWarehouse( jpegPK );        
 
-//         camera.showJpegFromSDRAM( jpg_holder );
+//         camera.renderJpegFromSDRAM( jpg_holder );
 
 
 //     }catch( std::runtime_error& error ){
@@ -170,7 +170,7 @@ public:
 
 //         camera.encodePixelsToJPG();
 
-//         camera.showJpegFromSDRAM( jpg_holder );
+//         camera.renderJpegFromSDRAM( jpg_holder );
 
 //         jpegPK  = camera.saveJPGSDRAMToWarehouse();
 

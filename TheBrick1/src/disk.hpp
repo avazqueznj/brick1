@@ -276,7 +276,7 @@ void listQSPIFiles(const char* path) {
 #include <stdexcept>
 #include <SDRAM.h>
 
-void loadQSPIFileToSDRAM(const String& path, uint8_t* destBuffer, size_t maxCapacity, size_t& outLen) {
+void loadQSPIFileToSDRAMXXX(const String& path, uint8_t* destBuffer, size_t maxCapacity, size_t& outLen) {
 
     Serial.println("[STORAGE] loadQSPIFileToSDRAM..");        
 
@@ -333,7 +333,7 @@ void loadQSPIFileToSDRAM(const String& path, uint8_t* destBuffer, size_t maxCapa
 
 //=============
 
-void saveQSPIFileFromSDRAM(const String& path, const uint8_t* data, size_t len) {
+void saveQSPIFileFromSDRAMXX(const String& path, const uint8_t* data, size_t len) {
 
     Serial.println("Saving file " + path);
 
@@ -465,92 +465,6 @@ void clearTextVecQSPI(const String& path)
     fclose(f);
 
     Serial.println("[CFG] File cleared");
-}
-
-
-//--------------------------------------------------------------------------------------------------------------
-//-------------------------------    RAW WAREHOUSE (Part 4) - NJ PRODUCTION GRADE (UNIFIED)
-//--------------------------------------------------------------------------------------------------------------
-
-// --- PRODUCTION ADDRESS MAP (Part 4) ---
-#define WAREHOUSE_START    0x700000   // Partition 4 Start (7MB mark)
-#define PIC_SLOT_SIZE      0x20000    // 128KB per Slot (Unified for all JPEGs)
-
-void checkResult(int result, const char* msg) {
-    if (result != 0) {
-        Serial.print("\n!!! CRITICAL QSPI ERROR: ");
-        Serial.print(msg);
-        Serial.print(" (Code: ");
-        Serial.print(result);
-        Serial.println(") !!!");
-        sosHALT(String("!!! QSPI FAIL: " + String(result)).c_str());
-    }
-}
-
-void writeToSilicon(uint32_t baseAddr, int bucket, uint8_t* source, uint32_t len, uint32_t maxLimit) {
-    // LOG EVERYTHING FIRST
-    Serial.println("------------------------------------------");
-    Serial.print("QSPI WRITE START: Bucket "); Serial.println(bucket);
-    Serial.print("Target Addr: 0x"); Serial.println(baseAddr + (bucket * maxLimit), HEX);
-    Serial.print("Data Size: "); Serial.print(len); Serial.println(" bytes");
-
-    if (source == NULL) { Serial.println("EXCEPTION: NULL BUFFER"); while(1); }
-    
-    if (len > (maxLimit - 4)) {
-        Serial.print("EXCEPTION: DATA TOO BIG ("); Serial.print(len);
-        Serial.print(" > "); Serial.print(maxLimit - 4); Serial.println(")");
-        while(1);
-    }
-
-    mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
-    if (bd == NULL) { Serial.println("EXCEPTION: NO BD"); while(1); }
-
-    uint32_t targetAddr = baseAddr + (bucket * maxLimit);
-
-    checkResult(bd->init(), "INIT");
-    
-    Serial.print("QSPI: Erasing..."); 
-    checkResult(bd->erase(targetAddr, maxLimit), "ERASE");
-    Serial.println("DONE");
-
-    Serial.print("QSPI: Programming Data...");
-    checkResult(bd->program(source, targetAddr + 4, len), "DATA_WRITE");
-    Serial.println("DONE");
-
-    Serial.print("QSPI: Committing Length Header...");
-    checkResult(bd->program((uint8_t*)&len, targetAddr, 4), "COMMIT");
-    Serial.println("DONE");
-
-    checkResult(bd->deinit(), "DEINIT");
-    Serial.println("QSPI: WRITE SUCCESSFUL");
-    Serial.println("------------------------------------------");
-}
-
-uint32_t loadPicFromRAWQSPI(uint8_t* dest, int bucket) {
-    uint32_t targetAddr = WAREHOUSE_START + (bucket * PIC_SLOT_SIZE);
-    uint32_t actualLen = 0;
-
-    Serial.println("------------------------------------------");
-    Serial.print("QSPI LOAD START: Bucket "); Serial.println(bucket);
-    Serial.print("Source Addr: 0x"); Serial.println(targetAddr, HEX);
-
-    mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
-    if (bd == NULL || bd->init() != 0) return 0;
-
-    bd->read((uint8_t*)&actualLen, targetAddr, 4);
-    
-    if (actualLen > 0 && actualLen <= (PIC_SLOT_SIZE - 4)) {
-        Serial.print("Found Valid Image: "); Serial.print(actualLen); Serial.println(" bytes");
-        bd->read(dest, targetAddr + 4, actualLen);
-        Serial.println("QSPI: LOAD SUCCESSFUL");
-    } else {
-        Serial.println("QSPI: BUCKET EMPTY (Found 0xFFFFFFFF or 0)");
-        actualLen = 0; 
-    }
-    
-    bd->deinit();
-    Serial.println("------------------------------------------");
-    return actualLen;
 }
 
 

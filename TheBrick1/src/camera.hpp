@@ -19,14 +19,36 @@
 
 extern "C" void add_style_button_default(lv_obj_t *obj);
 
-// --- HEADER DEFINITION ---
+// --- PRODUCTION ADDRESS MAP (Part 4) ---
+#define WAREHOUSE_START    0x700000   // Partition 4 Start (7MB mark)
+#define PIC_SLOT_SIZE      0x20000    // 128KB per Slot (Unified for all JPEGs)
+
+
+// --- WAREHOUSE ENUMS ---
+enum BucketType : uint32_t {
+    BT_EMPTY      = 0,
+    BT_USER_PIC   = 1, // Taken by driver, needs sync
+    BT_LAYOUT_PIC = 2  // Persistent vehicle layout
+};
+
+struct WarehouseItem {
+    int slotIndex;
+    String uuid;
+    BucketType type;
+    uint32_t length;
+};
+
+// --- WAREHOUSE HEADER DEFINITION ---
 // Forced to 64 bytes for clean alignment
 struct BucketHeader {
     uint32_t length;      // 4 bytes: Actual JPEG size
-    char uuid[36];        // 36 bytes: UUID String (The raw chars)
-    char terminal;        // 1 byte: THE GUARDIAN (Forced 0 to stop runaways)
-    uint8_t padding[23];  // 23 bytes: Reserved/Padding to reach 64
+    uint32_t type;        // 4 bytes: Using BucketType (User vs Layout)
+    char uuid[36];        // 36 bytes: UUID String
+    char terminal;        // 1 byte: OVERFLOW STOPPER (Forced 0)
+    uint8_t padding[19];  // 19 bytes: Padding to reach 64
 };
+
+
 
 #define IMAGE_MODE CAMERA_RGB565
 #define GC9A01A_CYAN 0x07FF
@@ -52,6 +74,34 @@ public:
         return pixelsSize;
     }
 
+    uint8_t* getJpegBuffer(){
+        return jpegBuffer;
+    }
+
+    size_t getLastJpegSize(){
+        return lastJpegSize;
+    }    
+
+    void setLastJpegSize(size_t size) {
+        // 1. Minimum sanity check: No zero-byte ghosts
+        if (size == 0) {
+            throw std::runtime_error("WAREHOUSE EXCEPTION: Attempted to set lastJpegSize to 0!");
+        }
+
+        // 2. Maximum sanity check: Must fit in our 128KB slot (minus 64-byte header)
+        if (size > (PIC_SLOT_SIZE - 64)) {
+            Serial.print("[CRITICAL] Oversized JPEG: "); Serial.println(size);
+            throw std::runtime_error("WAREHOUSE EXCEPTION: JPEG size exceeds allocated slot capacity!");
+        }
+
+        // 3. Set the value
+        lastJpegSize = size;
+
+        // 4. Log it for the Janitor
+        Serial.print("[WAREHOUSE] lastJpegSize updated: "); 
+        Serial.print(size); 
+        Serial.println(" bytes.");
+    }
 
 private:
 
@@ -64,8 +114,8 @@ private:
 
     // JPEG stuff
     JPEGENC jpg;
-    uint8_t* jpegBuffer;        // Landing zone for finished JPG
     uint8_t* jpegWorkSpace;     // Encoder's scratchpad
+    uint8_t* jpegBuffer;        // Landing zone for finished JPG
     size_t lastJpegSize = 0;
     const size_t MAX_JPG_SIZE = 128 * 1024; // 128KB is plenty for 640x480
 
@@ -103,74 +153,14 @@ private:
         
     }
 
-    //---
 
-    // NJ Style UUID Generator
-    String generatePK() {
-        uint8_t uuid[16];
-        for (int i = 0; i < 16; ++i) uuid[i] = random(0, 256);
-        uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
-        uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1
-        char buf[37];
-        snprintf(buf, sizeof(buf),
-            "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-            uuid[0], uuid[1], uuid[2], uuid[3], uuid[4], uuid[5], uuid[6], uuid[7],
-            uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
-        return String(buf);
-    }
-
-    // INTERNAL: Scans 64-byte headers across the QSPI grid
-    int findBucketIndex(String targetUUID = "") {
-        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
-        if (!bd) throw std::runtime_error("QSPI CRITICAL: BlockDevice is NULL");
-        
-        if (bd->init() != 0) throw std::runtime_error("QSPI INIT FAIL during scan");
-
-        BucketHeader header;
-        int foundIndex = -1;
-
-        for (int i = 0; i < 64; i++) {
-            uint32_t addr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
-            bd->read((uint8_t*)&header, addr, sizeof(BucketHeader));
-            header.terminal = 0; // Force null so String() doesn't explode if flash is dirty
-
-            if (targetUUID == "") { 
-                // Look for empty (erased flash is 0xFF)
-                if (header.length == 0 || header.length == 0xFFFFFFFF) {
-                    foundIndex = i;
-                    break;
-                }
-            } else {
-                // Match the UUID string via safe strncmp
-                if (strncmp(targetUUID.c_str(), header.uuid, 36) == 0) {
-                    foundIndex = i;
-                    break;
-                }
-            }
-        }
-        bd->deinit();
-
-        // NJ STYLE: No silent returns.
-        if (foundIndex == -1) {
-            if (targetUUID == "") {
-                // This is a system-halting state for a 'Save' operation
-                throw std::runtime_error(" EXCEPTION: SILICON IS FULL. NO SLOTS AVAILABLE.");
-            } else {
-                // This is a system-halting state for a 'Load' or 'Delete' operation
-                Serial.print("[ERROR] UUID NOT FOUND: "); Serial.println(targetUUID);
-                throw std::runtime_error(" EXCEPTION: PK NOT FOUND IN SILICON.");
-            }
-        }
-
-        return foundIndex;
-    }    
 
 public:
 
 
-    static cameraClass& getInstance() {
+    static cameraClass* getInstance() {
         static cameraClass instance; 
-        return instance;
+        return &instance;
     }
 
     void shootToPixSDRAM(){
@@ -325,8 +315,8 @@ public:
 
     //---------------------------------------
 
-    void showJpegFromSDRAM( lv_obj_t* jpg_holder  ) {
-        Serial.println("[PIC] showJpegFromSDRAM (rendering from internal buffer)");
+    void renderJpegFromSDRAM( lv_obj_t* jpg_holder  ) {
+        Serial.println("[PIC] renderJpegFromSDRAM (rendering from internal buffer)");
 
         try {
             // 1. Safety Check
@@ -398,7 +388,7 @@ public:
 
         } catch (const std::exception& e) {
             Serial.println("========================================");
-            Serial.println("CRITICAL ERROR IN showJpegFromSDRAM:");
+            Serial.println("CRITICAL ERROR IN renderJpegFromSDRAM:");
             Serial.println(e.what());
             Serial.println("========================================");
         }
@@ -408,32 +398,99 @@ public:
 
 
     //---------------------------------------
-
     ///WAREHOUSE
-
     //---------------------------------------
-    
+
+    private:
+
+
+    // NJ Style UUID Generator
+    String generatePK() {
+        uint8_t uuid[16];
+        for (int i = 0; i < 16; ++i) uuid[i] = random(0, 256);
+        uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
+        uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1
+        char buf[37];
+        snprintf(buf, sizeof(buf),
+            "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+            uuid[0], uuid[1], uuid[2], uuid[3], uuid[4], uuid[5], uuid[6], uuid[7],
+            uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
+        return String(buf);
+    }
+
+    int findBucketIndex(String targetUUID = "") {
+        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+        if (!bd) throw std::runtime_error("QSPI CRITICAL: BlockDevice is NULL");
+        
+        if (bd->init() != 0) throw std::runtime_error("QSPI INIT FAIL during scan");
+
+        BucketHeader header;
+        int foundIndex = -1;
+
+        for (int i = 0; i < 64; i++) {
+            uint32_t addr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
+            bd->read((uint8_t*)&header, addr, sizeof(BucketHeader));
+            header.terminal = 0; // Force null so String() doesn't explode if flash is dirty
+
+            if (targetUUID == "") { 
+                // Look for empty (erased flash is 0xFF)
+                if (header.length == 0 || header.length == 0xFFFFFFFF) {
+                    foundIndex = i;
+                    break;
+                }
+            } else {
+                // Match the UUID string via safe strncmp
+                if (strncmp(targetUUID.c_str(), header.uuid, 36) == 0) {
+                    foundIndex = i;
+                    break;
+                }
+            }
+        }
+        bd->deinit();
+
+        // NJ STYLE: No silent returns.
+        if (foundIndex == -1) {
+            if (targetUUID == "") {
+                // This is a system-halting state for a 'Save' operation
+                throw std::runtime_error(" EXCEPTION: SILICON IS FULL. NO SLOTS AVAILABLE.");
+            } else {
+                // This is a system-halting state for a 'Load' or 'Delete' operation
+                Serial.print("[ERROR] UUID NOT FOUND: "); Serial.println(targetUUID);
+                throw std::runtime_error(" EXCEPTION: PK NOT FOUND IN SILICON.");
+            }
+        }
+
+        return foundIndex;
+    }    
+
+    public:
+
     // ======================================================================
     // SAVE: Finds a bucket, writes Header + Data, returns UUID
     // ======================================================================
-    String saveJPGSDRAMToWarehouse() {
+
+    String saveJPGSDRAMToWarehouse(BucketType type = BT_USER_PIC) {
+        return saveJPGSDRAMToWarehouse( generatePK(), type );
+    }
+
+    String saveJPGSDRAMToWarehouse(String newPK, BucketType type = BT_USER_PIC) {
         Serial.println("------------------------------------------");
-        Serial.println("[WAREHOUSE] AUTO-SAVE INITIATED");
+        Serial.print("[WAREHOUSE] SAVE INITIATED - TYPE: "); 
+        Serial.println(type == BT_LAYOUT_PIC ? "LAYOUT" : "USER");
 
         if (lastJpegSize == 0 || jpegBuffer == nullptr) {
             throw std::runtime_error("WAREHOUSE EXCEPTION: No image in RAM to save!");
         }
 
         int bucket = findBucketIndex(""); 
-        if (bucket == -1) throw std::runtime_error("WAREHOUSE EXCEPTION: Silicon is FULL!");
-
-        // Initialize the Header
+        
         BucketHeader header;
         memset(&header, 0, sizeof(header));
         header.length = (uint32_t)lastJpegSize;
-        String newPK = generatePK(); 
+        header.type = (uint32_t)type; 
+        //String newPK = generatePK(); 
         strncpy(header.uuid, newPK.c_str(), 36);
-        header.terminal = 0; // Forced terminal
+        header.terminal = 0; 
 
         uint32_t targetAddr = WAREHOUSE_START + (bucket * PIC_SLOT_SIZE);
         
@@ -443,13 +500,8 @@ public:
         mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
         bd->init();
         
-        // 1. Erase the 128KB slot
         if (bd->erase(targetAddr, PIC_SLOT_SIZE) != 0) throw std::runtime_error("QSPI ERASE FAIL");
-
-        // 2. Write the 64-byte Header at the start
         if (bd->program((uint8_t*)&header, targetAddr, 64) != 0) throw std::runtime_error("QSPI HEADER FAIL");
-
-        // 3. Write the JPEG data starting 64 bytes in
         if (bd->program(jpegBuffer, targetAddr + 64, header.length) != 0) throw std::runtime_error("QSPI DATA FAIL");
 
         bd->deinit();
@@ -540,95 +592,97 @@ public:
         Serial.println("------------------------------------------");
     }
 
+    // ======================================================================
+    // ZAP ALL: Scans every bucket and erases any that contain data
+    // ======================================================================
+    void zapAllWarehouseSlots() {
+        Serial.println("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        Serial.println("[WAREHOUSE] GLOBAL ZAP INITIATED");
+        Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+        if (!bd) throw std::runtime_error("QSPI CRITICAL: BD is NULL");
+
+        int rc = bd->init();
+        if (rc != 0) throw std::runtime_error("QSPI GLOBAL ZAP: Init failed");
+
+        int zappedCount = 0;
+        BucketHeader header;
+
+        for (int i = 0; i < 64; i++) {
+            uint32_t targetAddr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
+            
+            bd->read((uint8_t*)&header, targetAddr, sizeof(BucketHeader));
+            header.terminal = 0; // The Guardian
+
+            Serial.print("[SLOT "); Serial.print(i); 
+            Serial.print(" @ 0x"); Serial.print(targetAddr, HEX); Serial.print("]: ");
+
+            if (header.length != 0 && header.length != 0xFFFFFFFF) {
+                Serial.print("FOUND DATA. PK: "); Serial.print(header.uuid);
+                Serial.print(" ("); Serial.print(header.length); Serial.println(" bytes)");
+                
+                Serial.print("   -> Erasing silicon...");
+                rc = bd->erase(targetAddr, PIC_SLOT_SIZE);
+                if (rc != 0) {
+                    bd->deinit();
+                    throw std::runtime_error(String( "QSPI GLOBAL ZAP: Erase failed at slot " + String(i) ).c_str());
+                }
+                Serial.println(" CLEANSED.");
+                zappedCount++;
+            } else {
+                Serial.println("EMPTY. Skipping.");
+            }
+        }
+
+        bd->deinit();
+
+        Serial.println("------------------------------------------");
+        Serial.print("[WAREHOUSE] GLOBAL ZAP COMPLETE. Total Slots Cleared: "); 
+        Serial.println(zappedCount);
+        Serial.println("------------------------------------------\n");
+    }
+
+    std::vector<WarehouseItem> getWarehouseInventory(uint32_t filterType = 0) {
+        Serial.println("------------------------------------------");
+        Serial.print("[WAREHOUSE] Scanning for Type: "); 
+        if (filterType == 0) Serial.println("ALL");
+        else Serial.println(filterType == BT_LAYOUT_PIC ? "LAYOUTS ONLY" : "USER PICS ONLY");
+
+        std::vector<WarehouseItem> inventory;
+        mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
+        if (!bd) throw std::runtime_error("QSPI CRITICAL: BD is NULL");
+        
+        bd->init();
+        BucketHeader header;
+
+        for (int i = 0; i < 64; i++) {
+            uint32_t targetAddr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
+            bd->read((uint8_t*)&header, targetAddr, sizeof(BucketHeader));
+            header.terminal = 0; 
+
+            Serial.print("  [FOUND] Slot "); Serial.print(i);
+            Serial.print((BucketType)header.type == BT_LAYOUT_PIC ? " (LAYOUT) " : " (USER) ");
+            Serial.print(header.length);
+            Serial.print(" PK: "); Serial.println(String(header.uuid));
+
+            // Match if: Slot isn't empty AND (Filter is 0 OR Type matches)
+            if (header.length != 0 && header.length != 0xFFFFFFFF) {
+                if (filterType == 0 || header.type == filterType) {
+                    WarehouseItem item;
+                    item.slotIndex = i;
+                    item.uuid = String(header.uuid);
+                    item.type = (BucketType)header.type;
+                    item.length = header.length;
+                    inventory.push_back(item);
+                }
+            }
+        }
+        bd->deinit();
+        Serial.print("[WAREHOUSE] Inventory Scan Complete. Found: "); Serial.println(inventory.size());
+        return inventory;
+    }
+
+   
 
 };
-
-
-// ======================================================================
-// ZAP ALL: Scans every bucket and erases any that contain data
-// ======================================================================
-void zapAllWarehouseSlots() {
-    Serial.println("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    Serial.println("[WAREHOUSE] GLOBAL ZAP INITIATED");
-    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-    mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
-    if (!bd) throw std::runtime_error("QSPI CRITICAL: BD is NULL");
-
-    int rc = bd->init();
-    if (rc != 0) throw std::runtime_error("QSPI GLOBAL ZAP: Init failed");
-
-    int zappedCount = 0;
-    BucketHeader header;
-
-    for (int i = 0; i < 64; i++) {
-        uint32_t targetAddr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
-        
-        bd->read((uint8_t*)&header, targetAddr, sizeof(BucketHeader));
-        header.terminal = 0; // The Guardian
-
-        Serial.print("[SLOT "); Serial.print(i); 
-        Serial.print(" @ 0x"); Serial.print(targetAddr, HEX); Serial.print("]: ");
-
-        if (header.length != 0 && header.length != 0xFFFFFFFF) {
-            Serial.print("FOUND DATA. PK: "); Serial.print(header.uuid);
-            Serial.print(" ("); Serial.print(header.length); Serial.println(" bytes)");
-            
-            Serial.print("   -> Erasing silicon...");
-            rc = bd->erase(targetAddr, PIC_SLOT_SIZE);
-            if (rc != 0) {
-                bd->deinit();
-                throw std::runtime_error(String( "QSPI GLOBAL ZAP: Erase failed at slot " + String(i) ).c_str());
-            }
-            Serial.println(" CLEANSED.");
-            zappedCount++;
-        } else {
-            Serial.println("EMPTY. Skipping.");
-        }
-    }
-
-    bd->deinit();
-
-    Serial.println("------------------------------------------");
-    Serial.print("[WAREHOUSE] GLOBAL ZAP COMPLETE. Total Slots Cleared: "); 
-    Serial.println(zappedCount);
-    Serial.println("------------------------------------------\n");
-}
-
-void listAllWarehouseSlots() {
-    Serial.println("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    Serial.println("[WAREHOUSE] List raw");
-    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-    mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
-    if (!bd) throw std::runtime_error("QSPI CRITICAL: BD is NULL");
-
-    int rc = bd->init();
-    if (rc != 0) throw std::runtime_error("QSPI listP: Init failed");
-
-
-    BucketHeader header;
-    for (int i = 0; i < 64; i++) {
-        uint32_t targetAddr = WAREHOUSE_START + (i * PIC_SLOT_SIZE);
-        
-        bd->read((uint8_t*)&header, targetAddr, sizeof(BucketHeader));
-        header.terminal = 0; // The Guardian
-
-        Serial.print("[SLOT "); Serial.print(i); 
-        Serial.print(" @ 0x"); Serial.print(targetAddr, HEX); Serial.print("]: ");
-
-        if (header.length != 0 && header.length != 0xFFFFFFFF) {
-            Serial.print("FOUND DATA. PK: "); Serial.print(header.uuid);
-            Serial.print(" ("); Serial.print(header.length); Serial.println(" bytes)");
-            
-        } else {
-            Serial.println("EMPTY. Skipping.");
-        }        
-    }
-
-    bd->deinit();
-
-    Serial.println("------------------------------------------");
-    Serial.print("[WAREHOUSE] List raw "); 
-    Serial.println("------------------------------------------\n");
-}

@@ -1150,172 +1150,102 @@ public:
     //==========================================================================================================================================
     //==========================================================================================================================================    
 
-
-    int syncPics(  ) {
+    int syncPics() {
 
         Serial.println("SYNC PICS ====================================================");
-
-        int picsLoaded  = 0;
+        int picsLoaded = 0;
         int picsDeleted = 0;
 
-        openQSPI();
+        // 1) Get ONLY the layouts currently in silicon
+        std::vector<WarehouseItem> localLayouts = cameraClass::getInstance()->getWarehouseInventory(BT_LAYOUT_PIC);
 
-        // 2) Build list of expected picture filenames (NO path, just "brickimg_<uuid>.jpg")
-        std::vector<String> expectedPics;
-        for (size_t i = 0; i < layouts.size(); i++) {
-
-            layoutClass& layout = layouts[i];
-            for (size_t j = 0; j < layout.zones.size(); j++) {
-
-                layoutZoneClass& zone = layout.zones[j];
-                if (zone.zonePic.length() == 0) {
-                    continue;
-                }
-
-                String fname = "brickimg_";
-                fname += zone.zonePic;
-                fname += ".jpg";
-                bool alreadyThere = false;
-                for (size_t k = 0; k < expectedPics.size(); k++) {
-                    if (expectedPics[k] == fname) {
-                        alreadyThere = true;
-                        break;
-                    }
-                }
-                if (!alreadyThere) {
-                    expectedPics.push_back(fname);
+        // 2) Collect expected UUIDs from your layouts list
+        Serial.println("Needed pics ->");
+        std::vector<String> expectedUUIDs;
+        for (auto& layout : layouts) {
+            for (auto& zone : layout.zones) {
+                if (zone.zonePic.length() > 0){
+                    expectedUUIDs.push_back(zone.zonePic);
+                    Serial.println(zone.zonePic);
                 }
             }
         }
 
-        // 3) Remove orphaned brickimg_* files in /qspi/ that are NOT in expectedPics
-        DIR* dir = opendir("/qspi/");
-        if (dir == NULL) {
-            Serial.println("[PICS] Failed to open /qspi/ directory.");
-        } else {
-
-            struct dirent* de;
-            while ((de = readdir(dir)) != NULL) {
-
-                const char* name = de->d_name;
-                if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0'))) {
-                    continue;
-                }
-                if (de->d_type == DT_DIR) {
-                    continue;
-                }
-
-                // we only care about "brickimg_..."
-                const char* prefix = "brickimg_";
-                int prefixLen = 9; // strlen("brickimg_");
-                bool hasPrefix = true;
-                for (int i = 0; i < prefixLen; i++) {
-                    if (name[i] != prefix[i]) {
-                        hasPrefix = false;
-                        break;
-                    }
-                }
-                if (!hasPrefix) {
-                    continue;   // leave wifi files alone
-                }
-
-                // check if this file is in expectedPics
-                bool keep = false;
-                for (size_t k = 0; k < expectedPics.size(); k++) {
-                    if (expectedPics[k] == String(name)) {
-                        keep = true;
-                        break;
-                    }
-                }
-
-                if (!keep) {
-                    // orphan -> delete
-                    String fullPath = "/qspi/";
-                    fullPath += name;
-
-                    Serial.print("[PICS] Deleting orphan: ");
-                    Serial.println(fullPath);
-
-                    deleteFileFromQSPI( fullPath );
-                    picsDeleted++;
-                }
+        // 3) ORPHAN CHECK: Does local layout exist in expected list?
+        Serial.println("Check vs local pics , needed and orphaned ->");
+        for (auto& local : localLayouts) {
+            bool found = false;
+            for (const String& expected : expectedUUIDs) {
+                if (local.uuid == expected) { found = true; break; }
             }
-
-            closedir(dir);
+            if (!found) {
+                Serial.print("Not needed!!! ZAP-> ");
+                Serial.println(local.uuid);
+                cameraClass::getInstance()->zapJPGfromWarehouse(local.uuid);
+                picsDeleted++;
+            }
         }
 
-        // 4) Download any expected pics that do not exist yet
-        for (size_t i = 0; i < expectedPics.size(); i++) {
+        // 4) DOWNLOAD CHECK: Does expected layout exist in local inventory?
+        Serial.println("Download missing ->");                
+        for (const String& expectedUUID : expectedUUIDs) {
 
-            String fname = expectedPics[i];
-            String path  = "/qspi/";
-            path += fname;
 
-            // check existence
-            FILE* f = openFileFromQSPI(path);
-            if (f != NULL) {
-                // already cached
-                closeFileFromQSPI(f);
-                Serial.print("[PICS] Already present: ");
-                Serial.println(path);
-                continue;
+            bool exists = false;
+            for (auto& local : localLayouts) {
+                if (local.uuid == expectedUUID) { 
+                    exists = true; break; 
+                }
             }
 
-            // we need to download; extract uuid from "brickimg_<uuid>.jpg"
-            String uuid = fname;
-            // remove "brickimg_" prefix
-            uuid.remove(0, 9);
-            // remove ".jpg" suffix if present
-            int dotPos = uuid.lastIndexOf(".jpg");
-            if (dotPos >= 0) {
-                uuid = uuid.substring(0, dotPos);
+            if(exists){
+                Serial.print("Already in storage! -> ");
+                Serial.println(expectedUUID);
             }
 
-            Serial.print("[PICS] Missing, downloading uuid: ");
-            Serial.println(uuid);
+            if (!exists) {
+                Serial.print("Missing in storage! -> ");
+                Serial.println(expectedUUID);
 
-            size_t imgLen = 0;
+                uint8_t* img = NULL;
+                size_t imgLen = 0; // Move outside so catch/logs can see it
+                
+                try {
+                    img = comms->GETImageToSDRAM(serverURL, expectedUUID, imgLen);
+                    
+                    if (img && imgLen > 0) {
+                        // NJ STYLE: Trust no one. Check buffer limits before memcpy.
+                        if (imgLen > (PIC_SLOT_SIZE - 64)) {
+                            throw std::runtime_error("SYNC EXCEPTION: Downloaded image exceeds warehouse slot size!");
+                        }
 
-            
-            //===============================================
-            //===============================================
-            //===============================================
-    
-            uint8_t* img; 
-
-            img = comms->GETImageToSDRAM( serverURL, uuid, imgLen);
-            if (img == NULL || imgLen == 0) {
-                Serial.println("[PICS] GETImageToSDRAM returned null/0");
-                throw std::runtime_error("syncPics: GETImageToSDRAM failed");
+                        memcpy(cameraClass::getInstance()->getJpegBuffer(), img, imgLen);
+                        cameraClass::getInstance()->setLastJpegSize(imgLen);
+                        
+                        // Explicitly saving with the Server's UUID and Layout type
+                        cameraClass::getInstance()->saveJPGSDRAMToWarehouse(expectedUUID, BT_LAYOUT_PIC);
+                        
+                        SDRAM.free(img);
+                        img = NULL; // Clean pointer after free
+                        picsLoaded++;
+                    }
+                } catch (...) {
+                    if (img != NULL) {
+                        SDRAM.free(img);
+                        img = NULL;
+                    }
+                    Serial.print("[SYNC ERROR] Failed downloading/saving UUID: "); Serial.println(expectedUUID);
+                    throw; // Re-throw so the system knows we are in a bad state
+                }
             }
 
-            // Save to QSPI, always free img
-            Serial.println("Save to disk!!!");
-            try {
-                saveQSPIFileFromSDRAM(path, img, imgLen);
-            } catch (...) {
-                SDRAM.free(img);
-                throw;
-            }
 
-            SDRAM.free(img);
-
-            Serial.print("[PICS] Cached ");
-            Serial.print(imgLen);
-            Serial.print(" bytes to ");
-            Serial.println(path);
-
-            picsLoaded++;
         }
 
-        Serial.print("SYNC PICS DONE, loaded: ");
-        Serial.print(picsLoaded);
-        Serial.print(", deleted orphans: ");
-        Serial.println(picsDeleted);
-
-    
         return picsLoaded;
     }
+
+
     //----------------
 
     void zapPics() {
@@ -1382,5 +1312,6 @@ public:
     //==========================================================================================================================================    
 
 };
+
 
 

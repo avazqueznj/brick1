@@ -30,7 +30,7 @@ public:
     lv_obj_t* letterKeyboard = nullptr;    
     lv_obj_t* numericKeyboard = nullptr;    
 
-    lv_obj_t* jpg_holder = NULL;
+    lv_obj_t* jpg_holder = NULL; // cam will assign this pointer
 
     screenClass( settingsClass* settingsParam, ScreensEnum screenIdParam ): 
     settings{settingsParam}, screenId{screenIdParam}{
@@ -79,90 +79,9 @@ public:
         Serial.println(path);
         try {
 
-            Serial.print("[PIC] load ... ");                
-            size_t imgLen = 0;
-            loadQSPIFileToSDRAM( path, jpg_io_buf, JPG_IO_BUF_SIZE , imgLen );
-            // jpg_io_buf
-            Serial.print("Loaded .... Total bytes: ");
-            Serial.println(imgLen);
-
-
-            // Validate JPEG magic bytes
-            if (!(jpg_io_buf[0] == 0xFF && jpg_io_buf[1] == 0xD8)) {
-                Serial.println("[FATAL] Not a JPEG (bad magic bytes)");
-                return;
-            }
-
-                // ==================================================
-                // Center the JPEG *inside* our 800x480 framebuffer
-                // ==================================================
-                uint16_t jw = 0;
-                uint16_t jh = 0;
-                int16_t  x  = 0;
-                int16_t  y  = 0;
-
-                if (TJpgDec.getJpgSize(&jw, &jh, jpg_io_buf, imgLen) ){
-                    Serial.print("[PIC] JPG size: ");
-                    Serial.print(jw);
-                    Serial.print(" x ");
-                    Serial.println(jh);
-
-                    if (jw < JPG_W) {
-                        x = (int16_t)((JPG_W - jw) / 2);
-                    }
-                    if (jh < JPG_H) {
-                        y = (int16_t)((JPG_H - jh) / 2);
-                    }
-
-                    Serial.print("[PIC] Center offsets x=");
-                    Serial.print(x);
-                    Serial.print(" y=");
-                    Serial.println(y);
-                } else {
-                    Serial.println("[PIC] Could not get JPG size (drawing at 0,0).");
-                }
-
-
-            // Clear framebuffer - before call back
-            size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
-            memset(jpg_fb, 0, jpg_bytes);
-
-            Serial.println("Drawing JPEG via TJpg_Decoder into framebuffer...");
-            TJpgDec.drawJpg(x, y, jpg_io_buf, imgLen); 
-            //TJpgDec.drawJpg(0, 0, jpg_io_buf, imgLen); // call back to render here
-            Serial.println("JPEG decode complete.");
-
-            // Show JPEG as LVGL image on current screen
-            // if (jpg_obj == NULL) {
-            //     jpg_obj = lv_img_create(lv_scr_act());
-            // }
-            // lv_img_set_src(jpg_obj, &jpg_dsc);
-            // lv_obj_center(jpg_obj);
-
-            if (jpg_holder == NULL) {
-                jpg_holder = lv_img_create(lv_scr_act());
-
-                // Make it clickable so it eats the click
-                lv_obj_add_flag(jpg_holder, LV_OBJ_FLAG_CLICKABLE);
-
-                // Click on the image = hide (no delete)
-                lv_obj_add_event_cb(
-                    jpg_holder,
-                    [](lv_event_t* e) {
-                        lv_obj_t* obj = lv_event_get_target(e);
-                        // Just hide it; no lv_obj_del, no free
-                        lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
-                    },
-                    LV_EVENT_CLICKED,
-                    NULL
-                );
-
-            }
-
-            lv_img_set_src(jpg_holder, &jpg_dsc);
-            lv_obj_center(jpg_holder);
-            lv_obj_clear_flag(jpg_holder, LV_OBJ_FLAG_HIDDEN);
-
+            Serial.print("[PIC] load ... ");                        
+            cameraClass::getInstance()->loadJPGSDRAMFromWarehouse( path );
+            cameraClass::getInstance()->renderJpegFromSDRAM( jpg_holder );
 
         } catch (const std::exception& e) {
             Serial.println("==============================");

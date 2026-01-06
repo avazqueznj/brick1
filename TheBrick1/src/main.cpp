@@ -104,10 +104,10 @@ mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
   #include "util.hpp"
   #include "disk.hpp"
   #include "comms.hpp"
-  #include "domain.hpp"
   #include "camera.hpp"
-  #include "screenClass.hpp"
+  #include "domain.hpp"
 
+      #include "screenClass.hpp"
       #include "loginScreen.hpp"
       #include "settingsScreen.hpp"
       #include "mainScreen.hpp"
@@ -709,14 +709,14 @@ void loop() {
 
               if (cmd == "list part4") {
                   Serial.println("===== ZAP partition 4/user =====");
-                  listAllWarehouseSlots();
+                  cameraClass::getInstance()->getWarehouseInventory();
                   Serial.println("===== ZAP partition 4/user =====");
                 } else                
           
 
               if (cmd == "zap part4") {
                   Serial.println("===== ZAP partition 4/user =====");
-                  zapAllWarehouseSlots();
+                  cameraClass::getInstance()->zapAllWarehouseSlots();
                   Serial.println("===== ZAP partition 4/user =====");
                 } else                
           
@@ -736,41 +736,30 @@ void loop() {
 
               if (cmd == "?") {
                 Serial.println("===== HELP =====");
-                Serial.println("KV:");
 
+                Serial.println("KV:");
                   Serial.println(" show settings");
                   Serial.println(" reset settings");              
-
                   Serial.println(" show history");
                   Serial.println(" zap history");
-
                   Serial.println(" set token{token}");
-                  //Serial.println("show token"); redacted
-
                   Serial.println(" zap kv");                 
 
                 Serial.println("QSPI PART1/wifi:");                
-
                   Serial.println(" show config");
                   Serial.println(" delete config");
                   Serial.println(" delete old config");
-
                   Serial.println(" list part1");
-                  Serial.println(" zap images"); // from qspi                  
 
                 Serial.println("QSPI PART4/user:");                                
-
                   Serial.println(" zap part4"); // from qspi                
                   Serial.println(" list part4"); // from qspi                
 
                 Serial.println("MISC:");                                                
+                  Serial.println(" show inspection");
+                  Serial.println(" show human inspection");
 
-                Serial.println(" show inspection");
-                Serial.println(" show human inspection");
-
-              } else         
-
-              {
+              } else{
                 Serial.println( "*** Unknown brick command  ***" );
               }
           }
