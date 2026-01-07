@@ -721,7 +721,8 @@ public:
 
         }catch( const std::runtime_error& error ){
             spinnerEnd();
-            String chainedError = String( "ERROR: Could not sync: " ) + error.what();            
+            String chainedError = String( "ERROR: Could not sync: " ) + error.what();   
+            Serial.println(chainedError);
             throw std::runtime_error( chainedError.c_str() );
         }
 
@@ -1014,6 +1015,7 @@ public:
 
             updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,error.what(), EDI, inspectionText );
             String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
+            Serial.println(errorMessage);
             throw std::runtime_error( errorMessage.c_str() );
         }
 
@@ -1041,6 +1043,7 @@ public:
             
             updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,error.what(), EDI, inspectionText );
             String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
+            Serial.println(errorMessage);
             throw std::runtime_error( errorMessage.c_str() );
         }
     }    
