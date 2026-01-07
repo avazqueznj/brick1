@@ -143,7 +143,7 @@ if (target == objects.sync_pic_button ){
 
         cameraClass* camera = cameraClass::getInstance();
 
-        camera->syncPics( 
+        camera->syncUserPics( 
             domainManagerClass::getInstance()->comms,  
             domainManagerClass::getInstance()->serverURL,
             "/api/device/upload_photo"

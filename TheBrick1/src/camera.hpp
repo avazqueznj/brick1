@@ -711,7 +711,9 @@ public:
     }
 
     
-    int syncPics(commsClass* comms, String serverURL, String path ) {
+    int syncUserPics(commsClass* comms, String serverURL, String path ) {
+
+        Serial.print("SYNC USER PICS ===================== ");
 
         try{
 

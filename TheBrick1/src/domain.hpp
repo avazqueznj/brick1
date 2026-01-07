@@ -666,10 +666,10 @@ public:
                     sentInspections = retryAllPendingInspections();
                 }
 
-                int syncedPics = 0;
+                int userPics = 0;
                 {
                     getInternalHeapFreeBytes();
-                    syncedPics = cameraClass::getInstance()->syncPics( 
+                    userPics = cameraClass::getInstance()->syncUserPics( 
                         domainManagerClass::getInstance()->comms,  
                         domainManagerClass::getInstance()->serverURL,
                         "/api/device/upload_photo"
@@ -677,10 +677,10 @@ public:
                 }
             
                 getInternalHeapFreeBytes();
-                int loadedPics = 0;
+                int layoutPics = 0;
                 try {
                     Serial.println("syncPics .....");                                        
-                    loadedPics = syncPics();
+                    layoutPics = syncLayoutPics();
                     WiFi.end();                    
                 } catch (const std::runtime_error& e) {
                     Serial.println("[WARN] syncPics failed, continuing without pics.");
@@ -707,10 +707,10 @@ public:
                     syncMessage += sentInspections;
                     syncMessage += " pend inspections, ";       
 
-                    syncMessage += loadedPics;
+                    syncMessage += layoutPics;
                     syncMessage += " layout pics, ";       
 
-                    syncMessage += syncedPics;
+                    syncMessage += userPics;
                     syncMessage += " user pics. ";       
 
 
@@ -1004,7 +1004,7 @@ public:
 
             retryAllPendingInspections();
 
-            cameraClass::getInstance()->syncPics( 
+            cameraClass::getInstance()->syncUserPics( 
                 domainManagerClass::getInstance()->comms,  
                 domainManagerClass::getInstance()->serverURL,
                 "/api/device/upload_photo"
@@ -1191,9 +1191,9 @@ public:
     //==========================================================================================================================================
     //==========================================================================================================================================    
 
-    int syncPics() {
+    int syncLayoutPics() {
 
-        Serial.println("SYNC PICS ====================================================");
+        Serial.println("SYNC << LAYOUT >> PICS ====================================================");
         int picsLoaded = 0;
         int picsDeleted = 0;
 
