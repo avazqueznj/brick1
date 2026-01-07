@@ -559,6 +559,110 @@ public:
         }
     }
 
+   // --+
+   
+   bool POSTRawBinary(
+    String serverURL, String ssid, String pass, String path,
+    const String& uuid, 
+    uint8_t type, 
+    uint8_t* data, 
+    size_t len  
+) {
+    if (data == nullptr || len == 0) {
+        throw std::runtime_error("POST_FATAL: Attempted to upload NULL or empty buffer for PK: " + std::string(uuid.c_str()));
+    }
+
+    SSLClient client;
+    
+    try {
+        spinnerContinue();   
+        client.connect(serverURL, ssid, pass);
+        spinnerContinue();
+
+        Serial.println("==============================");
+        Serial.println("[UPLOAD] Starting Binary POST");
+        Serial.print("[UPLOAD] PK: "); Serial.println(uuid);
+        Serial.print("[UPLOAD] Size: "); Serial.print(len); Serial.println(" bytes");
+        Serial.println("==============================");
+
+        // 1. Send Request Line
+        client.print("POST " + path + " HTTP/1.1\r\n");
+        
+        // 2. Send Headers
+        client.print("Host: " + serverURL + "\r\n");
+        client.print("Authorization: Bearer " + BEARER_TOKEN + "\r\n");
+        client.print("x-uuid: " + uuid + "\r\n");
+        client.print("x-type: " + String(type) + "\r\n");
+        client.print("Content-Type: image/jpeg\r\n");
+        client.print("Content-Length: " + String(len) + "\r\n");
+        client.print("Connection: close\r\n");
+        client.print("\r\n");
+
+        // 3. Send Payload from SDRAM (NJ STYLE: LOOP THE WRITE)
+        size_t totalWritten = 0;
+        int attempts = 0;
+
+        while (totalWritten < len) {
+            // Attempt to write the remainder
+            size_t remaining = len - totalWritten;
+            size_t written = client.client.write(data + totalWritten, remaining);
+            
+            if (written > 0) {
+                totalWritten += written;
+                Serial.print("[WRITE] Progress: "); 
+                Serial.print(totalWritten); Serial.print("/"); Serial.print(len);
+                Serial.print(" (+"); Serial.print(written); Serial.println(")");
+                attempts = 0; // Reset failsafe
+            } else {
+                // Buffer full or hardware busy
+                attempts++;
+                delay(50); // Give the radio a serious gap to clear the 16KB record
+                Serial.print("!"); // Visual indicator of a "Wait" state
+                if (attempts > 100) throw std::runtime_error("Socket stalled for too long at " + std::to_string(totalWritten));
+            }
+            spinnerContinue();   
+        }
+
+        Serial.println("[UPLOAD] Payload fully committed to hardware.");
+
+        // 4. Read Response (Pessimistic)
+        unsigned long startTime = millis();
+        String statusLine = "";
+        
+        while (client.connected() && (millis() - startTime < BRICK_HTTP_READ_TIMEOUT)) {
+            if (client.available()) {
+                statusLine = client.readStringUntil('\n');
+                statusLine.trim();
+                spinnerContinue();   
+                
+                Serial.print("[SERVER RCV] "); Serial.println(statusLine);
+
+                if (statusLine.indexOf("200 OK") != -1 || statusLine.indexOf("409 Conflict") != -1) {
+                    Serial.print("[UPLOAD] Final Result: "); Serial.println(statusLine);
+                    return true;
+                }
+                
+                if (statusLine.startsWith("HTTP/1.1 ")) {
+                    throw std::runtime_error("Server rejected upload: " + std::string(statusLine.c_str()));
+                }
+            }
+            delay(10);
+            Serial.print(".");
+        }
+
+        throw std::runtime_error("Timeout waiting for server ACK");
+
+    } catch (const std::exception& e) {
+        String chainMsg = "SYNC_EXCEPTION [" + uuid + "] -> " + String(e.what());
+        Serial.print("[CRITICAL] "); Serial.println(chainMsg);
+        throw std::runtime_error(chainMsg.c_str());
+    } catch (...) {
+        throw std::runtime_error("SYNC_EXCEPTION [" + std::string(uuid.c_str()) + "] -> Unknown exception");
+    }
+}
+
+    // ---
+
 };
 
 

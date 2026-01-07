@@ -661,28 +661,124 @@ public:
             bd->read((uint8_t*)&header, targetAddr, sizeof(BucketHeader));
             header.terminal = 0; 
 
-            Serial.print("  [FOUND] Slot "); Serial.print(i);
-            Serial.print((BucketType)header.type == BT_LAYOUT_PIC ? " (LAYOUT) " : " (USER) ");
-            Serial.print(header.length);
-            Serial.print(" PK: "); Serial.println(String(header.uuid));
+            Serial.print("[SLOT "); 
+            if (i < 10) Serial.print("0"); // Keep columns aligned
+            Serial.print(i); Serial.print("] ");
 
-            // Match if: Slot isn't empty AND (Filter is 0 OR Type matches)
             if (header.length != 0 && header.length != 0xFFFFFFFF) {
-                if (filterType == 0 || header.type == filterType) {
+                // PESSIMISM: Check for impossible sizes (128KB max)
+                if (header.length > (128 * 1024)) {
+                    Serial.print("!! GARBAGE !! Length: "); Serial.print(header.length);
+                    Serial.print(" PK: "); Serial.println(header.uuid);
+                }
+                // Check if it matches the filter
+                else if (filterType == 0 || header.type == filterType) {
                     WarehouseItem item;
                     item.slotIndex = i;
                     item.uuid = String(header.uuid);
                     item.type = (BucketType)header.type;
                     item.length = header.length;
                     inventory.push_back(item);
+
+                    Serial.print(item.type == BT_LAYOUT_PIC ? "[LAYOUT] " : "[USER]   ");
+                    Serial.print("Len: "); Serial.print(item.length);
+                    Serial.print(" PK: "); Serial.println(item.uuid);
+                } 
+                else {
+                    // It's valid data, just not what we asked for
+                    Serial.print("[FILTERED] Type: "); 
+                    Serial.print(header.type == BT_LAYOUT_PIC ? "LAYOUT" : (header.type == BT_USER_PIC ? "USER" : "UNKNOWN"));
+                    Serial.print(" PK: "); Serial.println(header.uuid);
+                }
+            } 
+            else {
+                // THE EMPTY CASE: 0 or 0xFFFFFFFF
+                Serial.print(header.length == 0 ? "[EMPTY:ZAPPED] " : "[EMPTY:FRESH]  ");
+                
+                // Even if empty, let's see if a Ghost PK is lingering in the bytes
+                if (header.uuid[0] != 0 && (uint8_t)header.uuid[0] != 0xFF) {
+                    Serial.print("Ghost PK: "); Serial.println(header.uuid);
+                } else {
+                    Serial.println("--");
                 }
             }
         }
+
+
         bd->deinit();
         Serial.print("[WAREHOUSE] Inventory Scan Complete. Found: "); Serial.println(inventory.size());
         return inventory;
     }
 
-   
+    
+    int syncPics(commsClass* comms, String serverURL, String path ) {
+
+        try{
+
+            spinnerStart();
+
+            if (!comms) {
+                throw std::runtime_error("JANITOR_FATAL: Null comms object passed to syncPics. Pipe is missing!");
+                return 0;
+            }
+
+            // 1. Get the list of USER photos
+            std::vector<WarehouseItem> pending = getWarehouseInventory(BT_USER_PIC);        
+            if (pending.empty()){
+                Serial.println("[JANITOR] Warehouse clean. No user pics to sync.");
+                return 0;
+            }
+
+            Serial.print("[JANITOR] Found "); Serial.print(pending.size()); Serial.println(" items.");
+
+            int syncedPics = 0;
+            for (auto& item : pending) {
+                try {
+                    // 2. Load from Silicon into SDRAM (Sets jpegBuffer and lastJpegSize)
+                    loadJPGSDRAMFromWarehouse(item.uuid);             
+                    
+                    uint8_t* rawData = getJpegBuffer();
+                    size_t dataLen = getLastJpegSize();
+
+                    // NJ Style: Validation first.
+                    if (dataLen == 0 || dataLen > (128 * 1024)) {
+                        Serial.print("[JANITOR] Skipping corrupt slot: "); Serial.println(item.uuid);
+                        continue; 
+                    }
+
+                    // 3. The Upload 
+                    // We use the credentials already held by the comms object
+                    comms->POSTRawBinary(
+                        serverURL, comms->ssid, comms->pass, path,
+                        item.uuid, 
+                        (uint8_t)item.type, 
+                        rawData, 
+                        dataLen
+                    );
+
+                    // 4. The ZAP (Only happens if POST didn't throw)
+                    Serial.print("[JANITOR] ACK Received for: "); Serial.println(item.uuid);
+                    zapJPGfromWarehouse(item.uuid);
+                    syncedPics++;
+                    
+                } catch (const std::exception& e) {
+                    // Log it and STOP. If one fails, the pipe is likely broken.
+                    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    Serial.print("[JANITOR] SYNC FAILED: "); Serial.println(e.what());
+                    Serial.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    break; 
+                }
+            }
+
+            spinnerEnd();
+
+            return syncedPics;
+
+        }catch(...){
+            spinnerEnd();
+            throw;
+        }
+    }
+
 
 };

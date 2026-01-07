@@ -137,6 +137,27 @@ public:
         }
 
 
+if (target == objects.sync_pic_button ){
+
+    try{
+
+        cameraClass* camera = cameraClass::getInstance();
+
+        camera->syncPics( 
+            domainManagerClass::getInstance()->comms,  
+            domainManagerClass::getInstance()->serverURL,
+            "/api/device/upload_photo"
+         );
+
+
+    }catch( std::runtime_error& error ){
+
+    }
+}
+
+
+
+
 // static String jpegPK  = "[test]";
 
 // if (target == objects.test_load1 ){

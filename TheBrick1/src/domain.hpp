@@ -487,6 +487,21 @@ public:
 
         result += "END***\n";
 
+        if( pic1id != "NONE" ){
+            result += "USERPIC*" + pic1id + "\n";
+        }
+        if( pic2id != "NONE" ){
+            result += "USERPIC*" + pic2id + "\n";
+        }
+        if( pic3id != "NONE" ){
+            result += "USERPIC*" + pic3id + "\n";
+        }
+        if( pic4id != "NONE" ){
+            result += "USERPIC*" + pic4id + "\n";
+        }
+
+        result += "END2***\n";        
+
         return result;
     }   
 
@@ -644,10 +659,23 @@ public:
                     getInternalHeapFreeBytes();
                 }
                     
-                // sync inspes
-                getInternalHeapFreeBytes();
-                int sentInspections = retryAllPendingInspections();
-                
+                int sentInspections = 0;
+                {
+                    // sync inspes
+                    getInternalHeapFreeBytes();
+                    sentInspections = retryAllPendingInspections();
+                }
+
+                int syncedPics = 0;
+                {
+                    getInternalHeapFreeBytes();
+                    syncedPics = cameraClass::getInstance()->syncPics( 
+                        domainManagerClass::getInstance()->comms,  
+                        domainManagerClass::getInstance()->serverURL,
+                        "/api/device/upload_photo"
+                    );
+                }
+            
                 getInternalHeapFreeBytes();
                 int loadedPics = 0;
                 try {
@@ -677,10 +705,14 @@ public:
                     syncMessage += " users, ";       
 
                     syncMessage += sentInspections;
-                    syncMessage += " pending inspections, ";       
+                    syncMessage += " pend inspections, ";       
 
                     syncMessage += loadedPics;
-                    syncMessage += " pictures. ";       
+                    syncMessage += " layout pics, ";       
+
+                    syncMessage += syncedPics;
+                    syncMessage += " user pics. ";       
+
 
                     spinnerEnd();                           
 
@@ -971,6 +1003,12 @@ public:
             updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
 
             retryAllPendingInspections();
+
+            cameraClass::getInstance()->syncPics( 
+                domainManagerClass::getInstance()->comms,  
+                domainManagerClass::getInstance()->serverURL,
+                "/api/device/upload_photo"
+            );
 
         }catch( const std::runtime_error& error ){
 
