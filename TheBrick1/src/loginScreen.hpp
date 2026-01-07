@@ -137,23 +137,23 @@ public:
         }
 
 
-if (target == objects.sync_pic_button ){
+// if (target == objects.sync_pic_button ){
 
-    try{
+//     try{
 
-        cameraClass* camera = cameraClass::getInstance();
+//         cameraClass* camera = cameraClass::getInstance();
 
-        camera->syncUserPics( 
-            domainManagerClass::getInstance()->comms,  
-            domainManagerClass::getInstance()->serverURL,
-            "/api/device/upload_photo"
-         );
+//         camera->syncUserPics( 
+//             domainManagerClass::getInstance()->comms,  
+//             domainManagerClass::getInstance()->serverURL,
+//             "/api/device/upload_photo"
+//          );
 
 
-    }catch( std::runtime_error& error ){
+//     }catch( std::runtime_error& error ){
 
-    }
-}
+//     }
+// }
 
 
 
