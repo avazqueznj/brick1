@@ -1027,8 +1027,15 @@ public:
         String result = "";  
         
         try{
+
             result =  comms->POST( serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company,  EDI );
             updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
+
+            cameraClass::getInstance()->syncUserPics( 
+                domainManagerClass::getInstance()->comms,  
+                domainManagerClass::getInstance()->serverURL,
+                "/api/device/upload_photo"
+            );
 
         }catch( const std::runtime_error& error ){
             
