@@ -693,6 +693,20 @@ public:
             try{
 
                 spinnerStart();                
+
+                // delete a previous photo
+                try{
+
+                    if( (*id) != "NONE" ){
+                        cameraClass::getInstance()->zapJPGfromWarehouse( *id );
+                    }
+                    
+                }catch( std::runtime_error& error ){
+                    Serial.println( "Could not delete previous photo !!!!!!!!!!!!!" );
+                    Serial.println( error.what() );
+                }
+                
+
                 cameraClass::getInstance()->shootToPixSDRAM();        
                 cameraClass::getInstance()->encodePixelsToJPG();
                 cameraClass::getInstance()->renderJpegFromSDRAM( jpg_holder );

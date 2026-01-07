@@ -385,7 +385,7 @@ public:
                             inspectionEDI += row[i] + "\n";
                         }
 
-                        if( row[i].startsWith( "END***") ){
+                        if( row[i].startsWith( "END2***") ){
                             afterDataRecord = true;
                             continue;
                         }
