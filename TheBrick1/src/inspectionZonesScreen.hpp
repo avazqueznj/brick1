@@ -1390,6 +1390,12 @@ public:
 
     void init() override {
 
+        if( !cameraClass::getInstance()->cameraUp ){
+            lv_obj_add_flag(  objects.take_pic, LV_OBJ_FLAG_HIDDEN);     
+        }else{
+            lv_obj_clear_flag(  objects.take_pic, LV_OBJ_FLAG_HIDDEN);     
+        }
+
         { // key nav
 
             // default

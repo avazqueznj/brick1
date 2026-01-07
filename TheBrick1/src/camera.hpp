@@ -65,7 +65,8 @@ struct BucketHeader {
 class cameraClass {
 public:
 
-    // uses
+    bool cameraUp = false;
+
     const uint16_t* getPixels(){
         return pixels;
     }
@@ -108,6 +109,7 @@ private:
     // has
     OV7670 ov767x;
     Camera cam;
+    
     FrameBuffer fb; 
     uint16_t* pixels;
     size_t pixelsSize = (640 * 480 * 2) + 32;
@@ -147,9 +149,11 @@ private:
         // start camera ==============================================
         Serial.println("[LOG] Starting Camera hardware...");
         if (!cam.begin(CAMERA_R640x480, IMAGE_MODE, 10)) {
-            throw std::runtime_error("HARDWARE ERROR: cam.begin failed!");
-        }        
-        Serial.println("[LOG] Starting Camera hardware... done!");        
+            Serial.println("HARDWARE ERROR: cam.begin failed!");
+            cameraUp = false;
+        }else{
+            cameraUp = true;
+        }       
         
     }
 
@@ -164,6 +168,10 @@ public:
     }
 
     void shootToPixSDRAM(){
+
+        if( !cameraUp ){
+            throw std::runtime_error("CAMERA ERROR: camera not ON.");
+        }
 
         // prepare blue buffer
         // get blue -> cam chip faield
