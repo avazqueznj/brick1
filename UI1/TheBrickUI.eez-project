@@ -9344,7 +9344,7 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "v 1.102P",
+              "text": "v 1.103P",
               "textType": "literal",
               "longMode": "WRAP",
               "recolor": false
@@ -10031,113 +10031,6 @@
               "useStyle": "button_default",
               "localStyles": {
                 "objID": "d4ac1e42-d85f-44b6-f367-9b7143cb38f3",
-                "definition": {
-                  "MAIN": {
-                    "FOCUSED": {
-                      "bg_color": "#ff0000"
-                    }
-                  }
-                }
-              },
-              "group": "",
-              "groupIndex": 0
-            },
-            {
-              "objID": "6f740475-262a-40d6-f366-2b978cb1e408",
-              "type": "LVGLButtonWidget",
-              "left": 33,
-              "top": 376,
-              "width": 161,
-              "height": 50,
-              "customInputs": [],
-              "customOutputs": [],
-              "style": {
-                "objID": "b57d2ede-57a4-43a3-a636-72a9dd07ef25",
-                "useStyle": "default",
-                "conditionalStyles": [],
-                "childStyles": []
-              },
-              "timeline": [],
-              "eventHandlers": [
-                {
-                  "objID": "362cfb3a-aaf4-49f4-b1d3-8ee68e8e0115",
-                  "eventName": "PRESSED",
-                  "handlerType": "action",
-                  "action": "mainEventDispatcher",
-                  "userData": 0
-                }
-              ],
-              "identifier": "syncPicButton",
-              "leftUnit": "px",
-              "topUnit": "px",
-              "widthUnit": "px",
-              "heightUnit": "px",
-              "children": [
-                {
-                  "objID": "f5a340df-8cca-46fd-a97e-3b2dc8c076dd",
-                  "type": "LVGLLabelWidget",
-                  "left": 0,
-                  "top": 0,
-                  "width": 108,
-                  "height": 30,
-                  "customInputs": [],
-                  "customOutputs": [],
-                  "style": {
-                    "objID": "0eae5bed-2f01-4f7e-b432-6a2710f5d0fe",
-                    "useStyle": "default",
-                    "conditionalStyles": [],
-                    "childStyles": []
-                  },
-                  "timeline": [],
-                  "eventHandlers": [],
-                  "leftUnit": "px",
-                  "topUnit": "px",
-                  "widthUnit": "content",
-                  "heightUnit": "content",
-                  "children": [],
-                  "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-                  "hiddenFlagType": "literal",
-                  "clickableFlagType": "literal",
-                  "flagScrollbarMode": "",
-                  "flagScrollDirection": "",
-                  "scrollSnapX": "",
-                  "scrollSnapY": "",
-                  "checkedStateType": "literal",
-                  "disabledStateType": "literal",
-                  "states": "",
-                  "localStyles": {
-                    "objID": "538bcdba-169c-42ef-d871-028a9ad2f365",
-                    "definition": {
-                      "MAIN": {
-                        "DEFAULT": {
-                          "align": "CENTER",
-                          "text_font": "MONTSERRAT_28"
-                        }
-                      }
-                    }
-                  },
-                  "group": "",
-                  "groupIndex": 0,
-                  "text": "# Login",
-                  "textType": "literal",
-                  "longMode": "WRAP",
-                  "recolor": false
-                }
-              ],
-              "widgetFlags": "GESTURE_BUBBLE|PRESS_LOCK|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_ON_FOCUS|SCROLL_WITH_ARROW|SNAPPABLE",
-              "hiddenFlagType": "literal",
-              "clickableFlag": true,
-              "clickableFlagType": "literal",
-              "flagScrollbarMode": "",
-              "flagScrollDirection": "",
-              "scrollSnapX": "",
-              "scrollSnapY": "",
-              "checkedStateType": "literal",
-              "disabledStateType": "literal",
-              "states": "",
-              "useStyle": "button_default",
-              "localStyles": {
-                "objID": "f2242931-234c-4f32-ee4e-0c4b6ac08334",
                 "definition": {
                   "MAIN": {
                     "FOCUSED": {
