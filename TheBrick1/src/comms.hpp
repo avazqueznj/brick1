@@ -517,7 +517,7 @@ public:
             Serial.println("!!!!! POST FAILED !!!!!");
             Serial.println("RAW RESPONSE:");
             Serial.println(response);
-            // No more vague messages. Throw the actual bad response.
+
             throw std::runtime_error("Transmission error!" ); 
         }
 
@@ -601,7 +601,7 @@ public:
 
             unsigned long timeout = millis();
             while (client.available() == 0) {                
-                if (millis() - timeout > 5000 ){ // shorten bcs stupid replit issue with errors
+                if (millis() - timeout > 10000 ){ // shorten bcs stupid replit issue with errors
                     Serial.println("[UPLOAD] REPLIT ISSUSE!!!! NO RESPONSE -> IGNORE FOR NOW  !!!!!!!!!!!!!!"); 
                     return true;
                 }

@@ -1163,16 +1163,22 @@ public:
             // Check if not submitted (pending)
             if (status != INSP_SUBMIT_OK) {
 
-                String EDI, inspectionText;
+                String EDI = ""; 
+                String inspectionText = "";
                 bool inInspection = true;
                 for (size_t j = 0; j < file.size(); ++j) {
                     if (inInspection) {
                         EDI += file[j] + "\n";
-                        if (file[j].startsWith("END")) inInspection = false;
+                        if (file[j].startsWith("END2***")) inInspection = false;
                     } else {
                         inspectionText += file[j] + "\n";
                     }
                 }
+
+                if(inspectionText==""){
+                    throw std::runtime_error("ERROR: Could not parse inspection record, end not found");
+                }
+
                 // Remove trailing newlines if needed
                 EDI.trim();
                 inspectionText.trim();

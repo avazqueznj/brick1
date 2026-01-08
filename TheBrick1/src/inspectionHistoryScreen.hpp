@@ -322,7 +322,7 @@ public:
         Serial.println( "Override Modal event " + modalActionTouch + ":" + button );
 
         if( modalActionTouch == "Submit" && button == "Ok" ){
-            doSubmitInspection();
+            doReSubmitInspection();
         }
 
     }
@@ -333,7 +333,7 @@ public:
         Serial.println( "Inspection modal key " + modalAction + ":" + key );
 
         if( modalAction == "Submit" && key == "#" ){
-            doSubmitInspection();
+            doReSubmitInspection();
         }
 
     }        
@@ -398,7 +398,12 @@ public:
 
                     inspectionTEXT += "\n";
 
+                    Serial.println("========================");
                     Serial.println(inspectionTEXT.c_str());
+                    Serial.println("========================");
+                    Serial.println(inspectionEDI.c_str());
+                    Serial.println("========================");
+                    
                     lv_textarea_set_text(objects.inspection_view, inspectionTEXT.c_str());
 
                     lv_textarea_set_cursor_pos(objects.inspection_view, 0); // Cursor at very start
@@ -420,7 +425,7 @@ public:
 
     }
 
-    void doSubmitInspection(){
+    void doReSubmitInspection(){
 
         Serial.println("Submit ...");
         spinnerStart();
