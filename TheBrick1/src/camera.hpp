@@ -61,6 +61,7 @@ struct BucketHeader {
 #define GC9A01A_YELLOW 0xFFE0
 #define ALIGN_PTR(p,a)   ((p & (a-1)) ?(((uintptr_t)p + a) & ~(uintptr_t)(a-1)) : p)
 #define HTONS(x) (((x >> 8) & 0x00FF) | ((x << 8) & 0xFF00))
+#define CALIBRATION_SHOTS 15
 
 class cameraClass {
 public:
@@ -184,7 +185,7 @@ public:
 
         // let it figure the picture exposure and all that
         Serial.println("[LOG] Pumping frames to adjust AEC/AGC...");
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < CALIBRATION_SHOTS; i++) {
             // If this returns -1, the DCMI is timed out.
             if (cam.grabFrame(fb, 1000) != 0) {
                 Serial.print("[WARN] Adjustment ERROR at frame "); Serial.println(i);
