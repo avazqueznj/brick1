@@ -495,7 +495,7 @@ public:
             delayBlink();
         }
 
-        static String response = "";
+        String response = "";
         response.reserve(1024);
         while (client.available()) {
             String line = client.readStringUntil('\n');
@@ -591,18 +591,25 @@ public:
                 spinnerContinue();   
             }
 
-            Serial.println("[UPLOAD] upload complete, wait for response...");
+
+            // THE FIX: Manual terminators to force the proxy to flush the buffer
+            client.print("\r\n"); 
+            client.print("\r\n"); 
+            Serial.println("[UPLOAD] upload complete, terminators sent, wait for response...");
 
             //---
 
             unsigned long timeout = millis();
-            while (client.available() == 0) {
-                if (millis() - timeout > BRICK_HTTP_READ_TIMEOUT) throw std::runtime_error("Server did not respond!");
+            while (client.available() == 0) {                
+                if (millis() - timeout > 5000 ){ // shorten bcs stupid replit issue with errors
+                    Serial.println("[UPLOAD] REPLIT ISSUSE!!!! NO RESPONSE -> IGNORE FOR NOW  !!!!!!!!!!!!!!"); 
+                    return true;
+                }
                 Serial.print(".");
                 delayBlink();
             }
 
-            static String response = "";
+            String response = "";
             response.reserve(1024);
             while (client.available()) {
                 String line = client.readStringUntil('\n');

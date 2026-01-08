@@ -699,6 +699,7 @@ public:
 
                     if( (*id) != "NONE" ){
                         cameraClass::getInstance()->zapJPGfromWarehouse( *id );
+                        (*id) = "NONE";
                     }
                     
                 }catch( std::runtime_error& error ){
