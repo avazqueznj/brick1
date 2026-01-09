@@ -544,14 +544,14 @@ public:
             client.connect(serverURL, ssid, pass);
             spinnerContinue();
 
+            long cacheBust = random(10000, 99999); 
+            String fullPath = path + "?bust=" + String(cacheBust);
+
             Serial.println("==============================");
-            Serial.println("[UPLOAD] Starting Binary POST");
+            Serial.print("[UPLOAD] Starting Binary POST ");Serial.println(fullPath);
             Serial.print("[UPLOAD] PK: "); Serial.println(uuid);
             Serial.print("[UPLOAD] Size: "); Serial.print(len); Serial.println(" bytes");
             Serial.println("==============================");
-
-long cacheBust = random(10000, 99999); 
-String fullPath = path + "?bust=" + String(cacheBust);
             
             // 1. Send Request Line
             client.print("POST " + fullPath + " HTTP/1.1\r\n");
