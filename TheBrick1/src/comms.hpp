@@ -203,14 +203,10 @@ public:
     String ssid = "irazu2G";
     String pass = "casiocasio";
 
+    commsClass(){}
+    virtual ~commsClass(){}
 
-
-    commsClass(){
-    }
-  
-    virtual ~commsClass(){
-    }
-
+    //---------------------------------------------------------------
 
     uint8_t* GETImageToSDRAM(
         String serverURL,
@@ -382,6 +378,9 @@ public:
         }
     }    
 
+
+    //---------------------------------------------------------------
+
     void GET( String serverURL, String ssid, String pass, String path, std::vector<String>& response ){
             
         SSLClient client;
@@ -461,8 +460,9 @@ public:
         Serial.println( "Wifi shutting down via RAII destructor ***" );            
     }
 
-
-   String POST(String serverURL, String ssid, String pass, String path, const String& payload) {
+    //---------------------------------------------------------------
+    
+    String POST(String serverURL, String ssid, String pass, String path, const String& payload) {
         Serial.println("POSTing to server...");
         SSLClient client;
         client.connect(serverURL, ssid, pass);
@@ -524,9 +524,9 @@ public:
         return response;
     }
 
-   // --+
-   
-   bool POSTRawBinary(
+    //---------------------------------------------------------------
+   #define POST_JPG_AK_TIMEOUT 10000
+   bool POSTJPEG(
     String serverURL, String ssid, String pass, String path,
     const String& uuid, 
     uint8_t type, 
@@ -582,7 +582,7 @@ public:
                     // Buffer full or hardware busy
                     attempts++;
                     delay(50); // Give the radio a serious gap to clear the 16KB record
-                    Serial.print("!"); // Visual indicator of a "Wait" state
+                    Serial.print("."); // Visual indicator of a "Wait" state
                     if (attempts > 100){
                         Serial.println("Socket stalled writting");
                         throw std::runtime_error("Socket stalled for too long at " + std::to_string(totalWritten));
@@ -601,9 +601,8 @@ public:
 
             unsigned long timeout = millis();
             while (client.available() == 0) {                
-                if (millis() - timeout > 10000 ){ // shorten bcs stupid replit issue with errors
-                    Serial.println("[UPLOAD] REPLIT ISSUSE!!!! NO RESPONSE -> IGNORE FOR NOW  !!!!!!!!!!!!!!"); 
-                    return true;
+                if (millis() - timeout > POST_JPG_AK_TIMEOUT ){ // shorten bcs stupid replit issue with errors
+                    throw std::runtime_error("[UPLOAD] NO AK! , ABORT !!!!!!!!!!!!!!");                     
                 }
                 Serial.print(".");
                 delayBlink();
@@ -618,16 +617,22 @@ public:
                 delayBlink();
             }
 
-            if (response.indexOf("200 OK") != -1 || response.indexOf("409 Conflict") != -1) {
-                Serial.print("[UPLOAD] Final Result: "); Serial.println(response);
+            // all of hthe below will zap the picures
+
+            if (response.indexOf("200 OK") != -1 ) {
+                Serial.print("[UPLOAD] 200 SUCCESS Final Result: "); Serial.println(response);
                 return true;
             }
+
+            if (response.indexOf("409 Conflict") != -1) {
+                Serial.print("[UPLOAD] << 409 DUPLICATED >> "); Serial.println(response);
+                return true;
+            }            
             
-            if (response.startsWith("HTTP/1.1 ")) {
-                throw std::runtime_error("Server rejected upload: " + std::string(response.c_str()));
-            }
-                
-            throw std::runtime_error(String(  "Response error" + response ).c_str());
+
+            Serial.print("ERROR!!!! Server rejected upload, NO RETRY! "); Serial.println(response);
+            return true;                
+
 
         } catch (const std::exception& e) {
             String chainMsg = "SYNC_EXCEPTION [" + uuid + "] -> " + String(e.what());

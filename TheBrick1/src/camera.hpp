@@ -220,7 +220,7 @@ public:
 
     // ----------------------------------------
 
-
+    // obsoleted with jpg encoding but keep to debug/see sensor output
     void renderPicFromPixSDRAMXXX() {
         Serial.println("[LOG] Render pic.");
 
@@ -284,7 +284,9 @@ public:
         Serial.println("[LOG] Render pic ... done");        
     }
 
-    size_t encodePixelsToJPG(int quality = 80) {
+    //---------------------------------------------------------------
+
+    size_t encodePixelsToJPG() {
         Serial.println("[LOG] Starting JPEG Compression...");
         
         // 1. Open the encoder directly to your SDRAM landing zone
@@ -297,9 +299,7 @@ public:
         // 2. Initialize the encode process
         JPEGENCODE jpe; 
         // Quality: 0=Best, 1=High, 2=Med, 3=Low
-        uint8_t q = JPEGE_Q_HIGH;
-        if (quality < 50) q = JPEGE_Q_MED;
-
+        uint8_t q = JPEGE_Q_BEST;
         rc = jpg.encodeBegin(&jpe, 640, 480, JPEGE_PIXEL_RGB565, JPEGE_SUBSAMPLE_444, q);
         if (rc != JPEGE_SUCCESS) {
             Serial.print("[ERROR] encodeBegin failed: "); Serial.println(rc);
@@ -426,6 +426,8 @@ public:
             uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
         return String(buf);
     }
+
+    //---------------------------------------------------------------
 
     int findBucketIndex(String targetUUID = "") {
         mbed::BlockDevice* bd = mbed::BlockDevice::get_default_instance();
@@ -652,6 +654,8 @@ public:
         Serial.println("------------------------------------------\n");
     }
 
+    //---------------------------------------------------------------
+
     std::vector<WarehouseItem> getWarehouseInventory(uint32_t filterType = 0) {
         Serial.println("------------------------------------------");
         Serial.print("[WAREHOUSE] Scanning for Type: "); 
@@ -719,7 +723,10 @@ public:
         return inventory;
     }
 
-    
+    //---------------------------------------------------------------
+    //---------------------------------------------------------------
+    //---------------------------------------------------------------
+
     int syncUserPics(commsClass* comms, String serverURL, String path ) {
 
         Serial.print("SYNC USER PICS ===================== ");
@@ -759,7 +766,7 @@ public:
 
                     // 3. The Upload 
                     // We use the credentials already held by the comms object
-                    comms->POSTRawBinary(
+                    comms->POSTJPEG(
                         serverURL, comms->ssid, comms->pass, path,
                         item.uuid, 
                         (uint8_t)item.type, 
@@ -791,5 +798,6 @@ public:
         }
     }
 
+    //---------------------------------------------------------------
 
 };
