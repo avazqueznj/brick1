@@ -550,8 +550,11 @@ public:
             Serial.print("[UPLOAD] Size: "); Serial.print(len); Serial.println(" bytes");
             Serial.println("==============================");
 
+long cacheBust = random(10000, 99999); 
+String fullPath = path + "?bust=" + String(cacheBust);
+            
             // 1. Send Request Line
-            client.print("POST " + path + " HTTP/1.1\r\n");
+            client.print("POST " + fullPath + " HTTP/1.1\r\n");
             
             // 2. Send Headers
             client.print("Host: " + serverURL + "\r\n");
