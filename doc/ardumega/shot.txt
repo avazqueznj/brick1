@@ -1,0 +1,126 @@
+#include <Arduino.h>
+#include <SPI.h>
+#include <Arducam_Mega.h>
+
+static constexpr int CAM_CS = 10;
+
+// Per your startup discipline: avoid global objects that might touch hardware.
+// This constructor is light, but we'll still allocate after SPI is up.
+Arducam_Mega* cam = nullptr;
+
+static void halt(const char* msg) {
+  Serial.println(msg);
+  while (true) { delay(1000); }
+}
+
+static void printHexLine(const uint8_t* buf, size_t n) {
+  for (size_t i = 0; i < n; ++i) {
+    if (buf[i] < 0x10) Serial.print('0');
+    Serial.print(buf[i], HEX);
+    Serial.print(' ');
+  }
+  Serial.println();
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(400);
+
+  Serial.println("\n--- ArduCAM MEGA B0400 test (GIGA / inner SPI header) ---");
+
+  pinMode(CAM_CS, OUTPUT);
+  digitalWrite(CAM_CS, HIGH); // deselect
+
+  // Inner 2×3 SPI header: your RFID already proved this works with SPI.begin()
+  SPI.begin();
+
+  // Set a stable SPI mode/speed. Start conservative. If your harness is long, try 4MHz.
+  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+
+  cam = new Arducam_Mega(CAM_CS);
+
+  CamStatus st = cam->begin();
+  if (st != CAM_ERR_SUCCESS) {
+    Serial.print("cam->begin() failed, status=");
+    Serial.println((int)st);
+    halt("Camera init failed.");
+  }
+
+  Serial.println("Camera init OK.");
+}
+
+void loop() {
+  // 3MP B0400: 2048x1536 = QXGA. For quicker test, try VGA.
+  const CAM_IMAGE_MODE mode = CAM_IMAGE_MODE_QXGA;     // 2048x1536
+  const CAM_IMAGE_PIX_FMT fmt = CAM_IMAGE_PIX_FMT_JPG; // JPEG
+
+  Serial.println("\nTaking picture...");
+  CamStatus st = cam->takePicture(mode, fmt);
+  if (st != CAM_ERR_SUCCESS) {
+    Serial.print("takePicture failed, status=");
+    Serial.println((int)st);
+    delay(2000);
+    return;
+  }
+
+  const uint32_t total = cam->getTotalLength();       // total JPEG bytes
+  uint32_t remaining = cam->getReceivedLength();      // remaining bytes to read
+
+  Serial.print("JPEG total bytes = ");
+  Serial.println(total);
+
+  if (remaining < 4) {
+    Serial.println("JPEG too small / no data.");
+    delay(2000);
+    return;
+  }
+
+  // Read first 32 bytes
+  uint8_t first[32];
+  const uint8_t firstN = (remaining < sizeof(first)) ? (uint8_t)remaining : (uint8_t)sizeof(first);
+  for (uint8_t i = 0; i < firstN; ++i) {
+    first[i] = cam->readByte();
+  }
+
+  Serial.print("First ");
+  Serial.print(firstN);
+  Serial.println(" bytes:");
+  printHexLine(first, firstN);
+
+  // Skip to last 16 bytes (without dumping entire JPEG)
+  const uint32_t lastN = 16;
+  remaining = cam->getReceivedLength();
+
+  if (remaining > lastN) {
+    uint8_t tmp[255];
+    while (cam->getReceivedLength() > lastN) {
+      uint32_t toDrop = cam->getReceivedLength() - lastN;
+      uint8_t chunk = (toDrop > sizeof(tmp)) ? (uint8_t)sizeof(tmp) : (uint8_t)toDrop;
+      (void)cam->readBuff(tmp, chunk); // discard
+    }
+  }
+
+  // Read last 16 bytes
+  uint8_t last[16];
+  uint8_t gotLast = 0;
+  while (cam->getReceivedLength() > 0 && gotLast < lastN) {
+    last[gotLast++] = cam->readByte();
+  }
+
+  Serial.print("Last ");
+  Serial.print(gotLast);
+  Serial.println(" bytes:");
+  printHexLine(last, gotLast);
+
+  // Sanity: JPEG usually starts FF D8 and ends FF D9
+  if (firstN >= 2) {
+    Serial.print("JPEG SOI (expect FF D8): ");
+    Serial.print(first[0], HEX); Serial.print(" "); Serial.println(first[1], HEX);
+  }
+  if (gotLast >= 2) {
+    Serial.print("JPEG EOI (expect FF D9): ");
+    Serial.print(last[gotLast-2], HEX); Serial.print(" "); Serial.println(last[gotLast-1], HEX);
+  }
+
+  delay(5000);
+}
