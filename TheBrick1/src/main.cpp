@@ -11,7 +11,7 @@
 
 
 // main switches 
-#define FEATURE_RFID   1  
+#define FEATURE_RFID   0  
 
 #include <Arduino.h>
 #include "mbed.h"
@@ -27,6 +27,10 @@
 #endif
 #include "RTClib.h"
 #include <TJpg_Decoder.h>
+#include <Arducam_Mega.h>
+
+static constexpr int MEGA_CS = 10; // since RFID is gone you can use D10
+Arducam_Mega* megaCam = nullptr;
 
 // jpeg decoding stuff
 static uint16_t* jpg_fb = NULL;
@@ -125,16 +129,15 @@ mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
 // machine to machin token
 String BEARER_TOKEN = "";
 
-// RFID Pins
-bool isRFIDup = false;
-#define SS_PIN 10  // SDA pin on RC522
-#define RST_PIN 9  // Back to D9 for RST
 
 // managers
 Arduino_H7_Video* Display = nullptr;
 Arduino_GigaDisplayTouch* TouchDetector = nullptr;
 RTC_DS3231* rtc = nullptr;
 #if FEATURE_RFID
+  bool isRFIDup = false;
+  #define SS_PIN 10  // SDA pin on RC522
+  #define RST_PIN 9  // Back to D9 for RST
   MFRC522* mfrc522 = nullptr;
 #endif
 stateManagerClass* stateManager = nullptr;  
@@ -302,6 +305,8 @@ void setup() {
     pinMode(colPins[i], INPUT);
   }
 
+//#####################################################################
+
   // JPEG decoder memory
   jpg_io_buf = (uint8_t*) SDRAM.malloc(JPG_IO_BUF_SIZE);
   if (!jpg_io_buf) {
@@ -333,6 +338,25 @@ void setup() {
   TJpgDec.setCallback(jpg_to_fb);
   TJpgDec.setJpgScale(1);
   TJpgDec.setSwapBytes(false);
+
+//#####################################################################
+
+Serial.println("MEGA CAM init...");
+megaCam = new Arducam_Mega(MEGA_CS);
+
+CamStatus cs = megaCam->begin();
+Serial.print("MEGA begin status: ");
+Serial.println((int)cs);
+
+if (cs != CAM_ERR_SUCCESS) {
+  sosHALT("MEGA camera init failed");
+}
+Serial.println("MEGA camera OK");
+
+
+//#####################################################################
+
+
 
   // done!!!!
   startedUp = true;
