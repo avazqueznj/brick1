@@ -120,7 +120,7 @@ private:
     uint8_t* jpegWorkSpace;     // Encoder's scratchpad
     uint8_t* jpegBuffer;        // Landing zone for finished JPG
     size_t lastJpegSize = 0;
-    const size_t MAX_JPG_SIZE = 256 * 1024; // 128KB is plenty for 640x480
+    const size_t MAX_JPG_SIZE = 128 * 1024; // 128KB is plenty for 640x480
 
     String currentPK;
 
@@ -799,82 +799,5 @@ public:
     }
 
     //---------------------------------------------------------------
-
-        // === ArduCAM MEGA (SPI) VGA shot into jpegBuffer (SDRAM) ===
-    size_t shootMegaJpegToSDRAM(Arducam_Mega& mega) {
-
-        if (!jpegBuffer) {
-            throw std::runtime_error("MEGA: jpegBuffer is null");
-        }
-
-        Serial.println("[MEGA] Taking VGA JPEG...");
-
-        // Camera transaction (SPI mode0)
-        SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-        CamStatus st = mega.takePicture(CAM_IMAGE_MODE_VGA, CAM_IMAGE_PIX_FMT_JPG);
-        SPI.endTransaction();
-
-        if (st != CAM_ERR_SUCCESS) {
-            Serial.print("[MEGA] takePicture failed: ");
-            Serial.println((int)st);
-            throw std::runtime_error("MEGA: takePicture failed");
-        }
-
-        uint32_t total = mega.getTotalLength();
-        Serial.print("[MEGA] JPEG total bytes: ");
-        Serial.println(total);
-
-        if (total == 0) throw std::runtime_error("MEGA: zero-length JPEG");
-        if (total > MAX_JPG_SIZE) {
-            Serial.print("[MEGA] JPEG exceeds MAX_JPG_SIZE: ");
-            Serial.println(total);
-            throw std::runtime_error("MEGA: increase MAX_JPG_SIZE or reduce mode");
-        }
-
-        // Read FIFO into SDRAM jpegBuffer
-        uint32_t copied = 0;
-
-        SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-        while (copied < total) {
-            uint32_t left = total - copied;
-            uint8_t n = (left > 255) ? 255 : (uint8_t)left;
-
-            uint8_t got = mega.readBuff(jpegBuffer + copied, n);
-            if (got == 0) break;
-            copied += got;
-        }
-        SPI.endTransaction();
-
-        if (copied != total) {
-            Serial.print("[MEGA] FIFO read incomplete. copied=");
-            Serial.print(copied);
-            Serial.print(" total=");
-            Serial.println(total);
-            throw std::runtime_error("MEGA: FIFO read incomplete");
-        }
-
-        // Validate SOI
-        if (!(jpegBuffer[0] == 0xFF && jpegBuffer[1] == 0xD8)) {
-            throw std::runtime_error("MEGA: invalid JPEG (missing FF D8)");
-        }
-
-        // If it doesn't fit warehouse slot, allow display but do not save.
-        try {
-            setLastJpegSize((size_t)total);
-        } catch (...) {
-            lastJpegSize = (size_t)total;
-            Serial.println("[MEGA] WARN: too big for warehouse slot; display-only.");
-        }
-
-        Serial.println("[MEGA] JPEG stored in SDRAM OK.");
-        return (size_t)total;
-    }
-
-    // Capture + decode + render using your existing TJpgDec pipeline
-    void shootMegaDecodeAndRender(lv_obj_t* jpg_holder, Arducam_Mega* mega) {
-        shootMegaJpegToSDRAM(*mega);
-        renderJpegFromSDRAM(jpg_holder);
-    }
-
 
 };

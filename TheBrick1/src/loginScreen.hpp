@@ -137,20 +137,6 @@ public:
         }
 
 
-
-if (target == objects.test2 ){
-
-    cameraClass* camera = cameraClass::getInstance();
-
-    camera->shootMegaDecodeAndRender(jpg_holder, megaCam);
-
-
-}
-
-
-
-
-
 // if (target == objects.sync_pic_button ){
 
 //     try{
