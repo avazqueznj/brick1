@@ -799,5 +799,69 @@ public:
     }
 
     //---------------------------------------------------------------
+    // Assumes miniCam (ArduCAM*), jpg_fb (framebuffer), jpg_dsc (LVGL desc) are available in your scope.
+
+    void takeAndRenderMiniJpeg(lv_obj_t* jpg_holder = nullptr) {
+        // 1. Capture JPEG to internal buffer
+        miniCam->flush_fifo();
+        miniCam->clear_fifo_flag();
+        miniCam->start_capture();
+        uint32_t t0 = millis();
+        while (!miniCam->get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+            if (millis() - t0 > 6000) {
+                Serial.println("[MiniCAM] Timeout!");
+                return;
+            }
+            delay(2);
+        }
+        uint32_t len = miniCam->read_fifo_length();
+        if (len < 100 || len > 128 * 1024) {
+            Serial.print("[MiniCAM] JPEG size suspicious: ");
+            Serial.println(len);
+            return;
+        }
+        uint8_t* jpegBuf = (uint8_t*) SDRAM.malloc(len);
+        if (!jpegBuf) {
+            Serial.println("[MiniCAM] JPEG malloc failed");
+            return;
+        }
+        miniCam->CS_LOW();
+        SPI.transfer(BURST_FIFO_READ);
+        for (uint32_t i = 0; i < len; i++) jpegBuf[i] = SPI.transfer(0x00);
+        miniCam->CS_HIGH();
+
+        // 2. Clear framebuffer
+        memset(jpg_fb, 0, JPG_W * JPG_H * 2);
+
+        // 3. Decode JPEG into framebuffer
+        int16_t realW = 0, realH = 0;
+        if (TJpgDec.getJpgSize((uint16_t*)&realW, (uint16_t*)&realH, jpegBuf, len)) {
+            Serial.print("[MiniCAM] Decoding JPEG: ");
+            Serial.print(realW); Serial.print("x"); Serial.println(realH);
+        } else {
+            Serial.println("[MiniCAM] JPEG header parse failed, forcing 640x480.");
+            realW = 640; realH = 480;
+        }
+        int16_t x = (JPG_W - realW) / 2;
+        int16_t y = (JPG_H - realH) / 2;
+        TJpgDec.drawJpg(x, y, jpegBuf, len);
+
+        SDRAM.free(jpegBuf);
+
+        // 4. Show on LVGL
+        if (jpg_holder == nullptr) {
+            jpg_holder = lv_img_create(lv_scr_act());
+            lv_obj_add_flag(jpg_holder, LV_OBJ_FLAG_CLICKABLE);
+            lv_obj_add_event_cb(jpg_holder, [](lv_event_t* e) {
+                lv_obj_t* obj = lv_event_get_target(e);
+                lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+                Serial.println("[UI] MiniCAM Photo Hidden.");
+            }, LV_EVENT_CLICKED, nullptr);
+        }
+        lv_img_set_src(jpg_holder, &jpg_dsc);
+        lv_obj_center(jpg_holder);
+        lv_obj_clear_flag(jpg_holder, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_move_foreground(jpg_holder);
+    }
 
 };

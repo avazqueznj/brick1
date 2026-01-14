@@ -11,7 +11,7 @@
 
 
 // main switches 
-#define FEATURE_RFID   1  
+#define FEATURE_RFID   0  
 
 #include <Arduino.h>
 #include "mbed.h"
@@ -27,6 +27,27 @@
 #endif
 #include "RTClib.h"
 #include <TJpg_Decoder.h>
+
+// ardumini
+#include <ArduCAM.h>
+#define MINICAM_CS_PIN 10
+ArduCAM* miniCam = nullptr;
+#ifdef JPEG
+#undef JPEG
+#endif
+
+#ifdef swap
+#undef swap
+#endif
+
+#ifdef OV7670
+#undef OV7670
+#endif
+
+#ifdef OV7675
+#undef OV7675
+#endif
+
 
 // jpeg decoding stuff
 static uint16_t* jpg_fb = NULL;
@@ -125,10 +146,6 @@ mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
 // machine to machin token
 String BEARER_TOKEN = "";
 
-// RFID Pins
-bool isRFIDup = false;
-#define SS_PIN 10  // SDA pin on RC522
-#define RST_PIN 9  // Back to D9 for RST
 
 // managers
 Arduino_H7_Video* Display = nullptr;
@@ -136,6 +153,9 @@ Arduino_GigaDisplayTouch* TouchDetector = nullptr;
 RTC_DS3231* rtc = nullptr;
 #if FEATURE_RFID
   MFRC522* mfrc522 = nullptr;
+  bool isRFIDup = false;
+  #define SS_PIN 10  // SDA pin on RC522
+  #define RST_PIN 9  // Back to D9 for RST
 #endif
 stateManagerClass* stateManager = nullptr;  
 
@@ -362,7 +382,18 @@ void setup() {
   }  
 
 
-  //_-------------------------------------------------------------------
+  //-----------------------------------------------------------------
+
+  // In setup(), after SDRAM/LVGL/SPI:
+pinMode(MINICAM_CS_PIN, OUTPUT); digitalWrite(MINICAM_CS_PIN, HIGH);
+miniCam = new ArduCAM(OV2640, MINICAM_CS_PIN);
+delay(200);
+miniCam->set_format(1);
+miniCam->InitCAM();
+miniCam->OV2640_set_JPEG_size(OV2640_640x480); // or higher if you want
+delay(200);
+
+  //------------------------------------------------------------------
 
   Serial.println("Started !!!!");
 }
@@ -773,7 +804,6 @@ void loop() {
       sosHALT(  "FATAL: " + String( e.what() )  );
     }
   }
-      
 
 }
 
