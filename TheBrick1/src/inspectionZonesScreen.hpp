@@ -698,7 +698,7 @@ public:
                 try{
 
                     if( (*id) != "NONE" ){
-                        cameraClass::getInstance()->zapJPGfromWarehouse( *id );
+                        cameraManagerClass::getInstance()->zapJPGfromWarehouse( *id );
                         (*id) = "NONE";
                     }
                     
@@ -708,10 +708,9 @@ public:
                 }
                 
 
-                cameraClass::getInstance()->shootToPixSDRAM();        
-                cameraClass::getInstance()->encodePixelsToJPG();
-                cameraClass::getInstance()->renderJpegFromSDRAM( jpg_holder );
-                *id = cameraClass::getInstance()->saveJPGSDRAMToWarehouse();
+                cameraManagerClass::getInstance()->shoot();                        
+                cameraManagerClass::getInstance()->displayJpegFromSDRAM( jpg_holder );
+                *id = cameraManagerClass::getInstance()->saveJPGSDRAMToWarehouse();
                 lv_obj_clear_state(pic_view1, LV_STATE_DISABLED);
                 lv_obj_clear_state(pic_del1, LV_STATE_DISABLED);
                 spinnerEnd();
@@ -729,8 +728,8 @@ public:
             try{
 
                 spinnerStart();
-                cameraClass::getInstance()->loadJPGSDRAMFromWarehouse( *id );        
-                cameraClass::getInstance()->renderJpegFromSDRAM( jpg_holder );  
+                cameraManagerClass::getInstance()->loadJPGSDRAMFromWarehouse( *id );        
+                cameraManagerClass::getInstance()->displayJpegFromSDRAM( jpg_holder );  
                 spinnerEnd();              
 
             }catch( std::runtime_error& error ){
@@ -747,7 +746,7 @@ public:
             try{
 
                 spinnerStart();
-                cameraClass::getInstance()->zapJPGfromWarehouse( *id );
+                cameraManagerClass::getInstance()->zapJPGfromWarehouse( *id );
                 *id = "NONE";
                 lv_obj_add_state(pic_view1, LV_STATE_DISABLED);
                 lv_obj_add_state(pic_del1, LV_STATE_DISABLED);          
@@ -1391,7 +1390,7 @@ public:
 
     void init() override {
 
-        if( !cameraClass::getInstance()->cameraUp ){
+        if( !cameraManagerClass::getInstance()->cameraUp ){
             lv_obj_add_flag(  objects.take_pic, LV_OBJ_FLAG_HIDDEN);     
         }else{
             lv_obj_clear_flag(  objects.take_pic, LV_OBJ_FLAG_HIDDEN);     

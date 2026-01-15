@@ -48,7 +48,14 @@ struct BucketHeader {
     uint8_t padding[19];  // 19 bytes: Padding to reach 64
 };
 
+// JPEG decode    
+uint8_t* TJPGDECWorkSpace;     // Encoder's scratchpad
+uint8_t* TJPGDECBuffer;        // Landing zone for finished JPG
+size_t lastJpegSize = 0;
+const size_t MAX_JPG_SIZE = 128 * 1024; // 128KB is plenty for 640x480
 
+// JPEG encode
+JPEGENC JPGEncoder;
 
 #define IMAGE_MODE CAMERA_RGB565
 #define GC9A01A_CYAN 0x07FF
@@ -63,26 +70,15 @@ struct BucketHeader {
 #define HTONS(x) (((x >> 8) & 0x00FF) | ((x << 8) & 0xFF00))
 #define CALIBRATION_SHOTS 10
 
-class cameraClass {
+
+class cameraClass{
 public:
 
-    bool cameraUp = false;
+    cameraClass(){};
 
-    const uint16_t* getPixels(){
-        return pixels;
-    }
+    virtual ~cameraClass(){};
 
-    size_t getPixelsSize(){
-        return pixelsSize;
-    }
-
-    uint8_t* getJpegBuffer(){
-        return jpegBuffer;
-    }
-
-    size_t getLastJpegSize(){
-        return lastJpegSize;
-    }    
+    virtual void shoot() = 0;
 
     void setLastJpegSize(size_t size) {
         // 1. Minimum sanity check: No zero-byte ghosts
@@ -103,76 +99,40 @@ public:
         Serial.print("[WAREHOUSE] lastJpegSize updated: "); 
         Serial.print(size); 
         Serial.println(" bytes.");
-    }
+    }    
+};
 
-private:
+//----------------------------
 
-    // has
+class OV767cameraClass:public cameraClass{
+public:
+
     OV7670 ov767x;
     Camera cam;
-    
     FrameBuffer fb; 
     uint16_t* pixels;
     size_t pixelsSize = (640 * 480 * 2) + 32;
 
-    // JPEG stuff
-    JPEGENC jpg;
-    uint8_t* jpegWorkSpace;     // Encoder's scratchpad
-    uint8_t* jpegBuffer;        // Landing zone for finished JPG
-    size_t lastJpegSize = 0;
-    const size_t MAX_JPG_SIZE = 128 * 1024; // 128KB is plenty for 640x480
-
-    String currentPK;
-
-//---------------------------------------------------------------
-
-private:
-    cameraClass() : ov767x(),  cam(ov767x),  fb()           
+    OV767cameraClass() : ov767x(),  cam(ov767x),  fb()           
     {   
         Serial.println("[LOG] Cam mem init ...");
             
-        // Use the SDRAM directly, but keep the pointer honest
+        // OV7670 landing buffer
         uint8_t *raw_mem = (uint8_t *)SDRAM.malloc( pixelsSize );
         if (!raw_mem) throw std::runtime_error("CRITICAL: SDRAM Malloc failed!");    
         pixels = (uint16_t *)ALIGN_PTR((uintptr_t)raw_mem, 32);
         fb.setBuffer((uint8_t *)pixels);
 
-        // JPEG ==================
-        // 2. JPEG Landing Buffer (128KB)
-        jpegBuffer = (uint8_t *)SDRAM.malloc(MAX_JPG_SIZE);
-        if (!jpegBuffer) throw std::runtime_error("CRITICAL: SDRAM Malloc failed for JPEG Buffer!");
-
-        // 3. JPEG Workspace (The Encoder's "Engine Room" - ~32KB)
-        jpegWorkSpace = (uint8_t *)SDRAM.malloc(32000);
-        if (!jpegWorkSpace) throw std::runtime_error("CRITICAL: SDRAM Malloc failed for Workspace!");
-        // JPEG ==================         
-
         // start camera ==============================================
         Serial.println("[LOG] Starting Camera hardware...");
         if (!cam.begin(CAMERA_R640x480, IMAGE_MODE, 10)) {
-            Serial.println("HARDWARE ERROR: cam.begin failed!");
-            cameraUp = false;
-        }else{
-            cameraUp = true;
-        }       
-        
+            throw std::runtime_error( "HARDWARE ERROR: OV7670 cam.begin failed!");
+        }    
     }
 
+    virtual ~OV767cameraClass(){}
 
-
-public:
-
-
-    static cameraClass* getInstance() {
-        static cameraClass instance; 
-        return &instance;
-    }
-
-    void shootToPixSDRAM(){
-
-        if( !cameraUp ){
-            throw std::runtime_error("CAMERA ERROR: camera not ON.");
-        }
+    void shoot() override {
 
         // prepare blue buffer
         // get blue -> cam chip faield
@@ -216,12 +176,14 @@ public:
         Serial.println("[LOG] Cache sync complete.");
 
         // --   
-    }
 
-    // ----------------------------------------
+        encodePixelsToJPG();
+    }
+    
+    //============================================================
 
     // obsoleted with jpg encoding but keep to debug/see sensor output
-    void renderPicFromPixSDRAMXXX() {
+    void renderPicFromPixelsXXXXXXXXX() {
         Serial.println("[LOG] Render pic.");
 
         // 8. LVGL Descriptor
@@ -282,15 +244,16 @@ public:
         lv_obj_invalidate(cam_img_obj);
 
         Serial.println("[LOG] Render pic ... done");        
-    }
+    }  
+    
+    //----------------------------------------------------------
 
-    //---------------------------------------------------------------
 
     size_t encodePixelsToJPG() {
         Serial.println("[LOG] Starting JPEG Compression...");
         
         // 1. Open the encoder directly to your SDRAM landing zone
-        int rc = jpg.open(jpegBuffer, (int)MAX_JPG_SIZE);
+        int rc = JPGEncoder.open(TJPGDECBuffer, (int)MAX_JPG_SIZE);
         if (rc != JPEGE_SUCCESS) {
             Serial.println("[ERROR] JPEG Open failed!");
             return 0;
@@ -300,41 +263,172 @@ public:
         JPEGENCODE jpe; 
         // Quality: 0=Best, 1=High, 2=Med, 3=Low
         uint8_t q = JPEGE_Q_BEST;
-        rc = jpg.encodeBegin(&jpe, 640, 480, JPEGE_PIXEL_RGB565, JPEGE_SUBSAMPLE_444, q);
+        rc = JPGEncoder.encodeBegin(&jpe, 640, 480, JPEGE_PIXEL_RGB565, JPEGE_SUBSAMPLE_444, q);
         if (rc != JPEGE_SUCCESS) {
             Serial.print("[ERROR] encodeBegin failed: "); Serial.println(rc);
             return 0;
         }
 
         // 3. Encode the frame from your pixels SDRAM
-        rc = jpg.addFrame(&jpe, (uint8_t *)pixels, 640 * 2);
+        rc = JPGEncoder.addFrame(&jpe, (uint8_t *)pixels, 640 * 2);
         if (rc != JPEGE_SUCCESS) {
             Serial.println("[ERROR] addFrame failed!");
             return 0;
         }
 
         // 4. Close returns the final compressed size
-        lastJpegSize = (size_t)jpg.close();
+        setLastJpegSize( (size_t)JPGEncoder.close() );
         
         Serial.print("[LOG] Compression done. Size: ");
         Serial.println(lastJpegSize);
         
         return lastJpegSize;
     }
+    
+    //-----------------------------------------------------
+};
 
-    //---------------------------------------
 
-    void renderJpegFromSDRAM( lv_obj_t* jpg_holder  ) {
-        Serial.println("[PIC] renderJpegFromSDRAM (rendering from internal buffer)");
+// ===========================================================================
+
+class OV2640MiniCameraClass:public cameraClass{
+public:
+
+    #define MINICAM_CS_PIN 10
+    ArduCAM* miniCam = nullptr;
+
+    OV2640MiniCameraClass():cameraClass(){
+        pinMode(MINICAM_CS_PIN, OUTPUT); digitalWrite(MINICAM_CS_PIN, HIGH);
+        miniCam = new ArduCAM(OV2640, MINICAM_CS_PIN);
+        delay(200);
+        miniCam->set_format(1);
+        miniCam->InitCAM();
+        miniCam->OV2640_set_JPEG_size(OV2640_640x480);         
+    };
+
+    virtual ~OV2640MiniCameraClass(){};
+
+    void shoot() override {
+
+        // 1. Start capture to camera FIFO
+        miniCam->flush_fifo();
+        miniCam->clear_fifo_flag();
+        miniCam->start_capture();
+
+        uint32_t t0 = millis();
+        while (!miniCam->get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
+            if (millis() - t0 > 6000) {
+                Serial.println("[MiniCAM] Timeout!");
+                return;
+            }
+            delay(2);
+        }
+
+        // 2. Read JPEG length and check bounds
+        uint32_t len = miniCam->read_fifo_length();
+        if (len < 100 || len > MAX_JPG_SIZE) {
+            Serial.print("[MiniCAM] JPEG size suspicious: ");
+            Serial.println(len);
+            return;
+        }
+
+        // 3. Read JPEG bytes into TJPGDECBuffer (permanent SDRAM buffer)
+        miniCam->CS_LOW();
+        SPI.transfer(BURST_FIFO_READ);
+        for (uint32_t i = 0; i < len; i++) TJPGDECBuffer[i] = SPI.transfer(0x00);
+        miniCam->CS_HIGH();
+
+        setLastJpegSize(len); // Updates lastJpegSize, validates size, logs
+
+        Serial.println("[MiniCAM] Frame capture, decode, and display complete.");
+    }
+
+
+};
+
+// ===========================================================================
+
+class cameraManagerClass {
+public:
+
+    cameraClass* camera = NULL;
+    bool cameraUp = false;
+
+    uint8_t* getJpegBuffer(){
+        return TJPGDECBuffer;
+    }
+
+    size_t getLastJpegSize(){
+        return lastJpegSize;
+    }    
+
+private:
+
+    // misc
+    String currentPK;
+
+//---------------------------------------------------------------
+
+private:
+
+    // singleton!
+    cameraManagerClass()     
+    {   
+        Serial.println("[LOG] Cam mem init ...");
+            
+        // JPEG DECODE ==================
+        // 2. JPEG Landing Buffer (128KB)
+        TJPGDECBuffer = (uint8_t *)SDRAM.malloc(MAX_JPG_SIZE);
+        if (!TJPGDECBuffer) throw std::runtime_error("CRITICAL: SDRAM Malloc failed for JPEG Buffer!");    
+        TJPGDECWorkSpace = (uint8_t *)SDRAM.malloc(32000);
+        if (!TJPGDECWorkSpace) throw std::runtime_error("CRITICAL: SDRAM Malloc failed for Workspace!");
+        // JPEG DECODE ==================         
+        
+
+        // set to OV2640
+        setCamera( new OV2640MiniCameraClass() );
+    }
+
+
+    // singleton!! no need
+    // virtual ~cameraManagerClass(){}
+
+public:
+
+
+    static cameraManagerClass* getInstance() {
+        static cameraManagerClass instance; 
+        return &instance;
+    }
+
+    // ----------------------------------------
+
+    void setCamera( cameraClass* cameraParam ){
+        camera = cameraParam;
+        cameraUp = true;
+    }
+
+    void setLastJpegSize( size_t size ){
+        camera->setLastJpegSize( size );
+    }
+ 
+    void shoot(){
+        camera->shoot();
+    };
+
+    // ----------------------------------------
+
+    void displayJpegFromSDRAM( lv_obj_t* jpg_holder  ) {
+        Serial.println("[PIC] displayJpegFromSDRAM (rendering from internal buffer)");
 
         try {
             // 1. Safety Check
-            if (lastJpegSize == 0 || jpegBuffer == NULL) {
+            if (lastJpegSize == 0 || TJPGDECBuffer == NULL) {
                 throw std::runtime_error("NJ ERROR: No JPEG data available to show!");
             }
 
             // 2. Validate JPEG magic bytes (FF D8)
-            if (!(jpegBuffer[0] == 0xFF && jpegBuffer[1] == 0xD8)) {
+            if (!(TJPGDECBuffer[0] == 0xFF && TJPGDECBuffer[1] == 0xD8)) {
                 Serial.println("[FATAL] Memory buffer is NOT a valid JPEG");
                 return;
             }
@@ -349,7 +443,7 @@ public:
             int16_t  y  = 0;
 
             uint16_t realW = 0, realH = 0;
-            if (TJpgDec.getJpgSize(&realW, &realH, jpegBuffer, lastJpegSize)) {
+            if (TJpgDec.getJpgSize(&realW, &realH, TJPGDECBuffer, lastJpegSize)) {
                 jw = realW;
                 jh = realH;
                 Serial.print("[PIC] Header Parse Success: ");
@@ -367,11 +461,11 @@ public:
 
             // 4. Wipe the Framebuffer before decoding
             size_t fb_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
-            memset(jpg_fb, 0, fb_bytes);
+            memset(LVGLJPEGBuffer, 0, fb_bytes);
 
-            // 5. The Decode: Blast from jpegBuffer into jpg_fb
+            // 5. The Decode: Blast from TJPGDECBuffer into jpg_fb
             Serial.println("[PIC] Starting TJpgDec hardware blast...");
-            TJpgDec.drawJpg(x, y, jpegBuffer, lastJpegSize); 
+            TJpgDec.drawJpg(x, y, TJPGDECBuffer, lastJpegSize); 
             Serial.println("[PIC] Decode complete.");
 
             // 6. LVGL UI Update
@@ -489,7 +583,7 @@ public:
         Serial.print("[WAREHOUSE] SAVE INITIATED - TYPE: "); 
         Serial.println(type == BT_LAYOUT_PIC ? "LAYOUT" : "USER");
 
-        if (lastJpegSize == 0 || jpegBuffer == nullptr) {
+        if (lastJpegSize == 0 || TJPGDECBuffer == nullptr) {
             throw std::runtime_error("WAREHOUSE EXCEPTION: No image in RAM to save!");
         }
 
@@ -513,7 +607,7 @@ public:
         
         if (bd->erase(targetAddr, PIC_SLOT_SIZE) != 0) throw std::runtime_error("QSPI ERASE FAIL");
         if (bd->program((uint8_t*)&header, targetAddr, 64) != 0) throw std::runtime_error("QSPI HEADER FAIL");
-        if (bd->program(jpegBuffer, targetAddr + 64, header.length) != 0) throw std::runtime_error("QSPI DATA FAIL");
+        if (bd->program(TJPGDECBuffer, targetAddr + 64, header.length) != 0) throw std::runtime_error("QSPI DATA FAIL");
 
         bd->deinit();
         
@@ -550,7 +644,7 @@ public:
         currentPK = String(header.uuid);
 
         // Read data starting at +64
-        int rc = bd->read(jpegBuffer, targetAddr + 64, header.length);
+        int rc = bd->read(TJPGDECBuffer, targetAddr + 64, header.length);
         bd->deinit();
 
         if (rc != 0) throw std::runtime_error("QSPI READ FAIL");
@@ -752,7 +846,7 @@ public:
             int syncedPics = 0;
             for (auto& item : pending) {
                 try {
-                    // 2. Load from Silicon into SDRAM (Sets jpegBuffer and lastJpegSize)
+                    // 2. Load from Silicon into SDRAM (Sets TJPGDECBuffer and lastJpegSize)
                     loadJPGSDRAMFromWarehouse(item.uuid);             
                     
                     uint8_t* rawData = getJpegBuffer();
@@ -798,70 +892,6 @@ public:
         }
     }
 
-    //---------------------------------------------------------------
-    // Assumes miniCam (ArduCAM*), jpg_fb (framebuffer), jpg_dsc (LVGL desc) are available in your scope.
 
-    void takeAndRenderMiniJpeg(lv_obj_t* jpg_holder = nullptr) {
-        // 1. Capture JPEG to internal buffer
-        miniCam->flush_fifo();
-        miniCam->clear_fifo_flag();
-        miniCam->start_capture();
-        uint32_t t0 = millis();
-        while (!miniCam->get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
-            if (millis() - t0 > 6000) {
-                Serial.println("[MiniCAM] Timeout!");
-                return;
-            }
-            delay(2);
-        }
-        uint32_t len = miniCam->read_fifo_length();
-        if (len < 100 || len > 128 * 1024) {
-            Serial.print("[MiniCAM] JPEG size suspicious: ");
-            Serial.println(len);
-            return;
-        }
-        uint8_t* jpegBuf = (uint8_t*) SDRAM.malloc(len);
-        if (!jpegBuf) {
-            Serial.println("[MiniCAM] JPEG malloc failed");
-            return;
-        }
-        miniCam->CS_LOW();
-        SPI.transfer(BURST_FIFO_READ);
-        for (uint32_t i = 0; i < len; i++) jpegBuf[i] = SPI.transfer(0x00);
-        miniCam->CS_HIGH();
-
-        // 2. Clear framebuffer
-        memset(jpg_fb, 0, JPG_W * JPG_H * 2);
-
-        // 3. Decode JPEG into framebuffer
-        int16_t realW = 0, realH = 0;
-        if (TJpgDec.getJpgSize((uint16_t*)&realW, (uint16_t*)&realH, jpegBuf, len)) {
-            Serial.print("[MiniCAM] Decoding JPEG: ");
-            Serial.print(realW); Serial.print("x"); Serial.println(realH);
-        } else {
-            Serial.println("[MiniCAM] JPEG header parse failed, forcing 640x480.");
-            realW = 640; realH = 480;
-        }
-        int16_t x = (JPG_W - realW) / 2;
-        int16_t y = (JPG_H - realH) / 2;
-        TJpgDec.drawJpg(x, y, jpegBuf, len);
-
-        SDRAM.free(jpegBuf);
-
-        // 4. Show on LVGL
-        if (jpg_holder == nullptr) {
-            jpg_holder = lv_img_create(lv_scr_act());
-            lv_obj_add_flag(jpg_holder, LV_OBJ_FLAG_CLICKABLE);
-            lv_obj_add_event_cb(jpg_holder, [](lv_event_t* e) {
-                lv_obj_t* obj = lv_event_get_target(e);
-                lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
-                Serial.println("[UI] MiniCAM Photo Hidden.");
-            }, LV_EVENT_CLICKED, nullptr);
-        }
-        lv_img_set_src(jpg_holder, &jpg_dsc);
-        lv_obj_center(jpg_holder);
-        lv_obj_clear_flag(jpg_holder, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_move_foreground(jpg_holder);
-    }
 
 };

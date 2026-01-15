@@ -669,7 +669,7 @@ public:
                 int userPics = 0;
                 {
                     getInternalHeapFreeBytes();
-                    userPics = cameraClass::getInstance()->syncUserPics( 
+                    userPics = cameraManagerClass::getInstance()->syncUserPics( 
                         domainManagerClass::getInstance()->comms,  
                         domainManagerClass::getInstance()->serverURL,
                         "/api/device/upload_photo"
@@ -1005,7 +1005,7 @@ public:
 
             retryAllPendingInspections();
 
-            cameraClass::getInstance()->syncUserPics( 
+            cameraManagerClass::getInstance()->syncUserPics( 
                 domainManagerClass::getInstance()->comms,  
                 domainManagerClass::getInstance()->serverURL,
                 "/api/device/upload_photo"
@@ -1033,7 +1033,7 @@ public:
             result =  comms->POST( serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company,  EDI );
             updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
 
-            cameraClass::getInstance()->syncUserPics( 
+            cameraManagerClass::getInstance()->syncUserPics( 
                 domainManagerClass::getInstance()->comms,  
                 domainManagerClass::getInstance()->serverURL,
                 "/api/device/upload_photo"
@@ -1214,7 +1214,7 @@ public:
         int picsDeleted = 0;
 
         // 1) Get ONLY the layouts currently in silicon
-        std::vector<WarehouseItem> localLayouts = cameraClass::getInstance()->getWarehouseInventory(BT_LAYOUT_PIC);
+        std::vector<WarehouseItem> localLayouts = cameraManagerClass::getInstance()->getWarehouseInventory(BT_LAYOUT_PIC);
 
         // 2) Collect expected UUIDs from your layouts list
         Serial.println("Needed pics ->");
@@ -1238,7 +1238,7 @@ public:
             if (!found) {
                 Serial.print("Not needed!!! ZAP-> ");
                 Serial.println(local.uuid);
-                cameraClass::getInstance()->zapJPGfromWarehouse(local.uuid);
+                cameraManagerClass::getInstance()->zapJPGfromWarehouse(local.uuid);
                 picsDeleted++;
             }
         }
@@ -1276,11 +1276,11 @@ public:
                             throw std::runtime_error("SYNC EXCEPTION: Downloaded image exceeds warehouse slot size!");
                         }
 
-                        memcpy(cameraClass::getInstance()->getJpegBuffer(), img, imgLen);
-                        cameraClass::getInstance()->setLastJpegSize(imgLen);
+                        memcpy(cameraManagerClass::getInstance()->getJpegBuffer(), img, imgLen);
+                        cameraManagerClass::getInstance()->setLastJpegSize(imgLen);
                         
                         // Explicitly saving with the Server's UUID and Layout type
-                        cameraClass::getInstance()->saveJPGSDRAMToWarehouse(expectedUUID, BT_LAYOUT_PIC);
+                        cameraManagerClass::getInstance()->saveJPGSDRAMToWarehouse(expectedUUID, BT_LAYOUT_PIC);
                         
                         SDRAM.free(img);
                         img = NULL; // Clean pointer after free

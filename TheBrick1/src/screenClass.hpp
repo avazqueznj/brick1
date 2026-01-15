@@ -80,8 +80,8 @@ public:
         try {
 
             Serial.print("[PIC] load ... ");                        
-            cameraClass::getInstance()->loadJPGSDRAMFromWarehouse( path );
-            cameraClass::getInstance()->renderJpegFromSDRAM( jpg_holder );
+            cameraManagerClass::getInstance()->loadJPGSDRAMFromWarehouse( path );
+            cameraManagerClass::getInstance()->displayJpegFromSDRAM( jpg_holder );
 
         } catch (const std::exception& e) {
             Serial.println("==============================");

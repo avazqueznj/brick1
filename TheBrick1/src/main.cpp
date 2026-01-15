@@ -28,10 +28,8 @@
 #include "RTClib.h"
 #include <TJpg_Decoder.h>
 
-// ardumini
+// ardumini -------------------------------------
 #include <ArduCAM.h>
-#define MINICAM_CS_PIN 10
-ArduCAM* miniCam = nullptr;
 #ifdef JPEG
 #undef JPEG
 #endif
@@ -47,15 +45,18 @@ ArduCAM* miniCam = nullptr;
 #ifdef OV7675
 #undef OV7675
 #endif
+// ardumini -------------------------------------
+
 
 
 // jpeg decoding stuff
-static uint16_t* jpg_fb = NULL;
+static uint16_t* LVGLJPEGBuffer = NULL;
 static lv_img_dsc_t jpg_dsc;
 static const int JPG_W = 800;
 static const int JPG_H = 480;
+
 bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
-    if (jpg_fb == NULL) return 0;
+    if (LVGLJPEGBuffer == NULL) return 0;
 
     if (x < 0 || y < 0) return 0;
     if (x >= JPG_W || y >= JPG_H) return 0;
@@ -67,14 +68,12 @@ bool jpg_to_fb(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
     if (y + h_i > JPG_H) h_i = JPG_H - y;
 
     for (int16_t row = 0; row < h_i; row++) {
-        uint16_t* dst = jpg_fb + (y + row) * JPG_W + x;
+        uint16_t* dst = LVGLJPEGBuffer + (y + row) * JPG_W + x;
         uint16_t* src = bitmap + row * w_i;
         memcpy(dst, src, (size_t)w_i * sizeof(uint16_t));
     }
     return 1;
 }
-static const size_t JPG_IO_BUF_SIZE = 400000; // ~400 KB
-static uint8_t* jpg_io_buf = NULL;
 
 //-------------------------------
 
@@ -85,17 +84,16 @@ static uint8_t* jpg_io_buf = NULL;
 void* sdram_malloc(size_t size) {
     return SDRAM.malloc(size);
 }
+
 void sdram_free(void* ptr) {
     SDRAM.free(ptr);
 }
+
 template <typename T>
 struct SDRAMAllocator {
     using value_type = T;
-
     SDRAMAllocator() noexcept {}
-
     template <class U> SDRAMAllocator(const SDRAMAllocator<U>&) noexcept {}
-
     T* allocate(std::size_t n) {
         void* p = sdram_malloc(n * sizeof(T));
         if (!p) {
@@ -103,7 +101,6 @@ struct SDRAMAllocator {
         }
         return static_cast<T*>(p);
     }
-
     void deallocate(T* p, std::size_t) noexcept {
         sdram_free(p);
     }
@@ -141,11 +138,8 @@ mbed::FATFileSystem fs("qspi"); // Mount point is "/qspi/"
 #include "stateManager.hpp"
 
 
-
-
 // machine to machin token
 String BEARER_TOKEN = "";
-
 
 // managers
 Arduino_H7_Video* Display = nullptr;
@@ -204,10 +198,8 @@ void getInternalHeapFreeBytes() {
 
 
 
-
 void setup() {
 
-  
 
   // setup serial
   Serial.begin(9600);
@@ -274,7 +266,6 @@ void setup() {
   SPI.begin();
 
   //check the rfid reader on spi
-
   #if FEATURE_RFID
     Serial.println("RFID");
     mfrc522 = new MFRC522(SS_PIN, RST_PIN);
@@ -322,37 +313,35 @@ void setup() {
     pinMode(colPins[i], INPUT);
   }
 
-  // JPEG decoder memory
-  jpg_io_buf = (uint8_t*) SDRAM.malloc(JPG_IO_BUF_SIZE);
-  if (!jpg_io_buf) {
-      sosHALT("[PIC] FATAL: cannot allocate jpg_io_buf in SDRAM");      
-  }
-  Serial.print("[PIC] Allocated jpg_io_buf, size = ");
-  Serial.println(JPG_IO_BUF_SIZE);
+  //-------------------------------------------------
+  // LVGL Image displaying buffers
 
-  // JPEG framebuffer in SDRAM
+  // LVGL JPEG SDRAM
   Serial.println("Allocating JPEG framebuffer...");
-  size_t jpg_bytes = (size_t)JPG_W * (size_t)JPG_H * 2;
-  jpg_fb = (uint16_t*)SDRAM.malloc(jpg_bytes);
-  if (jpg_fb == NULL) {
+  size_t LVGLJPEGBufferSize = (size_t)JPG_W * (size_t)JPG_H * 2;
+  LVGLJPEGBuffer = (uint16_t*)SDRAM.malloc(LVGLJPEGBufferSize);
+  if (LVGLJPEGBuffer == NULL) {
     Serial.println("JPEG framebuffer alloc failed! HALT.");
     sosHALT("JPEG framebuffer alloc failed! HALT.");
   }
   Serial.print("JPEG framebuffer at 0x");
-  Serial.println((uintptr_t)jpg_fb, HEX);
+  Serial.println((uintptr_t)LVGLJPEGBuffer, HEX);
 
   // LVGL descriptor pointing at that buffer
   jpg_dsc.header.always_zero = 0;
   jpg_dsc.header.w = JPG_W;
   jpg_dsc.header.h = JPG_H;
   jpg_dsc.header.cf = LV_IMG_CF_TRUE_COLOR;
-  jpg_dsc.data_size = (uint32_t)jpg_bytes;
-  jpg_dsc.data = (const uint8_t*)jpg_fb;
+  jpg_dsc.data_size = (uint32_t)LVGLJPEGBufferSize;
+  jpg_dsc.data = (const uint8_t*)LVGLJPEGBuffer;
 
   // TJpg_Decoder config
   TJpgDec.setCallback(jpg_to_fb);
   TJpgDec.setJpgScale(1);
   TJpgDec.setSwapBytes(false);
+
+  // LVGL Image displaying buffers
+  //-------------------------------------------------
 
   // done!!!!
   startedUp = true;
@@ -380,20 +369,6 @@ void setup() {
   }catch( const std::runtime_error& error ){
       Serial.println( error.what() );            
   }  
-
-
-  //-----------------------------------------------------------------
-
-  // In setup(), after SDRAM/LVGL/SPI:
-pinMode(MINICAM_CS_PIN, OUTPUT); digitalWrite(MINICAM_CS_PIN, HIGH);
-miniCam = new ArduCAM(OV2640, MINICAM_CS_PIN);
-delay(200);
-miniCam->set_format(1);
-miniCam->InitCAM();
-miniCam->OV2640_set_JPEG_size(OV2640_640x480); // or higher if you want
-delay(200);
-
-  //------------------------------------------------------------------
 
   Serial.println("Started !!!!");
 }
@@ -740,14 +715,14 @@ void loop() {
 
               if (cmd == "list part4") {
                   Serial.println("===== ZAP partition 4/user =====");
-                  cameraClass::getInstance()->getWarehouseInventory();
+                  cameraManagerClass::getInstance()->getWarehouseInventory();
                   Serial.println("===== ZAP partition 4/user =====");
                 } else                
           
 
               if (cmd == "zap part4") {
                   Serial.println("===== ZAP partition 4/user =====");
-                  cameraClass::getInstance()->zapAllWarehouseSlots();
+                  cameraManagerClass::getInstance()->zapAllWarehouseSlots();
                   Serial.println("===== ZAP partition 4/user =====");
                 } else                
           

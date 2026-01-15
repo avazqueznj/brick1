@@ -141,8 +141,9 @@ if (target == objects.test2) {
 
     try{
 
-        cameraClass* camera = cameraClass::getInstance();
-        camera->takeAndRenderMiniJpeg( jpg_holder ) ;
+        cameraManagerClass* camera = cameraManagerClass::getInstance();
+        camera->shoot() ;
+        cameraManagerClass::getInstance()->displayJpegFromSDRAM( jpg_holder );
 
     }catch( std::runtime_error& error ){
 
@@ -158,7 +159,7 @@ if (target == objects.test2) {
 
 //     try{
 
-//         cameraClass camera = cameraClass::getInstance();
+//         cameraManagerClass camera = cameraManagerClass::getInstance();
 
 //         camera.loadJPGSDRAMFromWarehouse( jpegPK );        
 
@@ -179,9 +180,9 @@ if (target == objects.test2) {
 
 //     try{
 
-//         cameraClass camera = cameraClass::getInstance();
+//         cameraManagerClass camera = cameraManagerClass::getInstance();
 
-//         camera.shootToPixSDRAM();        
+//         camera.OV7670shootToPixSDRAM();        
 
 //         camera.encodePixelsToJPG();
 
