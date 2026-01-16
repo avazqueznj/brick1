@@ -300,17 +300,24 @@ public:
     ArduCAM* miniCam = nullptr;
 
     OV2640MiniCameraClass():cameraClass(){
+
+        Serial.println("[MiniCAM] making V2640 mini cam ...");
+
         pinMode(MINICAM_CS_PIN, OUTPUT); digitalWrite(MINICAM_CS_PIN, HIGH);
         miniCam = new ArduCAM(OV2640, MINICAM_CS_PIN);
         delay(200);
         miniCam->set_format(1);
         miniCam->InitCAM();
         miniCam->OV2640_set_JPEG_size(OV2640_640x480);         
+
+        Serial.println("[MiniCAM] making V2640 mini cam ... done!");
     };
 
     virtual ~OV2640MiniCameraClass(){};
 
     void shoot() override {
+
+        Serial.println("[MiniCAM] Shoot! ");
 
         // 1. Start capture to camera FIFO
         miniCam->flush_fifo();
@@ -320,19 +327,14 @@ public:
         uint32_t t0 = millis();
         while (!miniCam->get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {
             if (millis() - t0 > 6000) {
-                Serial.println("[MiniCAM] Timeout!");
-                return;
+                throw std::runtime_error("[MiniCAM] Timeout during capture!");
             }
-            delay(2);
         }
 
         // 2. Read JPEG length and check bounds
         uint32_t len = miniCam->read_fifo_length();
-        if (len < 100 || len > MAX_JPG_SIZE) {
-            Serial.print("[MiniCAM] JPEG size suspicious: ");
-            Serial.println(len);
-            return;
-        }
+
+        setLastJpegSize(len); // Updates lastJpegSize, validates size, logs
 
         // 3. Read JPEG bytes into TJPGDECBuffer (permanent SDRAM buffer)
         miniCam->CS_LOW();
@@ -340,9 +342,7 @@ public:
         for (uint32_t i = 0; i < len; i++) TJPGDECBuffer[i] = SPI.transfer(0x00);
         miniCam->CS_HIGH();
 
-        setLastJpegSize(len); // Updates lastJpegSize, validates size, logs
-
-        Serial.println("[MiniCAM] Frame capture, decode, and display complete.");
+        Serial.println("[MiniCAM] Shoot! Done!!");
     }
 
 
@@ -376,8 +376,8 @@ private:
     // singleton!
     cameraManagerClass()     
     {   
-        Serial.println("[LOG] Cam mem init ...");
-            
+        Serial.println("[LOG] TJPGDECBuffer set ...");
+
         // JPEG DECODE ==================
         // 2. JPEG Landing Buffer (128KB)
         TJPGDECBuffer = (uint8_t *)SDRAM.malloc(MAX_JPG_SIZE);
@@ -388,6 +388,7 @@ private:
         
 
         // set to OV2640
+        Serial.println("[LOG] Cam set ...");
         setCamera( new OV2640MiniCameraClass() );
     }
 
