@@ -115,7 +115,7 @@ public:
 
     OV767cameraClass() : ov767x(),  cam(ov767x),  fb()           
     {   
-        Serial.println("[LOG] Cam mem init ...");
+        Serial.println("[LOG] Cam  init ...");
             
         // OV7670 landing buffer
         uint8_t *raw_mem = (uint8_t *)SDRAM.malloc( pixelsSize );
@@ -128,6 +128,8 @@ public:
         if (!cam.begin(CAMERA_R640x480, IMAGE_MODE, 10)) {
             throw std::runtime_error( "HARDWARE ERROR: OV7670 cam.begin failed!");
         }    
+
+        Serial.println("[LOG] Cam  init ... done!!");
     }
 
     virtual ~OV767cameraClass(){}
