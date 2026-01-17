@@ -113,7 +113,7 @@ public:
     uint16_t* pixels;
     size_t pixelsSize = (640 * 480 * 2) + 32;
 
-    OV767cameraClass() : ov767x(),  cam(ov767x),  fb()           
+    OV767cameraClass(): cameraClass(), ov767x(),  cam(ov767x),  fb()       
     {   
         Serial.println("[LOG] Cam  init ...");
             
@@ -293,10 +293,10 @@ public:
 
 // ===========================================================================
 
+#define MINICAM_CS_PIN 10
 class OV2640MiniCameraClass:public cameraClass{
 public:
-
-    #define MINICAM_CS_PIN 10
+    
     ArduCAM* miniCam = nullptr;
 
     OV2640MiniCameraClass():cameraClass(){
