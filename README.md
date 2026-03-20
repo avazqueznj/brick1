@@ -157,9 +157,9 @@ Legacy inspection systems are:
 
 ## 🖥 Full System View
 
-![Inspections UI](./Screenshot 2025-12-19 001342.png)
+![Inspections UI](./001342.png)
 
-![Inspection Details](./Screenshot 2026-01-06 190616.png)
+![Inspection Details](./190616.png)
 
 Brick is not just a device — it’s a **complete system**:
 - Embedded device
