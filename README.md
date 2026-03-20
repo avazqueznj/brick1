@@ -1,6 +1,6 @@
 
 
-# Brick Embedded Inspection Device
+# Brick Embedded Inspection Device  / Apache 2.0 License
 
 > Rugged, low-cost, next-generation asset inspection platform  
 > **Author:** Alejandro Vazquez  
