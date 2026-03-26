@@ -83,6 +83,44 @@ Legacy inspection systems are:
 
 ---
 
+### Configurable Inspection Layouts
+
+One of the most important parts of the system is the Layout Builder — the tool that controls exactly what gets inspected on every asset type.
+
+Supervisors build inspection layouts in the web app, and those layouts are automatically delivered to devices on their next sync. No firmware updates, no manual configuration on the device — just build the layout in the browser, activate it, and it's live.
+
+![Layout Builder showing the TRAILER layout with Brake System zone expanded](./LB.png)
+
+*The Layout Builder for the TRAILER layout. The left panel lists all configured layouts — active ones (SCHOOL-BUS, TRAILER, TRUCK, VAN) show a green power icon; inactive ones are grayed out. The right panel shows the zone editor for the selected layout. Here, the "Brake System" zone is expanded, showing a reference photo (used to help drivers identify the area on the vehicle), two components (Brake Adjustment and Brake Hoses), and an "Add Component" button. Additional zones — Coupling and Exterior Inspection — are visible below and can be expanded independently.*
+
+#### How Layouts Are Structured
+
+Layouts follow a strict hierarchy, each level configurable from the web app:
+
+```
+Layout  (e.g., "TRAILER")
+└── Zone  (e.g., "Brake System", "Coupling", "Exterior Inspection")
+    ├── Zone Reference Image  (optional JPEG shown on device during inspection)
+    └── Component  (e.g., "Brake Adjustment", "Brake Hoses")
+        └── Defect  (e.g., "Out of adjustment", "Cracked", "Leaking")
+            └── Severity  (0 = pass/no defect, 1–10 = defect severity)
+```
+
+- **Zones** represent major inspection areas of an asset. Each zone can have an optional reference image (a photo of that area on the vehicle) so drivers know exactly what to inspect.
+- **Components** are the specific parts within a zone that get checked.
+- **Defects** are the named failure conditions for each component, each with a severity rating.
+- A severity of **0** is a pass (recorded for audit trail). Severities **1–10** are actual defects that generate repair work orders.
+
+#### Activation and Sync
+
+Layouts must be explicitly **activated** before they are sent to devices. Activation validates that the layout is complete — every zone has at least one component, every component has at least one defect, and all names are filled in. Only active layouts appear in the device's inspection menu after the next sync.
+
+When a device syncs, it receives the full configuration for all active layouts assigned to its company, along with the roster of assets, users, and inspection types. The device stores this locally so inspections can be conducted offline.
+
+
+
+---
+
 ### 📊 Backend & Analytics
 
 ![Dashboard](./Screenshot 2025-12-18 232519.png)
