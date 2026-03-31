@@ -1,9 +1,9 @@
 /********************************************************************************************
  * CONFIDENTIAL AND PROPRIETARY
- * 
- * The Brick 1.0 
+ *
+ * The Brick 1.0
  * © [2025] [Alejandro Vazquez]. All rights reserved.
- * 
+ *
  * Portions of this software are based on LVGL (https://lvgl.io),
  * which is licensed under the MIT License.
  *
@@ -24,32 +24,30 @@
 #include "KVStore.h"
 #include "kvstore_global_api.h"
 
-//-------------------------------------------------
+#include <kvstore_global_api.h>
 
-
-#include <kvstore_global_api.h>  
-
-static bool kvKeyExists( const String &path ) {
+static bool kvKeyExists(const String &path)
+{
 
     kv_info_t info;
-    if( kv_get_info(path.c_str(), &info) == MBED_SUCCESS ){
-            return true;
+    if (kv_get_info(path.c_str(), &info) == MBED_SUCCESS)
+    {
+        return true;
     }
 
     return false;
 }
 
-// -----------------------------
-
 // Reference overload (actual impl)
-void saveToKVStore(const String path, const std::vector<String> &file) {
+void saveToKVStore(const String path, const std::vector<String> &file)
+{
 
     Serial.print("Save to KVStore....");
     Serial.println(path);
 
-    
     String kvFile = "";
-    for (const String& line : file) {
+    for (const String &line : file)
+    {
         kvFile += line + "\n";
     }
 
@@ -57,7 +55,8 @@ void saveToKVStore(const String path, const std::vector<String> &file) {
 
     int ret = kv_set(path.c_str(), kvFile.c_str(), data_len, 0);
 
-    if (ret != MBED_SUCCESS) {
+    if (ret != MBED_SUCCESS)
+    {
         Serial.println("ERROR: kv_set failed.");
         throw std::runtime_error("Failed to save to KVStore!");
     }
@@ -65,16 +64,19 @@ void saveToKVStore(const String path, const std::vector<String> &file) {
     Serial.println("Saved to KVStore.");
 }
 
-// Pointer overload for ompatibility 
-void saveToKVStore(const String path, const std::vector<String> *file) {    
-    if (file == NULL) {
+// Pointer overload for ompatibility
+void saveToKVStore(const String path, const std::vector<String> *file)
+{
+    if (file == NULL)
+    {
         throw std::runtime_error("saveToKVStore: file pointer is null");
     }
     saveToKVStore(path, *file);
 }
 
 // String overload (normalizes to line format then saves)
-void saveToKVStore(const String path, const String &kvFile) {
+void saveToKVStore(const String path, const String &kvFile)
+{
 
     Serial.print("Save to KVStore....");
     Serial.println(path);
@@ -83,29 +85,29 @@ void saveToKVStore(const String path, const String &kvFile) {
 
     int ret = kv_set(path.c_str(), kvFile.c_str(), data_len, 0);
 
-    if (ret != MBED_SUCCESS) {
-        Serial.println( String("ERROR: kv_set failed ->")+ ret );
+    if (ret != MBED_SUCCESS)
+    {
+        Serial.println(String("ERROR: kv_set failed ->") + ret);
         throw std::runtime_error("Failed to save to KVStore!");
     }
 
     Serial.println("Saved to KVStore.");
-
 }
 
-// ------------------------------ 
+#define KV_BUFFER_SIZE 10000 // 10k
+std::vector<String> loadFromKVStore(const String path)
+{
 
-#define KV_BUFFER_SIZE  10000 // 10k 
-std::vector<String> loadFromKVStore( const String path ) {
-
-    static char buffer[ KV_BUFFER_SIZE ]; 
+    static char buffer[KV_BUFFER_SIZE];
 
     Serial.print("Load from KVStore   ....");
-    Serial.println( path + " " );
+    Serial.println(path + " ");
 
     // get the raw data
     size_t actual_size = 0;
-    int ret = kv_get( path.c_str(), buffer, sizeof(buffer), &actual_size);
-    if (ret != MBED_SUCCESS || actual_size == 0) {
+    int ret = kv_get(path.c_str(), buffer, sizeof(buffer), &actual_size);
+    if (ret != MBED_SUCCESS || actual_size == 0)
+    {
         throw std::runtime_error("Failed to read file from disk!");
     }
 
@@ -116,29 +118,30 @@ std::vector<String> loadFromKVStore( const String path ) {
     std::vector<String> file;
     int start = 0;
     int end = joined.indexOf('\n');
-    while (end >= 0) {
+    while (end >= 0)
+    {
         String line = joined.substring(start, end);
         line.trim();
-        if (line.length() > 0) {
+        if (line.length() > 0)
+        {
             file.push_back(line);
         }
         start = end + 1;
         end = joined.indexOf('\n', start);
     }
 
-    return( file );
+    return (file);
 
     Serial.println("File loaded from KVStore ");
 }
-
-
 
 void zapKVStore()
 {
     Serial.println("[KV] Zapping KVStore...");
 
     int rc = kv_reset("/kv/");
-    if (rc != MBED_SUCCESS) {
+    if (rc != MBED_SUCCESS)
+    {
         Serial.print("[KV] kv_reset failed, rc=");
         Serial.println(rc);
         throw std::runtime_error("zapKVStore failed");
@@ -147,123 +150,133 @@ void zapKVStore()
     Serial.println("[KV] KVStore wiped");
 }
 
-
-
 //=============================
 
 // QSPI - parition 4 - but deprecated as there is a bug in the giga part1 and wifi
 
 //=============================
 
-
-
-///-----------------
-
-    void openQSPI(){
-        // 1) Ensure QSPI filesystem is accessible.
-        //    If /qspi/ can be opened, assume it's already mounted.
-        DIR* qspiDir = opendir("/qspi/");
-        if (qspiDir) {
-            Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
-            closedir(qspiDir);
-        } else {
-            Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
-            int err = fs.mount(&qspi);
-            if (err) {
-                Serial.print("[PICS] QSPI mount failed, code: ");
-                Serial.println(err);
-                throw std::runtime_error("syncPics: QSPI mount failed");
-            }
-            Serial.println("[PICS] fs.mount() succeeded.");
+void openQSPI()
+{
+    // 1) Ensure QSPI filesystem is accessible.
+    //    If /qspi/ can be opened, assume it's already mounted.
+    DIR *qspiDir = opendir("/qspi/");
+    if (qspiDir)
+    {
+        Serial.println("[PICS] /qspi/ already accessible, skipping fs.mount().");
+        closedir(qspiDir);
+    }
+    else
+    {
+        Serial.println("[PICS] /qspi/ not accessible, trying fs.mount()...");
+        int err = fs.mount(&qspi);
+        if (err)
+        {
+            Serial.print("[PICS] QSPI mount failed, code: ");
+            Serial.println(err);
+            throw std::runtime_error("syncPics: QSPI mount failed");
         }
+        Serial.println("[PICS] fs.mount() succeeded.");
     }
-
-
-    DIR* openDirFromQSPI(){
-
-        Serial.println("[STORAGE] open dir...");
-
-        DIR* dir = opendir("/qspi/");
-        if (dir == NULL) {
-            sosHALT("[ZAP PICS] Failed to open /qspi/ directory, aborting.");
-        }
-
-        Serial.println("[STORAGE] open dir...  done");        
-
-        return( dir );
-    }
-
-    void closeDirFromQSPI( DIR* dir ){
-
-        Serial.println("[STORAGE] close dir...");        
-        closedir(dir);        
-        Serial.println("[STORAGE] close dir...  done");                
-    }    
-
-    void deleteFileFromQSPI( String fullPath ){
-
-        Serial.println("[STORAGE] delete..");        
-
-        int rc = remove(fullPath.c_str());
-        if (rc == 0) {
-            Serial.println("[PICS]   OK (deleted)");
-        } else {
-            sosHALT("[PICS]   ERROR (could not delete)");
-        }        
-
-        Serial.println("[STORAGE] delete.. done");                
-    }
-
-    FILE* openFileFromQSPI( String path ){
-
-        Serial.println("[STORAGE] fopen..");        
-        return fopen(path.c_str(), "rb");
-        Serial.println("[STORAGE] fopen.. done");                
-    }
-
-    void closeFileFromQSPI( FILE* f ){
-        Serial.println("[STORAGE] close..");        
-        fclose(f);
-        Serial.println("[STORAGE] close..  done");        
-    }
-
-//===========================================================================================
-
-void listQSPIFiles(const char* path) {
-  Serial.print("Listing directory: "); Serial.println(path);
-  // Use opendir/readdir/closedir (POSIX style, supported by Mbed FS)
-  DIR* dir = opendir(path);
-  if (!dir) {
-    sosHALT("  (failed to open directory)");
-  }
-  struct dirent* de;
-  int found = 0;
-  while ((de = readdir(dir)) != NULL) {
-    Serial.print("  ");
-    Serial.print(de->d_name);
-    if (de->d_type == DT_DIR) Serial.print(" [DIR]");
-    Serial.println();
-    found++;
-  }
-  closedir(dir);
-  if (!found) Serial.println("  (empty)");
 }
 
-//===========================================================================================
+DIR *openDirFromQSPI()
+{
+
+    Serial.println("[STORAGE] open dir...");
+
+    DIR *dir = opendir("/qspi/");
+    if (dir == NULL)
+    {
+        sosHALT("[ZAP PICS] Failed to open /qspi/ directory, aborting.");
+    }
+
+    Serial.println("[STORAGE] open dir...  done");
+
+    return (dir);
+}
+
+void closeDirFromQSPI(DIR *dir)
+{
+
+    Serial.println("[STORAGE] close dir...");
+    closedir(dir);
+    Serial.println("[STORAGE] close dir...  done");
+}
+
+void deleteFileFromQSPI(String fullPath)
+{
+
+    Serial.println("[STORAGE] delete..");
+
+    int rc = remove(fullPath.c_str());
+    if (rc == 0)
+    {
+        Serial.println("[PICS]   OK (deleted)");
+    }
+    else
+    {
+        sosHALT("[PICS]   ERROR (could not delete)");
+    }
+
+    Serial.println("[STORAGE] delete.. done");
+}
+
+FILE *openFileFromQSPI(String path)
+{
+
+    Serial.println("[STORAGE] fopen..");
+    return fopen(path.c_str(), "rb");
+    Serial.println("[STORAGE] fopen.. done");
+}
+
+void closeFileFromQSPI(FILE *f)
+{
+    Serial.println("[STORAGE] close..");
+    fclose(f);
+    Serial.println("[STORAGE] close..  done");
+}
+
+void listQSPIFiles(const char *path)
+{
+    Serial.print("Listing directory: ");
+    Serial.println(path);
+    // Use opendir/readdir/closedir (POSIX style, supported by Mbed FS)
+    DIR *dir = opendir(path);
+    if (!dir)
+    {
+        sosHALT("  (failed to open directory)");
+    }
+    struct dirent *de;
+    int found = 0;
+    while ((de = readdir(dir)) != NULL)
+    {
+        Serial.print("  ");
+        Serial.print(de->d_name);
+        if (de->d_type == DT_DIR)
+            Serial.print(" [DIR]");
+        Serial.println();
+        found++;
+    }
+    closedir(dir);
+    if (!found)
+        Serial.println("  (empty)");
+}
 
 #include <stdio.h>
 #include <stdexcept>
 #include <SDRAM.h>
 
-
-void saveTextVecToQSPI(const String& path, const std::vector<String>* file)
+void saveTextVecToQSPI(const String &path, const std::vector<String> *file)
 {
 
-    if (file == nullptr) {
+    if (file == nullptr)
+    {
         throw std::runtime_error("saveTextVecToQSPI: file pointer is null");
     }
 
-    if (file->empty()) {
+    if (file->empty())
+    {
         throw std::runtime_error("saveTextVecToQSPI: empty config");
     }
 
@@ -272,15 +285,16 @@ void saveTextVecToQSPI(const String& path, const std::vector<String>* file)
 
     Serial.println("[CFG] Saving config to QSPI: " + path);
 
-    FILE* f = fopen(path.c_str(), "wb");
-    if (f == NULL) {
+    FILE *f = fopen(path.c_str(), "wb");
+    if (f == NULL)
+    {
         throw std::runtime_error(
-            ("saveTextVecToQSPI: cannot open for write: " + path).c_str()
-        );
+            ("saveTextVecToQSPI: cannot open for write: " + path).c_str());
     }
 
     // Write line-by-line to avoid giant buffers
-    for (const String& line : *file) {
+    for (const String &line : *file)
+    {
         size_t len = line.length();
         if (fwrite(line.c_str(), 1, len, f) != len ||
             fwrite("\n", 1, 1, f) != 1)
@@ -295,7 +309,7 @@ void saveTextVecToQSPI(const String& path, const std::vector<String>* file)
     Serial.println("[vec] Config saved OK");
 }
 
-std::vector<String> readTextVecFromQSPI(const String& path)
+std::vector<String> readTextVecFromQSPI(const String &path)
 {
     std::vector<String> result;
 
@@ -304,26 +318,29 @@ std::vector<String> readTextVecFromQSPI(const String& path)
 
     Serial.println("[vec] readTextVecFromQSPI from QSPI: " + path);
 
-    FILE* f = fopen(path.c_str(), "rb");
-    if (f == NULL) {
+    FILE *f = fopen(path.c_str(), "rb");
+    if (f == NULL)
+    {
         throw std::runtime_error(
-            ("loadFromQSPI: cannot open for read: " + path).c_str()
-        );
+            ("loadFromQSPI: cannot open for read: " + path).c_str());
     }
 
-    char lineBuf[512];   // NJ style: fixed, explicit, predictable
+    char lineBuf[512]; // NJ style: fixed, explicit, predictable
 
-    while (fgets(lineBuf, sizeof(lineBuf), f)) {
+    while (fgets(lineBuf, sizeof(lineBuf), f))
+    {
 
         // Strip newline / CRLF
         size_t len = strlen(lineBuf);
         while (len > 0 &&
-               (lineBuf[len - 1] == '\n' || lineBuf[len - 1] == '\r')) {
+               (lineBuf[len - 1] == '\n' || lineBuf[len - 1] == '\r'))
+        {
             lineBuf[--len] = '\0';
         }
 
         // Skip empty lines (optional)
-        if (len == 0) {
+        if (len == 0)
+        {
             continue;
         }
 
@@ -339,17 +356,17 @@ std::vector<String> readTextVecFromQSPI(const String& path)
     return result;
 }
 
-void clearTextVecQSPI(const String& path)
+void clearTextVecQSPI(const String &path)
 {
     openQSPI();
 
     Serial.println("[CFG] Clearing QSPI text file: " + path);
 
-    FILE* f = fopen(path.c_str(), "wb");
-    if (f == NULL) {
+    FILE *f = fopen(path.c_str(), "wb");
+    if (f == NULL)
+    {
         throw std::runtime_error(
-            ("clearTextVecQSPI: cannot open for write: " + path).c_str()
-        );
+            ("clearTextVecQSPI: cannot open for write: " + path).c_str());
     }
 
     // "wb" truncates or creates the file
@@ -357,7 +374,5 @@ void clearTextVecQSPI(const String& path)
 
     Serial.println("[CFG] File cleared");
 }
-
-
 
 #endif

@@ -1,55 +1,59 @@
 /********************************************************************************************
  * CONFIDENTIAL AND PROPRIETARY
- * 
- * The Brick 1.0 
+ *
+ * The Brick 1.0
  * © [2025] [Alejandro Vazquez]. All rights reserved.
- * 
+ *
  ********************************************************************************************/
 
 void navigateTo(int screenId);
 extern String BEARER_TOKEN;
 extern void getInternalHeapFreeBytes();
 
+// P R O B L E M  ***  D O M A I N
 
-
-
-                                // P R O B L E M  ***  D O M A I N 
-
-
-//-------------------------------------------------
-// SETTINGS
-//-------------------------------------------------
-
-class settingsClass : public std::map<String, String> {
+class settingsClass : public std::map<String, String>
+{
 public:
-
     // Throwing operator[]
-    String& operator[](const String& key) {
+    String &operator[](const String &key)
+    {
         auto it = this->find(key);
         if (it == this->end())
             throw std::out_of_range(("Missing config key: " + key).c_str());
         return it->second;
     }
-    
-    void defaultKey( String k, String v ){
+
+    void defaultKey(String k, String v)
+    {
         std::map<String, String>::operator[](k) = v;
     }
 
-    void load(const String& filename) {
+    void load(const String &filename)
+    {
         this->clear(); //<------------- note
-        try {
+        try
+        {
             auto lines = loadFromKVStore(filename); // may throw
-            for (const String& line : lines) {
-                String s = line; s.trim();
-                if (s.length() == 0 || s.startsWith("//")) continue;
+            for (const String &line : lines)
+            {
+                String s = line;
+                s.trim();
+                if (s.length() == 0 || s.startsWith("//"))
+                    continue;
                 int eq = s.indexOf('=');
-                if (eq > 0) {
-                    String k = s.substring(0, eq); k.trim();
-                    String v = s.substring(eq + 1); v.trim();
+                if (eq > 0)
+                {
+                    String k = s.substring(0, eq);
+                    k.trim();
+                    String v = s.substring(eq + 1);
+                    v.trim();
                     std::map<String, String>::operator[](k) = v;
                 }
             }
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception &e)
+        {
             // Add more context and rethrow
             String msg = String("Could not load config: ") + filename + " :: " + e.what();
             Serial.println(msg); // optional: log before throw
@@ -57,104 +61,104 @@ public:
         }
     }
 
-
-
-    void save(const String& filename) const {
-        try {
+    void save(const String &filename) const
+    {
+        try
+        {
             std::vector<String> lines;
-            for (const auto& it : *this)
+            for (const auto &it : *this)
                 lines.push_back(it.first + "=" + it.second);
             saveToKVStore(filename, &lines); // may throw
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception &e)
+        {
             String msg = String("Could not save config: ") + filename + " :: " + e.what();
             Serial.println(msg); // optional
             throw std::runtime_error(msg.c_str());
         }
     }
+};
 
-
-
-};                                
-
-class userClass{
+class userClass
+{
 public:
     String name;
     String username;
     String password;
 
-    userClass(){}
+    userClass() {}
 
-    userClass(String nameParam, String usernameParam, String passwordParam):
-        name(nameParam),
-        username(usernameParam),
-        password(passwordParam){}
+    userClass(String nameParam, String usernameParam, String passwordParam) : name(nameParam),
+                                                                              username(usernameParam),
+                                                                              password(passwordParam) {}
 
-    virtual ~userClass(){}
+    virtual ~userClass() {}
 
-    void clear(){
+    void clear()
+    {
         name = "";
         username = "";
         password = "";
     }
 };
 
-
-class layoutZoneClass{
+class layoutZoneClass
+{
 public:
     String name;
     String tag;
     String zonePic;
-    std::vector<  std::vector<String>  > components;    
-    layoutZoneClass(String nameParam, String tagParam, String zonePicParam):
-        name(nameParam),tag(tagParam),zonePic(zonePicParam){}
-    virtual ~layoutZoneClass(){}
+    std::vector<std::vector<String>> components;
+    layoutZoneClass(String nameParam, String tagParam, String zonePicParam) : name(nameParam), tag(tagParam), zonePic(zonePicParam) {}
+    virtual ~layoutZoneClass() {}
 };
 
-
-class layoutClass{
+class layoutClass
+{
 public:
     String name;
-    std::vector<  layoutZoneClass  > zones;    
-    layoutClass(String nameParam):name(nameParam){}
-    virtual ~layoutClass(){}    
+    std::vector<layoutZoneClass> zones;
+    layoutClass(String nameParam) : name(nameParam) {}
+    virtual ~layoutClass() {}
 };
 
-
-class assetClass{
+class assetClass
+{
 public:
     String ID;
     String layoutName;
     String tag;
     String buttonName;
-    assetClass( const String IDparam, const String typeParam, const String tagParam ):
-        ID(IDparam),layoutName(typeParam),tag(tagParam) {    
-            buttonName += ID;
-            buttonName += ": ";
-            buttonName += layoutName;
-        }
+    assetClass(const String IDparam, const String typeParam, const String tagParam) : ID(IDparam), layoutName(typeParam), tag(tagParam)
+    {
+        buttonName += ID;
+        buttonName += ": ";
+        buttonName += layoutName;
+    }
 
     // Copy constructor
-    assetClass(const assetClass& other)
-        : ID(other.ID), layoutName(other.layoutName), tag(other.tag), buttonName(other.buttonName) {
+    assetClass(const assetClass &other)
+        : ID(other.ID), layoutName(other.layoutName), tag(other.tag), buttonName(other.buttonName)
+    {
     }
-            
-    virtual ~assetClass(){}            
+
+    virtual ~assetClass() {}
 };
 
-
-class inspectionTypeClass{
+class inspectionTypeClass
+{
 public:
     String name;
-    std::vector<  String  > layouts;    
-    std::vector<  std::vector<String>  > formFields;    
-    inspectionTypeClass(String nameParam):name(nameParam){}
-    virtual ~inspectionTypeClass(){}    
+    std::vector<String> layouts;
+    std::vector<std::vector<String>> formFields;
+    inspectionTypeClass(String nameParam) : name(nameParam) {}
+    virtual ~inspectionTypeClass() {}
 };
-
 
 // ***
 
-class defectClass {
+class defectClass
+{
 public:
     assetClass asset;
     String zoneName;
@@ -166,68 +170,67 @@ public:
 
     defectClass(
         assetClass assetParam,
-        const String& zoneNameParam,
-        const String& componentNameParam,
-        const String& defectTypeParam,
+        const String &zoneNameParam,
+        const String &componentNameParam,
+        const String &defectTypeParam,
         int severityParam,
-        const String& notesParam,
-        const String& timeParam)
-    : asset(assetParam),
-      zoneName(zoneNameParam),
-      componentName(componentNameParam),
-      defectType(defectTypeParam),
-      severity(severityParam),
-      notes(notesParam),
-      time(timeParam)
-    {}
+        const String &notesParam,
+        const String &timeParam)
+        : asset(assetParam),
+          zoneName(zoneNameParam),
+          componentName(componentNameParam),
+          defectType(defectTypeParam),
+          severity(severityParam),
+          notes(notesParam),
+          time(timeParam)
+    {
+    }
 
-    bool isSameComponent(const defectClass& other) const {
+    bool isSameComponent(const defectClass &other) const
+    {
         bool sameAsset = (asset.ID == other.asset.ID);
         bool sameZone = (zoneName == other.zoneName);
         bool sameComponent = (componentName == other.componentName);
         bool result = sameAsset && sameZone && sameComponent;
         return result;
-    }    
+    }
 };
 
-
-class inspectionClass {
+class inspectionClass
+{
 public:
-
     String id;
-    String company;  
+    String company;
 
-    inspectionTypeClass* type = NULL;
-    std::vector<assetClass> assets;    
+    inspectionTypeClass *type = NULL;
+    std::vector<assetClass> assets;
     std::vector<defectClass> defects;
-    std::vector<  String  > inspectionFormFieldValues; 
+    std::vector<String> inspectionFormFieldValues;
 
     String startTime;
     String offset;
     String dst;
 
-    String driver_username;    
+    String driver_username;
     String driver_name;
 
-    String pic1id = "NONE";    
-    String pic2id = "NONE";    
-    String pic3id = "NONE";            
-    String pic4id = "NONE";            
+    String pic1id = "NONE";
+    String pic2id = "NONE";
+    String pic3id = "NONE";
+    String pic4id = "NONE";
 
 private:
-
     String finishedTimeString = "";
     DateTime finishedTime;
 
-//============================================================================
-
 public:
-
-    inspectionClass(){
+    inspectionClass()
+    {
         id = newUUID();
     }
 
-    void clear() {
+    void clear()
+    {
         id = newUUID();
         company = "";
 
@@ -239,30 +242,31 @@ public:
         offset = "";
         dst = "";
 
-        driver_username = "";        
+        driver_username = "";
         driver_name = "";
 
-        pic1id = "NONE";    
-        pic2id = "NONE";    
-        pic3id = "NONE";            
-        pic4id = "NONE";            
+        pic1id = "NONE";
+        pic2id = "NONE";
+        pic3id = "NONE";
+        pic4id = "NONE";
     }
 
-    void finished( int timeOffsetFromUTC ){     
-        
+    void finished(int timeOffsetFromUTC)
+    {
+
         // set the clock
-        finishedTime =  rtc->now();  
+        finishedTime = rtc->now();
 
         // set the strings for humans
         char timeString[30];
         DateTime local = finishedTime + TimeSpan(timeOffsetFromUTC * 60);
         snprintf(timeString, sizeof(timeString), "%04d-%02d-%02d %02d:%02d:%02d",
-                local.year(), local.month(), local.day(), local.hour(), local.minute(), local.second());        
+                 local.year(), local.month(), local.day(), local.hour(), local.minute(), local.second());
         finishedTimeString = timeString;
-
     }
 
-    String toHumanString() const {
+    String toHumanString() const
+    {
         String result = "INSPECTION\n";
 
         result += "ID: " + id + "\n";
@@ -270,21 +274,21 @@ public:
 
         result += "Driver: ";
         result += driver_username;
-        result += " ";       
+        result += " ";
         result += driver_name;
-        result += "\n";            
+        result += "\n";
 
         result += "Start time: ";
         result += startTime;
-        result += "\n";           
+        result += "\n";
 
         result += "finish time: ";
         result += finishedTimeString;
-        result += "\n";           
-        
+        result += "\n";
 
         // --- Inspection Type ---
-        if (type != NULL) {
+        if (type != NULL)
+        {
             result += "Type: ";
             result += type->name;
             result += "\n";
@@ -298,30 +302,36 @@ public:
 
             result += "Form Fields:\n";
             size_t rowIndex = 0;
-            for (const auto& row : type->formFields) {
+            for (const auto &row : type->formFields)
+            {
                 result += "";
                 result += String(rowIndex);
                 result += ": ";
                 result += row[0];
-                                        
+
                 // Add the value if it exists
-                if (rowIndex < inspectionFormFieldValues.size()) {
+                if (rowIndex < inspectionFormFieldValues.size())
+                {
                     result += " : ";
                     result += inspectionFormFieldValues[rowIndex];
-                } else {
+                }
+                else
+                {
                     result += " : <unset>";
                 }
                 result += "\n";
                 ++rowIndex;
             }
-
-        } else {
+        }
+        else
+        {
             result += "Type: NULL\n";
-        }      
+        }
 
         // --- Assets ---
         result += "Assets:\n";
-        for (const auto& asset : assets) {
+        for (const auto &asset : assets)
+        {
             result += " - ID: ";
             result += asset.ID;
             result += ", Layout: ";
@@ -348,9 +358,11 @@ public:
 
         // --- Defects: severity > 0 after ---
         result += "Defects:\n";
-        for (const auto& defect : defects) {
-            if (defect.severity > 0) {
-                result += "- Asset: ";                
+        for (const auto &defect : defects)
+        {
+            if (defect.severity > 0)
+            {
+                result += "- Asset: ";
                 result += defect.asset.ID;
                 result += " Zone: " + defect.zoneName;
                 result += ", " + defect.componentName;
@@ -362,35 +374,25 @@ public:
         }
 
         result += "Pictures:\n";
-        result += "Picture 1:" + pic1id + "\n"; 
-        result += "Picture 2:" + pic2id + "\n"; 
-        result += "Picture 3:" + pic3id + "\n"; 
-        result += "Picture 4:" + pic4id + "\n";         
+        result += "Picture 1:" + pic1id + "\n";
+        result += "Picture 2:" + pic2id + "\n";
+        result += "Picture 3:" + pic3id + "\n";
+        result += "Picture 4:" + pic4id + "\n";
 
-
-        result += "Submission status: \n";         
+        result += "Submission status: \n";
 
         return result;
-    }   
-    
-    //====================================
-    //============
-    //====================================
+    }
 
-    String toEDI() const {
+    String toEDI() const
+    {
 
         String result = "BRICKINSPECTION*1\n";
 
-        // display header 
-        result += 
-            "DISPLAYHEADER*" 
-            + String( finishedTime.unixtime() ) +
-            + "*" + id.substring(id.length() - 5) + "(" + BEARER_TOKEN.substring(BEARER_TOKEN.length() - 5) + ")"
-            + "*" + finishedTimeString 
-            + "*" + driver_name 
-            + "*" + assets[0].buttonName
-            + "*\uF071"
-            + "\n";
+        // display header
+        result +=
+            "DISPLAYHEADER*" + String(finishedTime.unixtime()) +
+            +"*" + id.substring(id.length() - 5) + "(" + BEARER_TOKEN.substring(BEARER_TOKEN.length() - 5) + ")" + "*" + finishedTimeString + "*" + driver_name + "*" + assets[0].buttonName + "*\uF071" + "\n";
 
         result += "INSPHEADER\n";
 
@@ -399,53 +401,55 @@ public:
 
         result += "DRIVER*";
         result += driver_name;
-        result += "*";       
+        result += "*";
         result += driver_username;
         result += "\n";
-            
+
         result += "INSPSTARTTIME*";
         result += startTime;
-        result += "\n";           
+        result += "\n";
 
         result += "INSPSUBTIME*";
         result += finishedTimeString;
-        result += "\n";           
+        result += "\n";
 
         result += "INSPTIMEOFFSET*";
         result += offset;
-        result += "\n";           
+        result += "\n";
 
         result += "INSPTIMEDST*";
         result += dst;
-        result += "\n";                 
+        result += "\n";
 
         // --- Assets ---
         result += "ASSETS\n";
-        for (const auto& asset : assets) {
-            result  += "ASSET*" + asset.ID             
-            + "*" + asset.layoutName           
-            + "*" + asset.tag
-            + "\n";
+        for (const auto &asset : assets)
+        {
+            result += "ASSET*" + asset.ID + "*" + asset.layoutName + "*" + asset.tag + "\n";
         }
 
         // --- Inspection Type ---
         result += "INSPTYPE\n";
 
-        result += "INSPTYPENAME*" + type->name +"\n";
+        result += "INSPTYPENAME*" + type->name + "\n";
 
         result += "FORMFIELDS\n";
 
         size_t rowIndex = 0;
-        for (const auto& row : type->formFields) {
+        for (const auto &row : type->formFields)
+        {
 
             // name
             result += "FF*" + row[0];
-        
+
             // value
-            if (rowIndex < inspectionFormFieldValues.size()) {
+            if (rowIndex < inspectionFormFieldValues.size())
+            {
                 result += "*";
                 result += sanitizeEDIValue(inspectionFormFieldValues[rowIndex]);
-            } else {
+            }
+            else
+            {
                 result += "*NULL";
             }
 
@@ -455,8 +459,10 @@ public:
 
         // --- Defects: severity == 0 first ---
         result += "CHECKS\n";
-        for (const auto& defect : defects) {
-            if (defect.severity == 0) {
+        for (const auto &defect : defects)
+        {
+            if (defect.severity == 0)
+            {
                 result += "CHECK*";
                 result += defect.asset.ID;
                 result += "*" + defect.zoneName;
@@ -471,9 +477,11 @@ public:
 
         // --- Defects: severity > 0 after ---
         result += "DEFECTS\n";
-        for (const auto& defect : defects) {
-            if (defect.severity > 0) {
-                result += "DEFECT*";                
+        for (const auto &defect : defects)
+        {
+            if (defect.severity > 0)
+            {
+                result += "DEFECT*";
                 result += defect.asset.ID;
                 result += "*" + defect.zoneName;
                 result += "*" + defect.componentName;
@@ -487,111 +495,107 @@ public:
 
         result += "END***\n";
 
-        if( pic1id != "NONE" ){
+        if (pic1id != "NONE")
+        {
             result += "USERPIC*" + pic1id + "\n";
         }
-        if( pic2id != "NONE" ){
+        if (pic2id != "NONE")
+        {
             result += "USERPIC*" + pic2id + "\n";
         }
-        if( pic3id != "NONE" ){
+        if (pic3id != "NONE")
+        {
             result += "USERPIC*" + pic3id + "\n";
         }
-        if( pic4id != "NONE" ){
+        if (pic4id != "NONE")
+        {
             result += "USERPIC*" + pic4id + "\n";
         }
 
-        result += "END2***\n";        
+        result += "END2***\n";
 
         return result;
-    }   
-
+    }
 };
 
+//-------------------------------------------------
 
-
+//    D O M A I N   M A N A G E R
 
 //-------------------------------------------------
 
-//    D O M A I N   M A N A G E R 
+#include <stdio.h>
+#define INSP_SUBMIT_ERROR "\uF071"
+#define INSP_SUBMIT_OK "\uF00C"
 
-//-------------------------------------------------
-
-#include <stdio.h>   
-#define INSP_SUBMIT_ERROR  "\uF071"
-#define INSP_SUBMIT_OK     "\uF00C"
-
-
-class domainManagerClass {
+class domainManagerClass
+{
 public:
-
     // from the config
-    String company = ""; 
-    String location = ""; 
-    String serverURL = "10.0.0.32"; 
+    String company = "";
+    String location = "";
+    String serverURL = "10.0.0.32";
 
-    int  timeZoneIndex = 0;    
-    int  timeOffsetFromUTC = 0;
+    int timeZoneIndex = 0;
+    int timeOffsetFromUTC = 0;
     int DST = 0;
 
     // internal
     String getConfigPath = "NOT SET";
     String postInspectionsPath = "NOT SET";
 
-    std::deque< assetClass > tempAssets;
+    std::deque<assetClass> tempAssets;
 
 private:
-
     // database
     std::vector<userClass, SDRAMAllocator<userClass>> users;
     std::vector<assetClass, SDRAMAllocator<assetClass>> assets;
     std::vector<layoutClass, SDRAMAllocator<layoutClass>> layouts;
     std::vector<inspectionTypeClass, SDRAMAllocator<inspectionTypeClass>> inspectionTypes;
 
-//----------------------------
-
 public:
-
-
     // Const getters
-    const std::vector<userClass, SDRAMAllocator<userClass>>*
+    const std::vector<userClass, SDRAMAllocator<userClass>> *
     getUsers() const { return &users; }
 
-    const std::vector<assetClass, SDRAMAllocator<assetClass>>*
+    const std::vector<assetClass, SDRAMAllocator<assetClass>> *
     getAssets() const { return &assets; }
 
-    const std::vector<layoutClass, SDRAMAllocator<layoutClass>>*
+    const std::vector<layoutClass, SDRAMAllocator<layoutClass>> *
     getLayouts() const { return &layouts; }
 
-    const std::vector<inspectionTypeClass, SDRAMAllocator<inspectionTypeClass>>*
+    const std::vector<inspectionTypeClass, SDRAMAllocator<inspectionTypeClass>> *
     getInspectionTypes() const { return &inspectionTypes; }
 
     // has
     bool isLoaded = false;
-    commsClass* comms = NULL;
-
-
+    commsClass *comms = NULL;
 
     // inspection
     inspectionClass currentInspection;
 
-    //logged user
+    // logged user
     userClass loggedUser;
 
     // singleton
-    static domainManagerClass* getInstance() {
-        static domainManagerClass instance;  // Guaranteed to be created once (thread-safe in C++11+)
+    static domainManagerClass *getInstance()
+    {
+        static domainManagerClass instance; // Guaranteed to be created once (thread-safe in C++11+)
         return &instance;
-    }    
-
-    domainManagerClass(){        
-        comms = new commsClass();            
     }
 
-    virtual ~domainManagerClass(){        
+    domainManagerClass()
+    {
+        comms = new commsClass();
+    }
+
+    virtual ~domainManagerClass()
+    {
         delete comms;
     }
 
-    void emptyAll() {
+    void emptyAll()
+    {
 
         currentInspection.clear();
 
@@ -601,32 +605,35 @@ public:
         users.clear();
     }
 
-    void logout(){
+    void logout()
+    {
 
         loggedUser.clear();
         currentInspection.clear();
 
-        navigateTo( SCREEN_ID_LOGIN_SCREEN );
+        navigateTo(SCREEN_ID_LOGIN_SCREEN);
     }
 
-
-    bool login(String usernameParam, String passwordParam) {
-
+    bool login(String usernameParam, String passwordParam)
+    {
 
         Serial.print("Login ....");
 
-        if( users.size() == 0 ){
+        if (users.size() == 0)
+        {
             throw std::runtime_error("No users loaded, cannot login");
         }
 
-        for (size_t i = 0; i < users.size(); i++) {
-            if (users[i].username == usernameParam && users[i].password == passwordParam) {
+        for (size_t i = 0; i < users.size(); i++)
+        {
+            if (users[i].username == usernameParam && users[i].password == passwordParam)
+            {
 
                 loggedUser = users[i];
 
                 Serial.print("Login successful: ");
                 Serial.println(users[i].name);
-                
+
                 return true;
             }
         }
@@ -635,314 +642,375 @@ public:
         return false;
     }
 
-    String sync(){
-        
+    String sync()
+    {
+
         spinnerReset();
         spinnerStart();
 
-        try{
+        try
+        {
 
+            getInternalHeapFreeBytes();
+
+            {
+                std::vector<String> config;
                 getInternalHeapFreeBytes();
-
-                {                    
-                    std::vector<String> config;
-                    getInternalHeapFreeBytes();
-                    comms->GET( serverURL , comms->ssid, comms->pass, 
-                        getConfigPath + 
-                        "?company=" + urlEncode( domainManagerClass::getInstance()->company )
-                        + "&" + 
-                        "location=" + urlEncode( domainManagerClass::getInstance()->location ), 
-                        config );
-                    getInternalHeapFreeBytes();
-                    parse( &config );
-                    saveTextVecToQSPI( "/qspi/brickconfig.txt" , &config  );
-                    getInternalHeapFreeBytes();
-                }
-                    
-                int sentInspections = 0;
-                {
-                    // sync inspes
-                    getInternalHeapFreeBytes();
-                    sentInspections = retryAllPendingInspections();
-                }
-
-                int userPics = 0;
-                {
-                    getInternalHeapFreeBytes();
-                    userPics = cameraManagerClass::getInstance()->syncUserPics( 
-                        domainManagerClass::getInstance()->comms,  
-                        domainManagerClass::getInstance()->serverURL,
-                        "/api/device/upload_photo"
-                    );
-                }
-            
+                comms->GET(serverURL, comms->ssid, comms->pass,
+                           getConfigPath +
+                               "?company=" + urlEncode(domainManagerClass::getInstance()->company) + "&" +
+                               "location=" + urlEncode(domainManagerClass::getInstance()->location),
+                           config);
                 getInternalHeapFreeBytes();
-                int layoutPics = 0;
-                try {
-                    Serial.println("syncPics .....");                                        
-                    layoutPics = syncLayoutPics();
-                    WiFi.end();                    
-                } catch (const std::runtime_error& e) {
-                    Serial.println("[WARN] syncPics failed, continuing without pics.");
-                    Serial.println(e.what());
-                    WiFi.end();
-                }
+                parse(&config);
+                saveTextVecToQSPI("/qspi/brickconfig.txt", &config);
+                getInternalHeapFreeBytes();
+            }
 
+            int sentInspections = 0;
+            {
+                // sync inspes
+                getInternalHeapFreeBytes();
+                sentInspections = retryAllPendingInspections();
+            }
 
+            int userPics = 0;
+            {
+                getInternalHeapFreeBytes();
+                userPics = cameraManagerClass::getInstance()->syncUserPics(
+                    domainManagerClass::getInstance()->comms,
+                    domainManagerClass::getInstance()->serverURL,
+                    "/api/device/upload_photo");
+            }
 
-                    String syncMessage = "Sync successful. \n";
+            getInternalHeapFreeBytes();
+            int layoutPics = 0;
+            try
+            {
+                Serial.println("syncPics .....");
+                layoutPics = syncLayoutPics();
+                WiFi.end();
+            }
+            catch (const std::runtime_error &e)
+            {
+                Serial.println("[WARN] syncPics failed, continuing without pics.");
+                Serial.println(e.what());
+                WiFi.end();
+            }
 
-                    syncMessage += domainManagerClass::getInstance()->assets.size();
-                    syncMessage += " assets, ";
+            String syncMessage = "Sync successful. \n";
 
-                    syncMessage += domainManagerClass::getInstance()->layouts.size();
-                    syncMessage += " layouts, ";
+            syncMessage += domainManagerClass::getInstance()->assets.size();
+            syncMessage += " assets, ";
 
-                    syncMessage += domainManagerClass::getInstance()->inspectionTypes.size();
-                    syncMessage += " types, ";
+            syncMessage += domainManagerClass::getInstance()->layouts.size();
+            syncMessage += " layouts, ";
 
-                    syncMessage += domainManagerClass::getInstance()->users.size();
-                    syncMessage += " users, ";       
+            syncMessage += domainManagerClass::getInstance()->inspectionTypes.size();
+            syncMessage += " types, ";
 
-                    syncMessage += sentInspections;
-                    syncMessage += " pend inspections, ";       
+            syncMessage += domainManagerClass::getInstance()->users.size();
+            syncMessage += " users, ";
 
-                    syncMessage += layoutPics;
-                    syncMessage += " layout pics, ";       
+            syncMessage += sentInspections;
+            syncMessage += " pend inspections, ";
 
-                    syncMessage += userPics;
-                    syncMessage += " user pics. ";       
+            syncMessage += layoutPics;
+            syncMessage += " layout pics, ";
 
+            syncMessage += userPics;
+            syncMessage += " user pics. ";
 
-                    spinnerEnd();                           
-
-                    return syncMessage;
-                                
-
-        }catch( const std::runtime_error& error ){
             spinnerEnd();
-            String chainedError = String( "ERROR: Could not sync: " ) + error.what();   
-            Serial.println(chainedError);
-            throw std::runtime_error( chainedError.c_str() );
+
+            return syncMessage;
         }
-
-
+        catch (const std::runtime_error &error)
+        {
+            spinnerEnd();
+            String chainedError = String("ERROR: Could not sync: ") + error.what();
+            Serial.println(chainedError);
+            throw std::runtime_error(chainedError.c_str());
+        }
     }
 
-//TODO: !!!!!!!!!!!!! THIS IS THE PROBLEM!!!! do not use vec to RAM
-    void parse( std::vector<String>* config ){     
+    // TODO: !!!!!!!!!!!!! THIS IS THE PROBLEM!!!! do not use vec to RAM
+    void parse(std::vector<String> *config)
+    {
 
-        Serial.println( "Parsing ..." );
+        Serial.println("Parsing ...");
 
-        std::vector<String>::iterator iterator = config->begin();    
-        while ( iterator != config->end() ) {   
+        std::vector<String>::iterator iterator = config->begin();
+        while (iterator != config->end())
+        {
 
             // HEADER ----->
-            if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");        
+            if (++iterator == config->end())
+                throw std::runtime_error("Unexpected end ");
 
-            std::vector<String> tokens = tokenize( *iterator , '*' );     
-            if( tokens[ 0 ] == "BRICKCONFIG" ){ 
-                Serial.println( "[BRICKCONFIG] found..." );
+            std::vector<String> tokens = tokenize(*iterator, '*');
+            if (tokens[0] == "BRICKCONFIG")
+            {
+                Serial.println("[BRICKCONFIG] found...");
 
                 emptyAll();
 
                 // ASSETS ----->
-                if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
-                tokens = tokenize( *iterator , '*' );
-                if( tokens[ 0 ] == "ASSETS" ){ 
-                    Serial.println( "[ASSETS] found... load assets!" );
+                if (++iterator == config->end())
+                    throw std::runtime_error("Unexpected end ");
+                tokens = tokenize(*iterator, '*');
+                if (tokens[0] == "ASSETS")
+                {
+                    Serial.println("[ASSETS] found... load assets!");
 
-                    while( true ){ // read the next asset
-                        ++iterator;tokens = tokenize( *iterator , '*' );
-                        if( tokens[ 0 ] != "AS" ) break;
+                    while (true)
+                    { // read the next asset
+                        ++iterator;
+                        tokens = tokenize(*iterator, '*');
+                        if (tokens[0] != "AS")
+                            break;
 
-                        Serial.println( "[ASSET] found... load asset!" );
-                        if( tokens.size() != 4 ) throw std::runtime_error( "Parse AS error, expecting 4 tokens" );
-                        assets.push_back( assetClass( tokens[ 1 ] , tokens[ 2 ] , tokens[ 3 ]  ) );        
-                        Serial.println( "Asset added!!" );
+                        Serial.println("[ASSET] found... load asset!");
+                        if (tokens.size() != 4)
+                            throw std::runtime_error("Parse AS error, expecting 4 tokens");
+                        assets.push_back(assetClass(tokens[1], tokens[2], tokens[3]));
+                        Serial.println("Asset added!!");
                     }
-
-                }else{
-                    throw std::runtime_error( "Parse error, expecting ASSETS" );
-                }                    
+                }
+                else
+                {
+                    throw std::runtime_error("Parse error, expecting ASSETS");
+                }
 
                 //  LAYOUTS ----->
-                if( tokens[ 0 ] == "LAYOUTS" ){ 
-                    Serial.println( "[LAYOUTS] found... load layout!" );
-                    
-                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
-                    tokens = tokenize( *iterator , '*' );                                        
-                    while( true ){  // get the next  layout                        
-                        if( tokens[ 0 ] != "LAY" ) break; // end layouts?                        
+                if (tokens[0] == "LAYOUTS")
+                {
+                    Serial.println("[LAYOUTS] found... load layout!");
+
+                    if (++iterator == config->end())
+                        throw std::runtime_error("Unexpected end ");
+                    tokens = tokenize(*iterator, '*');
+                    while (true)
+                    { // get the next  layout
+                        if (tokens[0] != "LAY")
+                            break; // end layouts?
 
                         // get name
-                        String layoutName; Serial.println( "Found LAY ..." );                        
-                        if( tokens.size() == 2 ){
-                            layoutName = tokens[ 1 ];
-                        }else throw std::runtime_error( "Parse error token LAY expecting 2 tokens " );
+                        String layoutName;
+                        Serial.println("Found LAY ...");
+                        if (tokens.size() == 2)
+                        {
+                            layoutName = tokens[1];
+                        }
+                        else
+                            throw std::runtime_error("Parse error token LAY expecting 2 tokens ");
 
                         // make layout step 1
                         layoutClass layout(layoutName);
 
                         // ZONES --->
-                        if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
-                        tokens = tokenize( *iterator , '*' );
-                        while( true ){ // read the next zone                            
-                            if( tokens[ 0 ] != "LAYZONE" ) break;
+                        if (++iterator == config->end())
+                            throw std::runtime_error("Unexpected end ");
+                        tokens = tokenize(*iterator, '*');
+                        while (true)
+                        { // read the next zone
+                            if (tokens[0] != "LAYZONE")
+                                break;
 
-                            Serial.println( "Found LayoutZone ..." );                        
-                            if( tokens.size() == 4 ){
-                                String zoneTag = tokens[ 1 ];
-                                String zoneName = tokens[ 2 ];
-                                String zonePic = tokens[ 3 ];
+                            Serial.println("Found LayoutZone ...");
+                            if (tokens.size() == 4)
+                            {
+                                String zoneTag = tokens[1];
+                                String zoneName = tokens[2];
+                                String zonePic = tokens[3];
 
                                 // make layout step 2
-                                layoutZoneClass zone(zoneName,zoneTag,zonePic);
+                                layoutZoneClass zone(zoneName, zoneTag, zonePic);
 
                                 // COMPONENTS ----->
-                                while( true ){ // read the next component
-                                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
-                                    tokens = tokenize( *iterator , '*' );
-                                    if( tokens[ 0 ] != "ZONECOMP" ) break;
+                                while (true)
+                                { // read the next component
+                                    if (++iterator == config->end())
+                                        throw std::runtime_error("Unexpected end ");
+                                    tokens = tokenize(*iterator, '*');
+                                    if (tokens[0] != "ZONECOMP")
+                                        break;
 
-                                    Serial.println( "Found Zone component & defects..." );                        
-                                    if( tokens.size() >= 3 ){
+                                    Serial.println("Found Zone component & defects...");
+                                    if (tokens.size() >= 3)
+                                    {
 
                                         // make layout step 3
-                                        zone.components.push_back( tokens );
-
-                                    }else throw std::runtime_error( "Parse error token ZONECOMP expecting >=3 tokens " );                                                                        
+                                        zone.components.push_back(tokens);
+                                    }
+                                    else
+                                        throw std::runtime_error("Parse error token ZONECOMP expecting >=3 tokens ");
                                 }
 
-                                layout.zones.push_back( zone );
-
-                            }else throw std::runtime_error( "Parse error token LAYZONE expecting 4 tokens " );
+                                layout.zones.push_back(zone);
+                            }
+                            else
+                                throw std::runtime_error("Parse error token LAYZONE expecting 4 tokens ");
                         }
 
                         // add layout
-                        layouts.push_back( layout );
-
-                    }                 
-                }else{
-                    throw std::runtime_error( "Parse error, expecting LAYOUTS" );
-                }     
+                        layouts.push_back(layout);
+                    }
+                }
+                else
+                {
+                    throw std::runtime_error("Parse error, expecting LAYOUTS");
+                }
 
                 //  INSPE TYPES ----->
-                if( tokens[ 0 ] == "INSPTYPES" ){ 
-                    Serial.println( "[INSPTYPES] found... load inpection types!" );
+                if (tokens[0] == "INSPTYPES")
+                {
+                    Serial.println("[INSPTYPES] found... load inpection types!");
 
-                    if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
-                    tokens = tokenize( *iterator , '*' );                                        
-                    while( true ){  // get the next inspt
-                        if( tokens[ 0 ] != "INSP" ) break; // end inspts
-                        Serial.println( "Found INSP ..." );                        
+                    if (++iterator == config->end())
+                        throw std::runtime_error("Unexpected end ");
+                    tokens = tokenize(*iterator, '*');
+                    while (true)
+                    { // get the next inspt
+                        if (tokens[0] != "INSP")
+                            break; // end inspts
+                        Serial.println("Found INSP ...");
 
                         // get name
-                        String inspName; 
-                        if( tokens.size() >= 3 ){
-                            inspName = tokens[ 1 ];                            
-                        }else throw std::runtime_error( "Parse error token INSP expecting >= 3 tokens " );
+                        String inspName;
+                        if (tokens.size() >= 3)
+                        {
+                            inspName = tokens[1];
+                        }
+                        else
+                            throw std::runtime_error("Parse error token INSP expecting >= 3 tokens ");
 
                         inspectionTypeClass inspType(inspName);
                         tokens.erase(tokens.begin(), tokens.begin() + 2);
                         inspType.layouts = tokens;
 
-                        // FORM FIELDS --->                    
-                        while( true ){ // read the next ff    
-                            if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
-                            tokens = tokenize( *iterator , '*' );                        
-                            if( tokens[ 0 ] != "INSPFF" ) break;
+                        // FORM FIELDS --->
+                        while (true)
+                        { // read the next ff
+                            if (++iterator == config->end())
+                                throw std::runtime_error("Unexpected end ");
+                            tokens = tokenize(*iterator, '*');
+                            if (tokens[0] != "INSPFF")
+                                break;
 
-                            Serial.println( "Found FF ..." );                        
-                            if( tokens.size() == 4 ){
+                            Serial.println("Found FF ...");
+                            if (tokens.size() == 4)
+                            {
 
                                 tokens.erase(tokens.begin(), tokens.begin() + 1);
-                                inspType.formFields.push_back( tokens );
-
-                            }else throw std::runtime_error( "Parse error token FF expecting 4 tokens " );
-
+                                inspType.formFields.push_back(tokens);
+                            }
+                            else
+                                throw std::runtime_error("Parse error token FF expecting 4 tokens ");
                         }
 
                         // add inspt
-                        inspectionTypes.push_back( inspType );
-
-                    }     
-
-                }else{
-                    throw std::runtime_error( "Parse error, expecting INSPTYPES" );
-                }                    
+                        inspectionTypes.push_back(inspType);
+                    }
+                }
+                else
+                {
+                    throw std::runtime_error("Parse error, expecting INSPTYPES");
+                }
 
                 //--
 
                 //  USERS TYPES ----->
-                if( tokens[ 0 ] == "USERS" ){ 
-                    Serial.println( "[USERS] found... " );
-                    
-                    while( true ){  // get the next user            
-                        if (++iterator == config->end()) throw std::runtime_error("Unexpected end ");
-                        tokens = tokenize( *iterator , '*' );                                        
-                        if( tokens[ 0 ] != "USER" ) break; // end users
-                        Serial.println( "Found USER ..." );                        
+                if (tokens[0] == "USERS")
+                {
+                    Serial.println("[USERS] found... ");
+
+                    while (true)
+                    { // get the next user
+                        if (++iterator == config->end())
+                            throw std::runtime_error("Unexpected end ");
+                        tokens = tokenize(*iterator, '*');
+                        if (tokens[0] != "USER")
+                            break; // end users
+                        Serial.println("Found USER ...");
 
                         // get data
-                        String name; 
-                        String username; 
-                        String password; 
-                        if( tokens.size() == 4 ){
-                            name = tokens[ 1 ];
-                            username = tokens[ 2 ];
-                            password = tokens[ 3 ];
-                        }else throw std::runtime_error( "Parse error token USER expecting 4 tokens " );
+                        String name;
+                        String username;
+                        String password;
+                        if (tokens.size() == 4)
+                        {
+                            name = tokens[1];
+                            username = tokens[2];
+                            password = tokens[3];
+                        }
+                        else
+                            throw std::runtime_error("Parse error token USER expecting 4 tokens ");
 
-                        userClass nextUser( name, username, password );
-                        users.push_back( nextUser );
-                    }     
-
-                }else{
-                    throw std::runtime_error( "Parse error, expecting USERS" );
-                }                    
-
+                        userClass nextUser(name, username, password);
+                        users.push_back(nextUser);
+                    }
+                }
+                else
+                {
+                    throw std::runtime_error("Parse error, expecting USERS");
+                }
 
                 //--
 
                 // done?
-                if( tokens[ 0 ] == "END" ){ 
-                    Serial.println( "Found [END]" );                
+                if (tokens[0] == "END")
+                {
+                    Serial.println("Found [END]");
                     isLoaded = true;
                     printDebugContents();
                     return;
-                }else{
-                    Serial.println( "Parse error un expected token" );                
-                    Serial.println( tokens[ 0 ] );                                    
-                    throw std::runtime_error( "Parse error un expected token" );                    
                 }
-
+                else
+                {
+                    Serial.println("Parse error un expected token");
+                    Serial.println(tokens[0]);
+                    throw std::runtime_error("Parse error un expected token");
+                }
             }
         } // scanning
 
-        throw std::runtime_error( "Parse error: unexpected end of file." );   
+        throw std::runtime_error("Parse error: unexpected end of file.");
     }
-    
 
-    void printDebugContents() {
+    void printDebugContents()
+    {
         Serial.println("========= ASSETS =========");
-        for (const assetClass& a : assets) {
-            Serial.print("ID: "); Serial.print(a.ID);
-            Serial.print(", Layout: "); Serial.print(a.layoutName);
-            Serial.print(", Tag: "); Serial.println(a.tag);
+        for (const assetClass &a : assets)
+        {
+            Serial.print("ID: ");
+            Serial.print(a.ID);
+            Serial.print(", Layout: ");
+            Serial.print(a.layoutName);
+            Serial.print(", Tag: ");
+            Serial.println(a.tag);
         }
 
         Serial.println("========= LAYOUTS =========");
-        for (const layoutClass& l : layouts) {
-            Serial.print("Layout Name: "); Serial.println(l.name);
-            for (const layoutZoneClass& z : l.zones) {
-                Serial.print("  Zone Name: "); Serial.print(z.name);
-                Serial.print(", Tag: "); Serial.println(z.tag);
-                Serial.print(", Pic: "); Serial.println(z.zonePic);
-                for (const auto& compGroup : z.components) {
+        for (const layoutClass &l : layouts)
+        {
+            Serial.print("Layout Name: ");
+            Serial.println(l.name);
+            for (const layoutZoneClass &z : l.zones)
+            {
+                Serial.print("  Zone Name: ");
+                Serial.print(z.name);
+                Serial.print(", Tag: ");
+                Serial.println(z.tag);
+                Serial.print(", Pic: ");
+                Serial.println(z.zonePic);
+                for (const auto &compGroup : z.components)
+                {
                     Serial.print("    Component Group: ");
-                    for (const String& comp : compGroup) {
-                        Serial.print(comp); Serial.print(" | ");
+                    for (const String &comp : compGroup)
+                    {
+                        Serial.print(comp);
+                        Serial.print(" | ");
                     }
                     Serial.println();
                 }
@@ -950,27 +1018,35 @@ public:
         }
 
         Serial.println("========= INSPECTION TYPES =========");
-        for (const inspectionTypeClass& i : inspectionTypes) {
-            Serial.print("Inspection Name: "); Serial.println(i.name);
-            
+        for (const inspectionTypeClass &i : inspectionTypes)
+        {
+            Serial.print("Inspection Name: ");
+            Serial.println(i.name);
+
             Serial.print("  Layouts: ");
-            for (const String& layout : i.layouts) {
-                Serial.print(layout); Serial.print(" | ");
+            for (const String &layout : i.layouts)
+            {
+                Serial.print(layout);
+                Serial.print(" | ");
             }
             Serial.println();
 
             Serial.println("  Form Fields:");
-            for (const auto& fieldGroup : i.formFields) {
+            for (const auto &fieldGroup : i.formFields)
+            {
                 Serial.print("    ");
-                for (const String& field : fieldGroup) {
-                    Serial.print(field); Serial.print(" | ");
+                for (const String &field : fieldGroup)
+                {
+                    Serial.print(field);
+                    Serial.print(" | ");
                 }
                 Serial.println();
             }
         }
 
         Serial.println("========= USERS =========");
-        for (size_t i = 0; i < users.size(); i++) {
+        for (size_t i = 0; i < users.size(); i++)
+        {
             Serial.print("User ");
             Serial.print(i);
             Serial.print(": Name=");
@@ -978,123 +1054,128 @@ public:
             Serial.print(", Username=");
             Serial.print(users[i].username);
             Serial.print(", Password=");
-            Serial.println( "*" );  // users[i].password
+            Serial.println("*"); // users[i].password
         }
         Serial.println("-------------------");
-
     }
 
-    //==========================================================================================================================================
-    //==========================================================================================================================================
-    //==========================================================================================================================================    
-
-
-    void doSubmitInspection( String EDI, String inspectionText){
+    void doSubmitInspection(String EDI, String inspectionText)
+    {
 
         spinnerReset();
 
-        // for the record                        
-        Serial.println( EDI );                        
+        // for the record
+        Serial.println(EDI);
         String filingRecord = EDI + "\n" + inspectionText + "\n";
-        String path = saveInspectionToDisk( filingRecord );
-        String result = "";              
+        String path = saveInspectionToDisk(filingRecord);
+        String result = "";
 
-        try{
-            result =  comms->POST( serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company,  EDI );            
-            updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
+        try
+        {
+            result = comms->POST(serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company, EDI);
+            updateInspectionFileStatus(path, INSP_SUBMIT_OK, result, EDI, inspectionText);
 
             retryAllPendingInspections();
 
-            cameraManagerClass::getInstance()->syncUserPics( 
-                domainManagerClass::getInstance()->comms,  
+            cameraManagerClass::getInstance()->syncUserPics(
+                domainManagerClass::getInstance()->comms,
                 domainManagerClass::getInstance()->serverURL,
-                "/api/device/upload_photo"
-            );
-
-        }catch( const std::runtime_error& error ){
-
-            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,error.what(), EDI, inspectionText );
-            String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
-            Serial.println(errorMessage);
-            throw std::runtime_error( errorMessage.c_str() );
+                "/api/device/upload_photo");
         }
+        catch (const std::runtime_error &error)
+        {
 
+            updateInspectionFileStatus(path, INSP_SUBMIT_ERROR, error.what(), EDI, inspectionText);
+            String errorMessage = String("ERROR: Could not submit: ") + error.what();
+            Serial.println(errorMessage);
+            throw std::runtime_error(errorMessage.c_str());
+        }
     }
 
-    void doReSubmitInspection( String path, String EDI, String inspectionText){
+    void doReSubmitInspection(String path, String EDI, String inspectionText)
+    {
 
-        // for the record                        
-        Serial.println( EDI );                    
+        // for the record
+        Serial.println(EDI);
         String filingRecord = EDI + "\n" + inspectionText + "\n";
-        String result = "";  
-        
-        try{
+        String result = "";
 
-            result =  comms->POST( serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company,  EDI );
-            updateInspectionFileStatus( path, INSP_SUBMIT_OK ,result, EDI, inspectionText );
+        try
+        {
 
-            cameraManagerClass::getInstance()->syncUserPics( 
-                domainManagerClass::getInstance()->comms,  
+            result = comms->POST(serverURL, comms->ssid, comms->pass, postInspectionsPath + "?company=" + company, EDI);
+            updateInspectionFileStatus(path, INSP_SUBMIT_OK, result, EDI, inspectionText);
+
+            cameraManagerClass::getInstance()->syncUserPics(
+                domainManagerClass::getInstance()->comms,
                 domainManagerClass::getInstance()->serverURL,
-                "/api/device/upload_photo"
-            );
-
-        }catch( const std::runtime_error& error ){
-            
-            updateInspectionFileStatus( path, INSP_SUBMIT_ERROR ,error.what(), EDI, inspectionText );
-            String errorMessage = String( "ERROR: Could not submit: " )  + error.what();
-            Serial.println(errorMessage);
-            throw std::runtime_error( errorMessage.c_str() );
+                "/api/device/upload_photo");
         }
-    }    
+        catch (const std::runtime_error &error)
+        {
 
-    void doSaveInspection(){
+            updateInspectionFileStatus(path, INSP_SUBMIT_ERROR, error.what(), EDI, inspectionText);
+            String errorMessage = String("ERROR: Could not submit: ") + error.what();
+            Serial.println(errorMessage);
+            throw std::runtime_error(errorMessage.c_str());
+        }
+    }
+
+    void doSaveInspection()
+    {
 
         // save it
-        String filingRecord = 
-            currentInspection.toEDI()  + "\n" +
+        String filingRecord =
+            currentInspection.toEDI() + "\n" +
             currentInspection.toHumanString() + "\n";
-        saveInspectionToDisk( filingRecord );                       
+        saveInspectionToDisk(filingRecord);
     }
 
-
-    String saveInspectionToDisk(const String& inspectionFilingRecord) {
+    String saveInspectionToDisk(const String &inspectionFilingRecord)
+    {
 
         // Slot selection logic as above (find empty or oldest based on parsed DISPLAYHEADER* timestamp)
 
-        int oldestSlot = 1;  // the one to delete
-        uint32_t oldestTime = UINT32_MAX;  //oldest to start
-        Serial.println( "SAVE: find slot...." );
-        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
+        int oldestSlot = 1;               // the one to delete
+        uint32_t oldestTime = UINT32_MAX; // oldest to start
+        Serial.println("SAVE: find slot....");
+        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i)
+        {
 
             String path = "/kv/insp" + String(i);
             uint32_t ts = 0;
-            try {
+            try
+            {
 
                 // load
                 std::vector<String> file = loadFromKVStore(path);
                 // parse
-                for (const String& line : file) {
-                    if (line.startsWith("DISPLAYHEADER*")) {
-                        std::vector<String> tokens = tokenize( line, '*' );
-                        ts = (uint32_t)( tokens[1] ).toInt();
+                for (const String &line : file)
+                {
+                    if (line.startsWith("DISPLAYHEADER*"))
+                    {
+                        std::vector<String> tokens = tokenize(line, '*');
+                        ts = (uint32_t)(tokens[1]).toInt();
                         break;
                     }
                 }
-            } catch (...) {
-                Serial.println( "ERROR!!!: Cannor parse slot ovewrite it!" );
+            }
+            catch (...)
+            {
+                Serial.println("ERROR!!!: Cannor parse slot ovewrite it!");
                 ts = 0;
                 oldestSlot = i;
                 break;
-
             }
 
             // checking time stamp
-            if (ts == 0) {
+            if (ts == 0)
+            {
                 oldestSlot = i;
                 break;
             }
-            if (ts < oldestTime) {
+            if (ts < oldestTime)
+            {
                 oldestTime = ts;
                 oldestSlot = i;
             }
@@ -1102,80 +1183,96 @@ public:
 
         // DO SAVE
         String path = "/kv/insp" + String(oldestSlot);
-        Serial.println( "SAVE: saving: " + path );
+        Serial.println("SAVE: saving: " + path);
         saveToKVStore(path, inspectionFilingRecord);
         Serial.print("Saved inspection to slot ");
         Serial.println(oldestSlot);
 
-        return( path );
+        return (path);
     }
 
-    void updateInspectionFileStatus( String path, String statusCode, String serverReply, String EDI, String inspectionText  ){
+    void updateInspectionFileStatus(String path, String statusCode, String serverReply, String EDI, String inspectionText)
+    {
 
         // DO SAVE
         EDI.replace(INSP_SUBMIT_ERROR, statusCode); // not fouond , maybe resending that is ok
 
-        Serial.println( "UPDATE!!: " + path );
+        Serial.println("UPDATE!!: " + path);
         saveToKVStore(
-            path, 
-            EDI + "\n" + inspectionText + "\n"
-            + serverReply + "\n"
-        );
+            path,
+            EDI + "\n" + inspectionText + "\n" + serverReply + "\n");
         Serial.print("UPDATED! inspection to slot ");
         Serial.println(path);
-
     }
 
-    int retryAllPendingInspections() {
+    int retryAllPendingInspections()
+    {
 
-        Serial.println( "RETRY PENDING ====================================================" );
+        Serial.println("RETRY PENDING ====================================================");
 
         // check slots
         int inspectionsSent = 0;
-        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i) {
+        for (int i = 1; i <= NUM_INSPECTION_SLOTS; ++i)
+        {
 
             String path = "/kv/insp" + String(i);
             std::vector<String> file;
-            try {
+            try
+            {
                 file = loadFromKVStore(path);
-            } catch (...) {
+            }
+            catch (...)
+            {
                 continue; // skip unreadable slots
             }
-            if (file.empty()) continue;
+            if (file.empty())
+                continue;
 
             // Find the DISPLAYHEADER line
             String displayHeader;
-            for (size_t j = 0; j < file.size(); ++j) {
-                if (file[j].startsWith("DISPLAYHEADER*")) {
+            for (size_t j = 0; j < file.size(); ++j)
+            {
+                if (file[j].startsWith("DISPLAYHEADER*"))
+                {
                     displayHeader = file[j];
                     break;
                 }
             }
-            if (displayHeader.length() == 0) continue; // no header? skip
+            if (displayHeader.length() == 0)
+                continue; // no header? skip
 
             // Find last star and last field (status)
             std::vector<String> fields = tokenize(displayHeader, '*');
-            if (fields.empty()) continue; // Or maybe log bad header
-            if (fields.size() <= 6) continue; 
+            if (fields.empty())
+                continue; // Or maybe log bad header
+            if (fields.size() <= 6)
+                continue;
             String status = fields[6];
             status.trim();
 
             // Check if not submitted (pending)
-            if (status != INSP_SUBMIT_OK) {
+            if (status != INSP_SUBMIT_OK)
+            {
 
-                String EDI = ""; 
+                String EDI = "";
                 String inspectionText = "";
                 bool inInspection = true;
-                for (size_t j = 0; j < file.size(); ++j) {
-                    if (inInspection) {
+                for (size_t j = 0; j < file.size(); ++j)
+                {
+                    if (inInspection)
+                    {
                         EDI += file[j] + "\n";
-                        if (file[j].startsWith("END2***")) inInspection = false;
-                    } else {
+                        if (file[j].startsWith("END2***"))
+                            inInspection = false;
+                    }
+                    else
+                    {
                         inspectionText += file[j] + "\n";
                     }
                 }
 
-                if(inspectionText==""){
+                if (inspectionText == "")
+                {
                     throw std::runtime_error("ERROR: Could not parse inspection record, end not found");
                 }
 
@@ -1183,31 +1280,30 @@ public:
                 EDI.trim();
                 inspectionText.trim();
 
-                // Try to resubmit, ignore errors 
-                try {
+                // Try to resubmit, ignore errors
+                try
+                {
 
-                    Serial.println( "RETRY >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+                    Serial.println("RETRY >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                     doReSubmitInspection(path, EDI, inspectionText);
                     inspectionsSent++;
-                    Serial.println( "RETRY >>>>>>>>>>>>>>> SUCCESS!!!" );
+                    Serial.println("RETRY >>>>>>>>>>>>>>> SUCCESS!!!");
+                }
+                catch (const std::runtime_error &error)
+                {
 
-                }catch( const std::runtime_error& error ){                    
-                    
-                    Serial.println( "RETRY >>>>>>>>>>>>>>> FAIL!!!" );                    
+                    Serial.println("RETRY >>>>>>>>>>>>>>> FAIL!!!");
                     // keep going , eat it
                 }
-            } 
+            }
 
         } // for
 
         return inspectionsSent;
-    }    
-    
-    //==========================================================================================================================================
-    //==========================================================================================================================================
-    //==========================================================================================================================================    
+    }
 
-    int syncLayoutPics() {
+    int syncLayoutPics()
+    {
 
         Serial.println("SYNC << LAYOUT >> PICS ====================================================");
         int picsLoaded = 0;
@@ -1219,9 +1315,12 @@ public:
         // 2) Collect expected UUIDs from your layouts list
         Serial.println("Needed pics ->");
         std::vector<String> expectedUUIDs;
-        for (auto& layout : layouts) {
-            for (auto& zone : layout.zones) {
-                if (zone.zonePic.length() > 0){
+        for (auto &layout : layouts)
+        {
+            for (auto &zone : layout.zones)
+            {
+                if (zone.zonePic.length() > 0)
+                {
                     expectedUUIDs.push_back(zone.zonePic);
                     Serial.println(zone.zonePic);
                 }
@@ -1230,12 +1329,19 @@ public:
 
         // 3) ORPHAN CHECK: Does local layout exist in expected list?
         Serial.println("Check vs local pics , needed and orphaned ->");
-        for (auto& local : localLayouts) {
+        for (auto &local : localLayouts)
+        {
             bool found = false;
-            for (const String& expected : expectedUUIDs) {
-                if (local.uuid == expected) { found = true; break; }
+            for (const String &expected : expectedUUIDs)
+            {
+                if (local.uuid == expected)
+                {
+                    found = true;
+                    break;
+                }
             }
-            if (!found) {
+            if (!found)
+            {
                 Serial.print("Not needed!!! ZAP-> ");
                 Serial.println(local.uuid);
                 cameraManagerClass::getInstance()->zapJPGfromWarehouse(local.uuid);
@@ -1244,100 +1350,116 @@ public:
         }
 
         // 4) DOWNLOAD CHECK: Does expected layout exist in local inventory?
-        Serial.println("Download missing ->");                
-        for (const String& expectedUUID : expectedUUIDs) {
-
+        Serial.println("Download missing ->");
+        for (const String &expectedUUID : expectedUUIDs)
+        {
 
             bool exists = false;
-            for (auto& local : localLayouts) {
-                if (local.uuid == expectedUUID) { 
-                    exists = true; break; 
+            for (auto &local : localLayouts)
+            {
+                if (local.uuid == expectedUUID)
+                {
+                    exists = true;
+                    break;
                 }
             }
 
-            if(exists){
+            if (exists)
+            {
                 Serial.print("Already in storage! -> ");
                 Serial.println(expectedUUID);
             }
 
-            if (!exists) {
+            if (!exists)
+            {
                 Serial.print("Missing in storage! -> ");
                 Serial.println(expectedUUID);
 
-                uint8_t* img = NULL;
+                uint8_t *img = NULL;
                 size_t imgLen = 0; // Move outside so catch/logs can see it
-                
-                try {
+
+                try
+                {
                     img = comms->GETImageToSDRAM(serverURL, expectedUUID, imgLen);
-                    
-                    if (img && imgLen > 0) {
+
+                    if (img && imgLen > 0)
+                    {
                         // NJ STYLE: Trust no one. Check buffer limits before memcpy.
-                        if (imgLen > (PIC_SLOT_SIZE - 64)) {
+                        if (imgLen > (PIC_SLOT_SIZE - 64))
+                        {
                             throw std::runtime_error("SYNC EXCEPTION: Downloaded image exceeds warehouse slot size!");
                         }
 
                         memcpy(cameraManagerClass::getInstance()->getJpegBuffer(), img, imgLen);
                         cameraManagerClass::getInstance()->setLastJpegSize(imgLen);
-                        
+
                         // Explicitly saving with the Server's UUID and Layout type
                         cameraManagerClass::getInstance()->saveJPGSDRAMToWarehouse(expectedUUID, BT_LAYOUT_PIC);
-                        
+
                         SDRAM.free(img);
                         img = NULL; // Clean pointer after free
                         picsLoaded++;
                     }
-                } catch (...) {
-                    if (img != NULL) {
+                }
+                catch (...)
+                {
+                    if (img != NULL)
+                    {
                         SDRAM.free(img);
                         img = NULL;
                     }
-                    Serial.print("[SYNC ERROR] Failed downloading/saving UUID: "); Serial.println(expectedUUID);
+                    Serial.print("[SYNC ERROR] Failed downloading/saving UUID: ");
+                    Serial.println(expectedUUID);
                     throw; // Re-throw so the system knows we are in a bad state
                 }
             }
-
-
         }
 
         return picsLoaded;
     }
 
-
     //----------------
 
-    void zapPicsXXX() {
+    void zapPicsXXX()
+    {
 
         Serial.println("ZAP PICS (DIR SCAN) =========================================");
 
         // Ensure QSPI filesystem is accessible.
         openQSPI();
-        DIR* dir = openDirFromQSPI();
+        DIR *dir = openDirFromQSPI();
 
-        struct dirent* de;
+        struct dirent *de;
         int removedCount = 0;
 
-        while ((de = readdir(dir)) != NULL) {
-            const char* name = de->d_name;
+        while ((de = readdir(dir)) != NULL)
+        {
+            const char *name = de->d_name;
 
             // Ignore "." and ".." and directories
-            if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0'))) {
+            if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0')))
+            {
                 continue;
             }
-            if (de->d_type == DT_DIR) {
+            if (de->d_type == DT_DIR)
+            {
                 continue;
             }
 
             // Only delete our own files: brickimg_*.*.
-            const char* prefix = "brickimg_";
+            const char *prefix = "brickimg_";
             int prefixLen = 9; // strlen("brickimg_");
             bool isBrickImg = true;
-            for (int i = 0; i < prefixLen; i++) {
-                if (name[i] != prefix[i]) {
+            for (int i = 0; i < prefixLen; i++)
+            {
+                if (name[i] != prefix[i])
+                {
                     isBrickImg = false;
                     break;
                 }
             }
-            if (!isBrickImg) {
+            if (!isBrickImg)
+            {
                 continue;
             }
 
@@ -1348,27 +1470,21 @@ public:
             Serial.println(fullPath);
 
             int rc = remove(fullPath.c_str());
-            if (rc == 0) {
+            if (rc == 0)
+            {
                 Serial.println("[ZAP PICS]   OK (deleted)");
                 removedCount++;
-            } else {
+            }
+            else
+            {
                 Serial.println("[ZAP PICS]   ERROR (could not delete)");
             }
         }
 
-        
-        closeDirFromQSPI( dir );
+        closeDirFromQSPI(dir);
 
         Serial.print("ZAP PICS DONE, total removed: ");
         Serial.println(removedCount);
         Serial.println("=============================================================");
     }
-
-    //==========================================================================================================================================
-    //==========================================================================================================================================
-    //==========================================================================================================================================    
-
 };
-
-
-
