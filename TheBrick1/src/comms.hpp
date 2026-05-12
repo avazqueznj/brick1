@@ -781,6 +781,11 @@ public:
 
             Serial.println("RTC synced!");
         }
+        catch (const std::exception &e)
+        {
+            String chainMsg = "NTP Sync failed!! -> ignored -> " + String( e.what() );
+            Serial.println(chainMsg);
+        }        
         catch (...)
         {
             timeClient.end();
